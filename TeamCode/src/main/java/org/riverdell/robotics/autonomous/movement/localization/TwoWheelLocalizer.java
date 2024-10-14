@@ -36,14 +36,11 @@ import java.util.List;
  */
 public class TwoWheelLocalizer extends TwoTrackingWheelLocalizer {
 
-    public static double TICKS_PER_REV = 2000;
-    public static double WHEEL_RADIUS = 0.94488189; // 48
+    public static double TICKS_PER_REV = 4096;
+    public static double WHEEL_RADIUS = 0.68897637795; // 48
     public static double GEAR_RATIO = 1;
 
     private final HypnoticRobot hypnoticRobot;
-
-    private final Motor.Encoder lateral;
-    private final Motor.Encoder perpendicular;
 
     public TwoWheelLocalizer(HypnoticRobot hypnoticRobot) {
         super(Arrays.asList(
@@ -52,9 +49,6 @@ public class TwoWheelLocalizer extends TwoTrackingWheelLocalizer {
         ));
 
         this.hypnoticRobot = hypnoticRobot;
-
-        this.lateral = new Motor(hypnoticRobot.hardwareMap, "backRight").encoder;
-        this.perpendicular = new Motor(hypnoticRobot.hardwareMap, "frontLeft").encoder;
     }
 
     public static double encoderTicksToInches(double ticks) {
@@ -64,8 +58,8 @@ public class TwoWheelLocalizer extends TwoTrackingWheelLocalizer {
     @NonNull
     @Override
     public List<Double> getWheelPositions() {
-        double lateralPos = lateral.getPosition();
-        double  perpPos = perpendicular.getPosition();
+        double lateralPos = hypnoticRobot.getDrivetrain().getPinpointDriver().getPosX();
+        double perpPos = hypnoticRobot.getDrivetrain().getPinpointDriver().getPosY();
         return Arrays.asList(
                 encoderTicksToInches(lateralPos),
                 encoderTicksToInches(perpPos)
@@ -74,7 +68,7 @@ public class TwoWheelLocalizer extends TwoTrackingWheelLocalizer {
 
     @Override
     public double getHeading() {
-        return hypnoticRobot.getDrivetrain().imu().getYaw(AngleUnit.RADIANS);
+        return hypnoticRobot.getDrivetrain().imu();
     }
 
     @NonNull

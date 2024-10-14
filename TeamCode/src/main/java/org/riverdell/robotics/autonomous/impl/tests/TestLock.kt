@@ -9,6 +9,7 @@ import org.riverdell.robotics.autonomous.movement.lockToPosition
 @Autonomous(name = "Test | Lock", group = "Test")
 class TestLock : HypnoticAuto({ opMode ->
     lockToPosition(Pose(0.0, 0.0, 0.0.degrees)) { _, _ ->
-        false
+        true // when sample dropped or something
     }
+    // move on
 })

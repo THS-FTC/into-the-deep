@@ -47,7 +47,7 @@ abstract class HypnoticAuto(
             )
             multipleTelemetry.addData(
                 "IMU",
-                drivetrain.imu().getYaw(AngleUnit.DEGREES)
+                drivetrain.imu()
             )
             multipleTelemetry.addData(
                 "Pose",
@@ -73,7 +73,7 @@ abstract class HypnoticAuto(
                 )
                 multipleTelemetry.addData(
                     "IMU",
-                    drivetrain.imu().getYaw(AngleUnit.DEGREES)
+                    drivetrain.imu()
                 )
                 multipleTelemetry.addData(
                     "Pose",

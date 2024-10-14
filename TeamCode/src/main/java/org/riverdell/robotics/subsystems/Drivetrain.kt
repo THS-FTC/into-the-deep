@@ -13,6 +13,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit
 import org.riverdell.robotics.HypnoticRobot
 import org.riverdell.robotics.autonomous.HypnoticAuto
 import org.riverdell.robotics.autonomous.movement.localization.TwoWheelLocalizer
+import org.riverdell.robotics.gobilda.GoBildaPinpointDriver
 import org.riverdell.robotics.utilities.hardware
 
 class Drivetrain(private val opMode: HypnoticRobot) : AbstractSubsystem()
@@ -23,9 +24,9 @@ class Drivetrain(private val opMode: HypnoticRobot) : AbstractSubsystem()
     lateinit var backRight: DcMotorEx
     lateinit var backLeft: DcMotorEx
 
-    private lateinit var imu: IMU
+    lateinit var pinpointDriver: GoBildaPinpointDriver
 
-    private val imuState by state(write = { _ -> }, read = { imu.robotYawPitchRollAngles })
+    private val imuState by state(write = { _ -> }, read = { pinpointDriver.heading })
     private val voltageState by state(write = { _ -> }, read = {
         opMode.hardwareMap.voltageSensor.first().voltage
     })
@@ -51,7 +52,7 @@ class Drivetrain(private val opMode: HypnoticRobot) : AbstractSubsystem()
 
     fun driveFieldCentric(driverOp: GamepadEx, scaleFactor: Double)
     {
-        val heading = imuState.current().getYaw(AngleUnit.DEGREES)
+        val heading = imuState.current()
         backingDriveBase.driveFieldCentric(
             -driverOp.leftX * scaleFactor,
             -driverOp.leftY * scaleFactor,
@@ -71,16 +72,7 @@ class Drivetrain(private val opMode: HypnoticRobot) : AbstractSubsystem()
      */
     override fun doInitialize()
     {
-        imu = opMode.hardware<IMU>("imu")
-        imu.initialize(
-            IMU.Parameters(
-                RevHubOrientationOnRobot(
-                    RevHubOrientationOnRobot.LogoFacingDirection.UP,
-                    RevHubOrientationOnRobot.UsbFacingDirection.RIGHT
-                )
-            )
-        )
-        imu.resetYaw()
+        pinpointDriver = opMode.hardware<GoBildaPinpointDriver>("pinpoint")
 
         if (opMode is HypnoticAuto)
         {

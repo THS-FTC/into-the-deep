@@ -46,16 +46,15 @@ class HypnoticTeleOp : HypnoticRobot()
         }
     }
 
-    private fun buildCommands()
-    {
-        /*gp1Commands.where(ButtonType.ButtonA)
+    private fun buildCommands() {
+
+        gp1Commands.where(ButtonType.ButtonA)
             .triggers {
                 test.motorGroup.goTo(-500)
 
             }.andIsHeldUntilReleasedWhere {
                 test.motorGroup.goTo(-100)
-            }*/
-
+            }
 
         gp1Commands.doButtonUpdatesManually()
         gp2Commands.doButtonUpdatesManually()

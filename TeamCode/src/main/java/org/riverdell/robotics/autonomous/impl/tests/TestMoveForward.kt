@@ -1,6 +1,7 @@
 package org.riverdell.robotics.autonomous.impl.tests
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous
+import io.liftgate.robotics.mono.pipeline.simultaneous
 import io.liftgate.robotics.mono.pipeline.single
 import org.riverdell.robotics.autonomous.HypnoticAuto
 import org.riverdell.robotics.autonomous.movement.geometry.Pose
@@ -16,30 +17,23 @@ class TestMoveForward : HypnoticAuto({ opMode ->
         Pose(
             0.0,
             0.0,
-            0.0
+            50.degrees
         )
-    )
+    ) {
+        // this area can customize a certain part of the path
+
+        withCustomMaxRotationalSpeed(0.5)
+    }
+
     navigatePurePursuit(
         PositionWaypoint(
             Pose(0.0, 0.0, 0.degrees),
             15.0
         ),
+
         PositionWaypoint(
             Pose(0.0, -40.0, 0.degrees),
             15.0
         )
     )
-
-    single("move forward and backward") {
-        purePursuitNavigateTo(
-            PositionWaypoint(
-                Pose(0.0, 0.0, 0.degrees),
-                15.0
-            ),
-            PositionWaypoint(
-                Pose(0.0, -40.0, 0.degrees),
-                15.0
-            ),
-        )
-    }
 })

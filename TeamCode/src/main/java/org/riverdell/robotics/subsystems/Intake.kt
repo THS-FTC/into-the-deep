@@ -20,16 +20,11 @@ class Intake(opMode: LinearOpMode) : AbstractSubsystem()
     private val wrist = motionProfiledServo("intake_wrist", wristConstraints)
 
     private val rotationConstraints = konfig<MotionProfileConstraints> { withCustomFileID("intake_grip_motionprofile") }
-    private val leftGrip = motionProfiledServo("intake_grip_left", rotationConstraints)
-    private val rightGrip = motionProfiledServo("intake_grip_right", rotationConstraints)
+    private val Grip = motionProfiledServo("intake_grip", rotationConstraints)
 
-    fun wristRotateTo(position: Double) = wrist.setMotionProfileTarget(position)
-    fun gripsRotateTo(position: Double) = CompletableFuture.allOf(
-        leftGrip.setMotionProfileTarget(
-            if (intakeConfig.get().leftIsReversed)
-                (1.0 - position) else position
-        ),
-        rightGrip.setMotionProfileTarget(
+    fun iWristRotateTo(position: Double) = wrist.setMotionProfileTarget(position)
+    fun iGripRotateTo(position: Double) = CompletableFuture.allOf(
+        Grip.setMotionProfileTarget(
             if (!intakeConfig.get().leftIsReversed)
                 (1.0 - position) else position
         )

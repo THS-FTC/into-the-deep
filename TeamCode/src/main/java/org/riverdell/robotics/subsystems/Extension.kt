@@ -31,10 +31,11 @@ class Extension(opMode: LinearOpMode) : AbstractSubsystem()
             kV, kA, kStatic,
             master = leftSlide,
             slaves = listOf(rightSlide)
-        ).withMotionProfiling(motionProfileConstraints)
+        )
     }
 
     fun extendToAndStayAt(position: Int) = slides.goTo(position)
+
     fun isExtending() = slides.isTravelling()
 
     override fun start()
@@ -44,7 +45,7 @@ class Extension(opMode: LinearOpMode) : AbstractSubsystem()
 
     override fun doInitialize()
     {
-
+        //slides.goTo(0)
     }
 
 }
