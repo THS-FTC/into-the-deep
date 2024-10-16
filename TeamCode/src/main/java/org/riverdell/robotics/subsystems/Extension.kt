@@ -35,7 +35,6 @@ class Extension(opMode: LinearOpMode) : AbstractSubsystem()
     }
 
     fun extendToAndStayAt(position: Int) = slides.goTo(position)
-
     fun isExtending() = slides.isTravelling()
 
     override fun start()

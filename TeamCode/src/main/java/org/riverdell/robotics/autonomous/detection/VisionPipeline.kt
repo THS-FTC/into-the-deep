@@ -19,18 +19,21 @@ class VisionPipeline(
 ) : AbstractSubsystem()
 {
     private lateinit var portal: VisionPortal
-    private lateinit var sampleDetection: SampleDetection
-
-    override fun composeStageContext() = TODO()
+    lateinit var sampleDetection: SampleDetection
 
     override fun start()
+    {
+
+    }
+
+    override fun doInitialize()
     {
         sampleDetection = SampleDetection()
         portal = VisionPortal.Builder()
             .setCamera(
                 opMode.hardware<WebcamName>("webcam")
             )
-            .setCameraResolution(Size(1920, 1080))
+            .setCameraResolution(Size(640, 480))
             .enableLiveView(true)
             .setAutoStopLiveView(true)
             .addProcessors(sampleDetection)
@@ -39,18 +42,12 @@ class VisionPipeline(
 
         FtcDashboard.getInstance().startCameraStream(
             sampleDetection,
-            60.0
+            30.0
         )
-    }
-
-    override fun doInitialize()
-    {
     }
 
     override fun dispose()
     {
         portal.close()
     }
-
-    override fun isCompleted() = true
 }

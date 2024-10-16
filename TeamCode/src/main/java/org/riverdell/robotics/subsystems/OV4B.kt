@@ -21,8 +21,8 @@ class OV4B(opMode: HypnoticRobot) : AbstractSubsystem()
     private val clawConstraints = konfig<MotionProfileConstraints>()
     private val clawRotation = motionProfiledServo("ov4b_claw", clawConstraints)
 
-    fun OclawRotateTo(position: Double) = clawRotation.setMotionProfileTarget(position)
-    fun O4bRotateTo(position: Double) = CompletableFuture.allOf(
+    fun clawRotateTo(position: Double) = clawRotation.setMotionProfileTarget(position)
+    fun v4bRotateTo(position: Double) = CompletableFuture.allOf(
         leftRotation.setMotionProfileTarget(
             if (Ov4bConfig.get().leftIsReversed)
                 (1.0 - position) else position
