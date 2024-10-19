@@ -7,6 +7,8 @@ import com.acmerobotics.roadrunner.localization.TwoTrackingWheelLocalizer;
 import com.arcrobotics.ftclib.hardware.motors.Motor;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
 import org.riverdell.robotics.HypnoticRobot;
 import org.riverdell.robotics.autonomous.movement.geometry.Pose;
 
@@ -36,10 +38,6 @@ import java.util.List;
  */
 public class TwoWheelLocalizer extends TwoTrackingWheelLocalizer {
 
-    public static double TICKS_PER_REV = 4096;
-    public static double WHEEL_RADIUS = 0.68897637795; // 48
-    public static double GEAR_RATIO = 1;
-
     private final HypnoticRobot hypnoticRobot;
 
     public TwoWheelLocalizer(HypnoticRobot hypnoticRobot) {
@@ -51,18 +49,15 @@ public class TwoWheelLocalizer extends TwoTrackingWheelLocalizer {
         this.hypnoticRobot = hypnoticRobot;
     }
 
-    public static double encoderTicksToInches(double ticks) {
-        return WHEEL_RADIUS * 2 * Math.PI * GEAR_RATIO * ticks / TICKS_PER_REV;
-    }
-
     @NonNull
     @Override
     public List<Double> getWheelPositions() {
-        double lateralPos = hypnoticRobot.getDrivetrain().getPinpointDriver().getPosX();
-        double perpPos = hypnoticRobot.getDrivetrain().getPinpointDriver().getPosY();
+        hypnoticRobot.getDrivetrain().getPinpointDriver().update();
+
+        Pose2D pose = hypnoticRobot.getDrivetrain().getPinpointDriver().getPosition();
         return Arrays.asList(
-                encoderTicksToInches(lateralPos),
-                encoderTicksToInches(perpPos)
+                pose.getX(DistanceUnit.INCH),
+                pose.getY(DistanceUnit.INCH)
         );
     }
 

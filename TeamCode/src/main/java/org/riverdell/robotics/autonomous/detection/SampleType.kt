@@ -7,8 +7,8 @@ enum class SampleType(
     val colorRangeMaximum: Scalar
 ) {
     Blue(
-        colorRangeMinimum = Scalar(90.0, 100.0, 100.0),
-        colorRangeMaximum = Scalar(130.0, 255.0, 255.0)
+        colorRangeMinimum = Scalar(50.0, 0.0, 50.0),
+        colorRangeMaximum = Scalar(128.0, 230.0, 255.0)
     ),
     Yellow(
         colorRangeMinimum = Scalar(20.0, 100.0, 100.0),

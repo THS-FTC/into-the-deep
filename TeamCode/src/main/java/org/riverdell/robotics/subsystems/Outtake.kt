@@ -13,7 +13,7 @@ class Outtake(opMode: LinearOpMode) : AbstractSubsystem()
     @Serializable
     data class OuttakeConfig(
         val openPosition: Double = 1.0,
-        val closedPosition: Double = 0.5,
+        val closedPosition: Double = 0.0,
         val frontPosition: Double = 0.0,
         val backPosition: Double = 1.0,
     )
@@ -32,47 +32,46 @@ class Outtake(opMode: LinearOpMode) : AbstractSubsystem()
     private val wristConstraints = konfig<MotionProfileConstraints> { withCustomFileID("outtake_wrist_motionprofile") }
     private val wrist = motionProfiledServo("outtake_wrist", wristConstraints)
 
-    private val rotationConstraints = konfig<MotionProfileConstraints> { withCustomFileID("outtake_grip_motionprofile") }
-    private val actuator = motionProfiledServo("outtake_grip", rotationConstraints)
+    private val rotationConstraints = konfig<MotionProfileConstraints> { withCustomFileID("intake_grip_motionprofile") }
+    private val actuator = motionProfiledServo("intake_grip", rotationConstraints) // change to outtakegrip
 
     private var currentOuttakeState = OuttakeState.Open
     private var currentWristState = WristState.Front
 
-    // extendoRetract
-    // intakeTransfer
-    // outtake active
-
-    fun idle() = toggleOuttakeRotation(WristState.Front)
-        .thenAccept {
-            println("something happened")
-        }
-        .thenCompose {
-            toggleOuttakeGrip(OuttakeState.Open)
-        }
-
-
-    fun active() = toggleOuttakeGrip(OuttakeState.Closed)
-        // TODO: release intake grip
-        /*.thenCompose {
-            toggleIntakeGrip(IntakeState.Open)
-        }*/
-        .thenCompose {
-            toggleOuttakeRotation(WristState.Back)
-        }
-
-    fun toggleOuttakeGrip(state: OuttakeState = OuttakeState.Open): CompletableFuture<StateResult>
+    fun setOuttakeGrip(newState: OuttakeState): CompletableFuture<Void>
     {
-        if (currentOuttakeState == state)
+        if (currentOuttakeState == newState)
         {
             return CompletableFuture.completedFuture(null)
         }
 
-        return if (state == OuttakeState.Open)
+        return if (newState == OuttakeState.Open)
         {
             gripRotateTo(outtakeConfig.get().openPosition)
+                .thenAccept {
+                    println(it)
+                }
         } else
         {
             gripRotateTo(outtakeConfig.get().closedPosition)
+                .thenAccept {
+                    println(it)
+                }
+        }
+    }
+
+    fun toggleOuttakeGrip(): CompletableFuture<StateResult>
+    {
+        return if (currentOuttakeState == OuttakeState.Closed)
+        {
+            gripRotateTo(outtakeConfig.get().openPosition).apply {
+                currentOuttakeState = OuttakeState.Open
+            }
+        } else
+        {
+            gripRotateTo(outtakeConfig.get().closedPosition).apply {
+                currentOuttakeState = OuttakeState.Closed
+            }
         }
     }
 
@@ -91,7 +90,6 @@ class Outtake(opMode: LinearOpMode) : AbstractSubsystem()
             wristRotateTo(outtakeConfig.get().backPosition)
         }
     }
-
 
     fun wristRotateTo(position: Double) = wrist.setMotionProfileTarget(position)
     fun gripRotateTo(position: Double) = actuator.setMotionProfileTarget(position)

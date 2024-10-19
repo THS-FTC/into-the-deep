@@ -76,6 +76,11 @@ class Drivetrain(private val opMode: HypnoticRobot) : AbstractSubsystem()
 
         if (opMode is HypnoticAuto)
         {
+            pinpointDriver.setOffsets(-84.0, -168.0) // TUNE THIS
+            pinpointDriver.setEncoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD)
+            pinpointDriver.recalibrateIMU()
+            pinpointDriver.resetPosAndIMU()
+
             frontLeft = opMode.hardware<DcMotorEx>("frontLeft")
             frontRight = opMode.hardware<DcMotorEx>("frontRight")
             backLeft = opMode.hardware<DcMotorEx>("backLeft")
@@ -106,6 +111,7 @@ class Drivetrain(private val opMode: HypnoticRobot) : AbstractSubsystem()
         val backRight = Motor(opMode.hardwareMap, "backRight")
         val frontLeft = Motor(opMode.hardwareMap, "frontLeft")
         val frontRight = Motor(opMode.hardwareMap, "frontRight")
+        frontRight.inverted = true
 
         backingDriveBase = MecanumDrive(
             frontLeft, frontRight, backLeft, backRight

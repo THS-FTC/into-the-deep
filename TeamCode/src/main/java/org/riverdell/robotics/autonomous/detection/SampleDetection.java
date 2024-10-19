@@ -47,7 +47,9 @@ public class SampleDetection implements CameraStreamSource, VisionProcessor {
 
     // dont tune
     public static double MIN_SAMPLE_AREA = 5000.0;
-    public static double SAMPLE_AREA_ROLLING_AVERAGE_MAX_DEVIATION = 4500.0;
+
+    public static double SAMPLE_AREA_AVERAGE_DURING_HOVER = 10000.0; // typical avg value
+    public static double SAMPLE_AREA_AVERAGE_DURING_HOVER_MAX_DEVIATION = 500000.0; // how much it fluctuates as you turn it
 
     // dont tune
     public static double SAMPLE_TRACKING_DISTANCE = 300.0;
@@ -64,15 +66,21 @@ public class SampleDetection implements CameraStreamSource, VisionProcessor {
     private double guidanceRotationAngle = 0.0;
     private double sampleArea = 0.0;
 
-    private final RollingAverage areaAverage = new RollingAverage(10);
-    private boolean areaAverageDirty = false;
-
     private Point autoSnapCenterLock = null;
     private long autoSnapHeartbeat = 0L;
 
-    public void markAreaAverageDirty() {
-        areaAverageDirty = true;
-    }
+    /**
+     *
+     colorRangeMinimum = Scalar(50.0, 0.0, 50.0),
+     colorRangeMaximum = Scalar(128.0, 230.0, 255.0)
+     */
+    public static double MIN_B = 50.0;
+    public static double MIN_G = 0.0;
+    public static double MIN_R = 50.0;
+
+    public static double MAX_B = 128.0;
+    public static double MAX_G = 230.0;
+    public static double MAX_R = 255.0;
 
     private SampleType detectionType = SampleType.Blue;
     private Supplier<Double> currentWristPosition = () -> 0.0;
@@ -97,6 +105,8 @@ public class SampleDetection implements CameraStreamSource, VisionProcessor {
         lastFrame.set(Bitmap.createBitmap(width, height, Bitmap.Config.RGB_565));
     }
 
+    public static int SET_TO_1_IF_COLOR_TUNING = 0;
+
     @Override
     public Object processFrame(Mat input, long captureTimeNanos) {
         Mat hsvMat = new Mat();
@@ -104,12 +114,21 @@ public class SampleDetection implements CameraStreamSource, VisionProcessor {
 
         // Create a mask for the specified color range
         Mat colorMask = new Mat();
-        Core.inRange(
-                hsvMat,
-                detectionType.getColorRangeMinimum(),
-                detectionType.getColorRangeMaximum(),
-                colorMask
-        );
+        if (SET_TO_1_IF_COLOR_TUNING == 0) {
+            Core.inRange(
+                    hsvMat,
+                    new Scalar(MIN_B, MIN_G, MIN_R),
+                    new Scalar(MAX_B, MAX_G, MAX_R),
+                    colorMask
+            );
+        } else {
+            Core.inRange(
+                    hsvMat,
+                    detectionType.getColorRangeMinimum(),
+                    detectionType.getColorRangeMaximum(),
+                    colorMask
+            );
+        }
 
         // Detect the sample object in the specified mask
         Point sampleCenter = detectSample(input, colorMask);
@@ -122,7 +141,7 @@ public class SampleDetection implements CameraStreamSource, VisionProcessor {
 
         // Convert the processed frame (Mat) to a Bitmap for FTC dashboard display
         Bitmap bitmap = Bitmap.createBitmap(input.width(), input.height(), Bitmap.Config.RGB_565);
-        Utils.matToBitmap(input, bitmap);
+        Utils.matToBitmap(SET_TO_1_IF_COLOR_TUNING == 1 ? input : colorMask, bitmap);
 
         // Update the last frame
         lastFrame.set(bitmap);
@@ -139,11 +158,6 @@ public class SampleDetection implements CameraStreamSource, VisionProcessor {
         Point sampleCenter = null;
         double minDistance = SAMPLE_TRACKING_DISTANCE;
 
-        if (areaAverageDirty) {
-            areaAverage.reset();
-            areaAverageDirty = false;
-        }
-
         // Loop through contours to find the largest contour (which should be the sample)
         for (MatOfPoint contour : contours) {
             Rect localBoundingBox = Imgproc.boundingRect(contour);
@@ -155,12 +169,7 @@ public class SampleDetection implements CameraStreamSource, VisionProcessor {
                 continue;
             }
 
-            boolean outlier = areaAverage.isOutlier(area, SAMPLE_AREA_ROLLING_AVERAGE_MAX_DEVIATION);
-            if (!areaAverage.isAvailable() || !outlier) {
-                areaAverage.add(area);
-            }
-
-            if (areaAverage.isAvailable() && !outlier) {
+            if (Math.abs(area - SAMPLE_AREA_AVERAGE_DURING_HOVER) < SAMPLE_AREA_AVERAGE_DURING_HOVER_MAX_DEVIATION) {
                 boundingBox = localBoundingBox;
                 sampleCenter = localSampleCenter;
                 minDistance = distance;
