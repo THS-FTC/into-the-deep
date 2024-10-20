@@ -63,6 +63,7 @@ class HypnoticTeleOp : HypnoticRobot()
                 intake.setRotationPulley(Intake.RotationState.Grab)
             }
             .whenPressedOnce()
+
         gp1Commands.where(ButtonType.BumperLeft)
             .triggers {
                 extension.extendToAndStayAt(-600)
