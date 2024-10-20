@@ -12,7 +12,7 @@ class Outtake(opMode: LinearOpMode) : AbstractSubsystem()
 {
     @Serializable
     data class OuttakeConfig(
-        val openPosition: Double = 1.0,
+        val openPosition: Double = 0.5,
         val closedPosition: Double = 0.0,
         val frontPosition: Double = 0.0,
         val backPosition: Double = 1.0,
@@ -28,12 +28,15 @@ class Outtake(opMode: LinearOpMode) : AbstractSubsystem()
     }
 
     private val outtakeConfig = konfig<OuttakeConfig>()
+        .apply {
+            println("HORS ${get().openPosition}")
+        }
 
     private val wristConstraints = konfig<MotionProfileConstraints> { withCustomFileID("outtake_wrist_motionprofile") }
     private val wrist = motionProfiledServo("outtake_wrist", wristConstraints)
 
-    private val rotationConstraints = konfig<MotionProfileConstraints> { withCustomFileID("intake_grip_motionprofile") }
-    private val actuator = motionProfiledServo("intake_grip", rotationConstraints) // change to outtakegrip
+    private val rotationConstraints = konfig<MotionProfileConstraints> { withCustomFileID("outtake_grip_motionprofile") }
+    private val actuator = motionProfiledServo("outtake_grip", rotationConstraints) // change to outtakegrip
 
     private var currentOuttakeState = OuttakeState.Open
     private var currentWristState = WristState.Front
@@ -101,6 +104,6 @@ class Outtake(opMode: LinearOpMode) : AbstractSubsystem()
 
     override fun doInitialize()
     {
-
+        gripRotateTo(outtakeConfig.get().openPosition)
     }
 }

@@ -10,6 +10,10 @@ import io.liftgate.robotics.mono.subsystem.Subsystem
 import io.liftgate.robotics.mono.subsystem.System
 import org.riverdell.robotics.autonomous.impl.tests.ExampleSystem
 import org.riverdell.robotics.subsystems.Drivetrain
+import org.riverdell.robotics.subsystems.Extension
+import org.riverdell.robotics.subsystems.IV4B
+import org.riverdell.robotics.subsystems.Intake
+import org.riverdell.robotics.subsystems.Lift
 import org.riverdell.robotics.subsystems.Outtake
 
 abstract class HypnoticRobot : LinearOpMode(), System
@@ -23,7 +27,10 @@ abstract class HypnoticRobot : LinearOpMode(), System
     override val subsystems: MutableSet<Subsystem> = mutableSetOf()
 
     val drivetrain by lazy { Drivetrain(this) }
-    val outtake by lazy { Outtake(this) }
+    val intake by lazy { Intake(this) }
+    val iv4b by lazy { IV4B(this) }
+    val lift by lazy { Lift(this) }
+    val extension by lazy {Extension(this)}
 
     val multipleTelemetry by lazy {
         MultipleTelemetry(
@@ -52,7 +59,7 @@ abstract class HypnoticRobot : LinearOpMode(), System
         instance = this
 
         register(
-            drivetrain, outtake,
+            drivetrain, intake, iv4b, lift, extension,
             *additionalSubSystems().toTypedArray()
         )
 
