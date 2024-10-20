@@ -14,11 +14,15 @@ class Outtake(opMode: LinearOpMode) : AbstractSubsystem()
     data class OuttakeConfig(
         val openPosition: Double = 0.5,
         val closedPosition: Double = 0.0,
+
         val frontPosition: Double = 0.0,
-        val backPosition: Double = 1.0,
+        val backPosition: Double = 0.5,
+
+        val transferPosition: Double = 0.4,
+        val outtakePositon: Double = 0.0,
     )
 
-    enum class OuttakeState
+    enum class ClawState
     {
         Closed, Open
     }
@@ -32,23 +36,26 @@ class Outtake(opMode: LinearOpMode) : AbstractSubsystem()
             println("HORS ${get().openPosition}")
         }
 
+    fun wristRotateTo(position: Double) = wrist.setMotionProfileTarget(position)
+    fun gripRotateTo(position: Double) = actuator.setMotionProfileTarget(position)
+
     private val wristConstraints = konfig<MotionProfileConstraints> { withCustomFileID("outtake_wrist_motionprofile") }
     private val wrist = motionProfiledServo("outtake_wrist", wristConstraints)
 
     private val rotationConstraints = konfig<MotionProfileConstraints> { withCustomFileID("outtake_grip_motionprofile") }
     private val actuator = motionProfiledServo("outtake_grip", rotationConstraints) // change to outtakegrip
 
-    private var currentOuttakeState = OuttakeState.Open
+    private var currentClawState = ClawState.Open
     private var currentWristState = WristState.Front
 
-    fun setOuttakeGrip(newState: OuttakeState): CompletableFuture<Void>
+    fun setOuttakeGrip(newState: ClawState): CompletableFuture<Void>
     {
-        if (currentOuttakeState == newState)
+        if (currentClawState == newState)
         {
             return CompletableFuture.completedFuture(null)
         }
 
-        return if (newState == OuttakeState.Open)
+        return if (newState == ClawState.Open)
         {
             gripRotateTo(outtakeConfig.get().openPosition)
                 .thenAccept {
@@ -65,15 +72,15 @@ class Outtake(opMode: LinearOpMode) : AbstractSubsystem()
 
     fun toggleOuttakeGrip(): CompletableFuture<StateResult>
     {
-        return if (currentOuttakeState == OuttakeState.Closed)
+        return if (currentClawState == ClawState.Closed)
         {
             gripRotateTo(outtakeConfig.get().openPosition).apply {
-                currentOuttakeState = OuttakeState.Open
+                currentClawState = ClawState.Open
             }
         } else
         {
             gripRotateTo(outtakeConfig.get().closedPosition).apply {
-                currentOuttakeState = OuttakeState.Closed
+                currentClawState = ClawState.Closed
             }
         }
     }
@@ -94,9 +101,6 @@ class Outtake(opMode: LinearOpMode) : AbstractSubsystem()
         }
     }
 
-    fun wristRotateTo(position: Double) = wrist.setMotionProfileTarget(position)
-    fun gripRotateTo(position: Double) = actuator.setMotionProfileTarget(position)
-
     override fun start()
     {
 
@@ -105,5 +109,6 @@ class Outtake(opMode: LinearOpMode) : AbstractSubsystem()
     override fun doInitialize()
     {
         gripRotateTo(outtakeConfig.get().openPosition)
+        wristRotateTo(outtakeConfig.get().frontPosition)
     }
 }

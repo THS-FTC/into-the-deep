@@ -14,6 +14,7 @@ import org.riverdell.robotics.subsystems.Extension
 import org.riverdell.robotics.subsystems.IV4B
 import org.riverdell.robotics.subsystems.Intake
 import org.riverdell.robotics.subsystems.Lift
+import org.riverdell.robotics.subsystems.OV4B
 import org.riverdell.robotics.subsystems.Outtake
 
 abstract class HypnoticRobot : LinearOpMode(), System
@@ -31,6 +32,8 @@ abstract class HypnoticRobot : LinearOpMode(), System
     val iv4b by lazy { IV4B(this) }
     val lift by lazy { Lift(this) }
     val extension by lazy {Extension(this)}
+    val ov4b by lazy {OV4B(this)}
+    val outtake by lazy {Outtake(this)}
 
     val multipleTelemetry by lazy {
         MultipleTelemetry(
@@ -59,7 +62,7 @@ abstract class HypnoticRobot : LinearOpMode(), System
         instance = this
 
         register(
-            drivetrain, intake, iv4b, lift, extension,
+            drivetrain, intake, iv4b, lift, extension,ov4b,outtake,
             *additionalSubSystems().toTypedArray()
         )
 

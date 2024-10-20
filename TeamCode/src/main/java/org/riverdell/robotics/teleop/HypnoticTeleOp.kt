@@ -10,6 +10,7 @@ import org.riverdell.robotics.autonomous.detection.SampleType
 import org.riverdell.robotics.autonomous.detection.VisionPipeline
 import org.riverdell.robotics.subsystems.IV4B
 import org.riverdell.robotics.subsystems.Intake
+import org.riverdell.robotics.subsystems.OV4B
 import org.riverdell.robotics.subsystems.Outtake
 import org.riverdell.robotics.utilities.hardware
 
@@ -23,14 +24,14 @@ class HypnoticTeleOp : HypnoticRobot()
     private val gp2Commands by lazy { commands(gamepad2) }
 
     val visionPipeline by lazy { VisionPipeline(this) }
-    val wrist by lazy { hardware<Servo>("intake_wrist") }
+//    val wrist by lazy { hardware<Servo>("intake_wrist") }
 
     override fun additionalSubSystems() = listOf(gp1Commands, gp2Commands, visionPipeline)
     override fun initialize()
     {
-        wrist.position = 0.5
-        visionPipeline.sampleDetection.supplyCurrentWristPosition { wrist.position }
-        visionPipeline.sampleDetection.setDetectionType(SampleType.Blue)
+//        wrist.position = 0.5
+//        visionPipeline.sampleDetection.supplyCurrentWristPosition { wrist.position }
+//        visionPipeline.sampleDetection.setDetectionType(SampleType.Blue)
 
         while (!isStarted)
         {
@@ -42,11 +43,11 @@ class HypnoticTeleOp : HypnoticRobot()
 
     override fun opModeStart()
     {
-        val robotDriver = GamepadEx(gamepad1)
+        val robotDriver = GamepadEx(gamepad2)
         buildCommands()
         while (opModeIsActive())
         {
-            val multiplier = 0.5 + gamepad1.right_trigger * 0.5
+            val multiplier = 0.5 + gamepad2.right_trigger * 0.5
             drivetrain.driveRobotCentric(robotDriver, multiplier)
 
             gp1Commands.run()
@@ -57,6 +58,7 @@ class HypnoticTeleOp : HypnoticRobot()
 
     private fun buildCommands()
     {
+        //game pad 1 commands
         gp1Commands.where(ButtonType.ButtonA)
             .triggers {
                 iv4b.setV4B(IV4B.V4BState.Grab)
@@ -85,6 +87,24 @@ class HypnoticTeleOp : HypnoticRobot()
                 intake.toggleIntakeGrip()
             }
             .whenPressedOnce()
+
+        gp2Commands.where(ButtonType.ButtonA)
+            .triggers {
+                outtake.setOuttakeGrip(Outtake.ClawState.Closed)
+                intake.setIntakeGrip(Intake.ClawState.Open).thenCompose { extension.extendToAndStayAt(-300) }
+                ov4b.setV4B(OV4B.OV4BState.Outtake)
+                lift.extendToAndStayAt(0)
+            }
+            .whenPressedOnce()
+        gp2Commands.where(ButtonType.ButtonB)
+            .triggers {
+                outtake.toggleOuttakeGrip()
+            }
+            .whenPressedOnce()
+
+
+        //game pad 2 commands
+
 
         gp1Commands.doButtonUpdatesManually()
         gp2Commands.doButtonUpdatesManually()

@@ -16,9 +16,9 @@ class IV4B(opMode: HypnoticRobot) : AbstractSubsystem()
     data class V4BConfig(
         val leftIsReversed: Boolean = false,
         val idlePosition: Double = 0.0,
-        val transferPosition: Double = 0.2,
+        val transferPosition: Double = 0.0,
         val observePosition: Double = 0.8,
-        val grabPosition: Double = 1.0,
+        val grabPosition: Double = 0.4,
         val moveAwayPosition: Double = 0.5,
     )
     enum class V4BState
@@ -135,6 +135,6 @@ class IV4B(opMode: HypnoticRobot) : AbstractSubsystem()
 
     override fun doInitialize()
     {
-
+        setV4B(V4BState.Observe)
     }
 }

@@ -5,8 +5,6 @@ import io.liftgate.robotics.mono.konfig.konfig
 import io.liftgate.robotics.mono.states.StateResult
 import io.liftgate.robotics.mono.subsystem.AbstractSubsystem
 import kotlinx.serialization.Serializable
-import org.riverdell.robotics.subsystems.Outtake.OuttakeConfig
-import org.riverdell.robotics.subsystems.Outtake.OuttakeState
 import org.riverdell.robotics.utilities.motionprofile.MotionProfileConstraints
 import java.util.concurrent.CompletableFuture
 
@@ -19,9 +17,9 @@ class Intake(opMode: LinearOpMode) : AbstractSubsystem()
         val closedPosition: Double = 1.0,
 
         //rotation
-        val transferPosition: Double = 0.4,
+        val transferPosition: Double = 1.0,
         val observePosition: Double = 0.0,
-        val grabPosition: Double = 0.4,
+        val grabPosition: Double = 0.0,
 
         // wrist
         val frontPosition: Double = 0.0,
@@ -138,5 +136,6 @@ class Intake(opMode: LinearOpMode) : AbstractSubsystem()
     {
         gripRotateTo(intakeConfig.get().openPosition)
         wristRotateTo(intakeConfig.get().frontPosition)
+        setRotationPulley(RotationState.Observe)
     }
 }
