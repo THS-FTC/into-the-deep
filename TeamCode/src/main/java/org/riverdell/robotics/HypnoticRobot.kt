@@ -16,6 +16,7 @@ import org.riverdell.robotics.subsystems.Intake
 import org.riverdell.robotics.subsystems.Lift
 import org.riverdell.robotics.subsystems.OV4B
 import org.riverdell.robotics.subsystems.Outtake
+import java.util.concurrent.CompletableFuture
 
 abstract class HypnoticRobot : LinearOpMode(), System
 {
@@ -50,6 +51,13 @@ abstract class HypnoticRobot : LinearOpMode(), System
         subsystems
             .map { it as AbstractSubsystem }
             .forEach { it.allPeriodic() }
+    }
+
+    //my own function idc
+    fun intakeSequence() = CompletableFuture.allOf(
+        //
+    ).thenCompose {
+        intake.setIntakeGrip(Intake.ClawState.Open)
     }
 
     open fun additionalSubSystems(): List<AbstractSubsystem>

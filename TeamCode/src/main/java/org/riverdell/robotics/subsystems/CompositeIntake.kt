@@ -8,7 +8,7 @@ import kotlinx.serialization.Serializable
 import org.riverdell.robotics.utilities.motionprofile.MotionProfileConstraints
 import java.util.concurrent.CompletableFuture
 
-class Intake(opMode: LinearOpMode) : AbstractSubsystem()
+class CompositeIntake(opMode: LinearOpMode) : AbstractSubsystem()
 {
 //    @Serializable
 //    data class IntakeConfig(

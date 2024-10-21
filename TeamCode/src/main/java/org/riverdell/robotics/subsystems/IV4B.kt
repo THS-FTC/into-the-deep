@@ -12,20 +12,20 @@ import java.util.concurrent.CompletableFuture
 
 class IV4B(opMode: HypnoticRobot) : AbstractSubsystem()
 {
-    @Serializable
-    data class V4BConfig(
-        val leftIsReversed: Boolean = false,
-        val idlePosition: Double = 0.0,
-        val transferPosition: Double = 0.0,
-        val observePosition: Double = 0.8,
-        val grabPosition: Double = 0.4,
-        val moveAwayPosition: Double = 0.5,
-    )
+//    @Serializable
+//    data class V4BConfig(
+//        val leftIsReversed: Boolean = false,
+//        val idlePosition: Double = 0.0,
+//        val transferPosition: Double = 0.0,
+//        val observePosition: Double = 0.8,
+//        val grabPosition: Double = 0.3,
+//        val moveAwayPosition: Double = 0.5,
+//    )
     enum class V4BState
     {
-        Observe,Transfer,Grab,Idle,MoveAway
+        Observe, Transfer, Grab, Idle, MoveAway
     }
-    private val v4bConfig = konfig<V4BConfig>()
+//    private val v4bConfig = konfig<V4BConfig>()
     private val currentV4BState = V4BState.Idle
 
     private val rotationConstraints = konfig<MotionProfileConstraints> { withCustomFileID("v4b_rotation_motionprofile") }
@@ -34,14 +34,21 @@ class IV4B(opMode: HypnoticRobot) : AbstractSubsystem()
 
     fun v4bRotateTo(position: Double) = CompletableFuture.allOf(
         leftRotation.setMotionProfileTarget(
-            if (v4bConfig.get().leftIsReversed)
+            if (IV4BConfig.leftIsReversed)
                 (1.0 - position) else position
         ),
         rightRotation.setMotionProfileTarget(
-            if (!v4bConfig.get().leftIsReversed)
+            if (!IV4BConfig.leftIsReversed)
                 (1.0 - position) else position
         )
     )
+
+
+
+
+
+
+
     fun setV4B(newState: V4BState): CompletableFuture<Void>
     {
         if (currentV4BState == newState)
@@ -51,36 +58,38 @@ class IV4B(opMode: HypnoticRobot) : AbstractSubsystem()
 
         return if (newState == V4BState.Transfer)
         {
-            v4bRotateTo(v4bConfig.get().transferPosition)
+            v4bRotateTo(IV4BConfig.transferPosition)
                 .thenAccept {
                     println(it)
                 }
         } else if (newState == V4BState.Grab){
-            v4bRotateTo(v4bConfig.get().grabPosition)
+            v4bRotateTo(IV4BConfig.grabPosition)
                 .thenAccept {
                     println(it)
                 }
         }
         else if (newState == V4BState.Idle){
-            v4bRotateTo(v4bConfig.get().idlePosition)
+            v4bRotateTo(IV4BConfig.idlePosition)
                 .thenAccept {
                     println(it)
                 }
         }
         else if (newState == V4BState.MoveAway){
-            v4bRotateTo(v4bConfig.get().moveAwayPosition)
+            v4bRotateTo(IV4BConfig.moveAwayPosition)
                 .thenAccept {
                     println(it)
                 }
         }
         else
         {
-            v4bRotateTo(v4bConfig.get().observePosition)
+            v4bRotateTo(IV4BConfig.observePosition)
                 .thenAccept {
                     println(it)
                 }
         }
     }
+
+
 
     /*fun toggleOuttakeRotate(): CompletableFuture<StateResult>
     {

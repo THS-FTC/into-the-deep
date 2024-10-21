@@ -12,14 +12,14 @@ import java.util.concurrent.CompletableFuture
 
 class OV4B(opMode: HypnoticRobot) : AbstractSubsystem()
 {
-    @Serializable
-    data class V4BConfig(
-        val leftIsReversed: Boolean = false,
-        val idlePosition: Double = 0.0,
-
-        val transferPosition: Double = 0.2,
-        val outtakePosition: Double = 0.5,
-    )
+//    @Serializable
+//    data class V4BConfig(
+//        val leftIsReversed: Boolean = false,
+//        val idlePosition: Double = 0.0,
+//
+//        val transferPosition: Double = 0.2,
+//        val outtakePosition: Double = 0.5,
+//    )
     enum class OV4BState
     {
         Transfer,Outtake,Idle
@@ -28,7 +28,7 @@ class OV4B(opMode: HypnoticRobot) : AbstractSubsystem()
     {
         Outtake,Intake,Idle
     }
-    private val ov4bConfig = konfig<V4BConfig>()
+//    private val ov4bConfig = konfig<V4BConfig>()
     private val currentV4BState = OV4BState.Idle
     private var currentRotateState = PulleyState.Idle
 
@@ -43,28 +43,30 @@ class OV4B(opMode: HypnoticRobot) : AbstractSubsystem()
     fun pulleyRotateTo(position: Double) = clawPulley.setMotionProfileTarget(position)
     fun v4bRotateTo(position: Double) = CompletableFuture.allOf(
         leftRotation.setMotionProfileTarget(
-            if (ov4bConfig.get().leftIsReversed)
+            if (OV4BConfig.leftIsReverse)
                 (1.0 - position) else position
         ),
         rightRotation.setMotionProfileTarget(
-            if (!ov4bConfig.get().leftIsReversed)
+            if (!OV4BConfig.leftIsReverse)
                 (1.0 - position) else position
         )
     )
+
     fun toggleOuttakeRotate(): CompletableFuture<StateResult>
     {
         return if (currentRotateState == PulleyState.Outtake)
         {
-            pulleyRotateTo(ov4bConfig.get().transferPosition).apply {
+            pulleyRotateTo(OV4BConfig.idlePulley).apply {
                 currentRotateState = PulleyState.Intake
             }
         } else
         {
-            pulleyRotateTo(ov4bConfig.get().outtakePosition).apply {
+            pulleyRotateTo(OV4BConfig.backPulley).apply {
                 currentRotateState = PulleyState.Outtake
             }
         }
     }
+
     fun setV4B(newState: OV4BState): CompletableFuture<Void>
     {
         if (currentV4BState == newState)
@@ -74,19 +76,19 @@ class OV4B(opMode: HypnoticRobot) : AbstractSubsystem()
 
         return if (newState == OV4BState.Transfer)
         {
-            v4bRotateTo(ov4bConfig.get().transferPosition)
+            v4bRotateTo(OV4BConfig.transferPosition)
                 .thenAccept {
                     println(it)
                 }
         } else if (newState == OV4BState.Outtake){
-            v4bRotateTo(ov4bConfig.get().outtakePosition)
+            v4bRotateTo(OV4BConfig.OuttakePosition)
                 .thenAccept {
                     println(it)
                 }
         }
         else
         {
-            v4bRotateTo(ov4bConfig.get().idlePosition)
+            v4bRotateTo(OV4BConfig.IdlePosition)
                 .thenAccept {
                     println(it)
                 }
@@ -130,7 +132,7 @@ class OV4B(opMode: HypnoticRobot) : AbstractSubsystem()
     override fun doInitialize()
     {
         currentRotateState = PulleyState.Intake
-        pulleyRotateTo(ov4bConfig.get().transferPosition)
+        pulleyRotateTo(OV4BConfig.transferPosition)
         setV4B(OV4BState.Transfer)
     }
 }

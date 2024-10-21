@@ -15,7 +15,7 @@ import org.riverdell.robotics.subsystems.Outtake
 import org.riverdell.robotics.utilities.hardware
 
 @TeleOp(
-    name = "Multiplayer",
+    name = "Bit-By-Bit Drive",
     group = "Drive"
 )
 class HypnoticTeleOp : HypnoticRobot()
@@ -68,7 +68,7 @@ class HypnoticTeleOp : HypnoticRobot()
 
         gp1Commands.where(ButtonType.BumperLeft)
             .triggers {
-                extension.extendToAndStayAt(-600)
+//                extension.extendToAndStayAt(-600)
                 intake.setRotationPulley(Intake.RotationState.Observe)
                 iv4b.setV4B(IV4B.V4BState.Observe)
             }
@@ -76,9 +76,9 @@ class HypnoticTeleOp : HypnoticRobot()
 
         gp1Commands.where(ButtonType.BumperRight)
             .triggers {
-                extension.extendToAndStayAt(200)
-                intake.setRotationPulley(Intake.RotationState.Transfer)
-                iv4b.setV4B(IV4B.V4BState.Transfer)
+//                extension.extendToAndStayAt(200)
+//                intake.setRotationPulley(Intake.RotationState.Transfer)
+//                iv4b.setV4B(IV4B.V4BState.Transfer)
             }
             .whenPressedOnce()
 
@@ -90,10 +90,10 @@ class HypnoticTeleOp : HypnoticRobot()
 
         gp2Commands.where(ButtonType.ButtonA)
             .triggers {
-                outtake.setOuttakeGrip(Outtake.ClawState.Closed)
-                intake.setIntakeGrip(Intake.ClawState.Open).thenCompose { extension.extendToAndStayAt(-300) }
-                ov4b.setV4B(OV4B.OV4BState.Outtake)
-                lift.extendToAndStayAt(0)
+//                outtake.setOuttakeGrip(Outtake.ClawState.Closed)
+//                intake.setIntakeGrip(Intake.ClawState.Open).thenCompose { extension.extendToAndStayAt(-300) }
+//                ov4b.setV4B(OV4B.OV4BState.Outtake)
+//                lift.extendToAndStayAt(0)
             }
             .whenPressedOnce()
         gp2Commands.where(ButtonType.ButtonB)
