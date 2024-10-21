@@ -1,0 +1,26 @@
+nodes: 
+  'main': 
+    navigationMode: GoToPosition
+    waypoints: 
+      - '{"x":6.0,"y":6.0,"heading":0.10471975511965978}'
+      - '{"x":6.0,"y":6.0,"heading":deg(20.0)}'
+      - '{&point1,"heading":0.10471975511965978}'
+      - '*pickup_sample'
+      - '&pose1'
+      - '{"x":8.0,"y":9.0,"heading":deg(40.0)}'
+    stuckProtection: 
+      enabled: false
+      stuckProtection: 
+        minimumRequiredTranslationalDifference: 0.5
+        minimumRequiredRotationalDifference: 0.05
+        minimumMillisUntilDeemedStuck: 2500
+      recoveryAction: 
+        shouldBackTrack: true
+        # Amount of stages to go back, to try to re-attempt navigation.
+        backTrackAmount: 1
+        # Amount of back track attempts until the navigation terminates.
+        terminateAfterAttempts: 3
+    maxTransationalSpeed: 1.0
+    maxRotationalSpeed: 1.0
+    automaticDeathEnabled: true
+    automaticDeathMillis: 2500.0
