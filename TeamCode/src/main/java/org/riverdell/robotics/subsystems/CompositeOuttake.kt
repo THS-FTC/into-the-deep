@@ -13,7 +13,7 @@ class CompositeOuttake(opMode: LinearOpMode) : AbstractSubsystem()
 
     enum class OuttakeState
     {
-        Ready,Idle
+        Idle,Placing
     }
 
     fun toggleOuttake

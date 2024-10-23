@@ -45,7 +45,7 @@ class Drivetrain(private val opMode: HypnoticRobot) : AbstractSubsystem()
         backingDriveBase.driveRobotCentric(
             -driverOp.leftY * scaleFactor,
             -driverOp.leftX * scaleFactor,
-            driverOp.rightX * scaleFactor,
+            -driverOp.rightX * scaleFactor,
             true
         )
     }
