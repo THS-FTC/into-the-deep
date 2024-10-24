@@ -137,6 +137,5 @@ class Intake(opMode: LinearOpMode) : AbstractSubsystem()
     {
 //        gripRotateTo(intakeConfig.get().openPosition)
 //        wristRotateTo(intakeConfig.get().frontPosition)
-//        setRotationPulley(RotationState.Observe)
     }
 }

@@ -69,7 +69,27 @@ class Outtake(opMode: LinearOpMode) : AbstractSubsystem()
                 }
         }
     }
+    fun setWrist(newState: WristState): CompletableFuture<Void>
+    {
+        if (currentWristState == newState)
+        {
+            return CompletableFuture.completedFuture(null)
+        }
 
+        return if (newState == WristState.Front)
+        {
+            wristRotateTo(OutakeConfig.frontPosition)
+                .thenAccept {
+                    println(it)
+                }
+        } else {
+            wristRotateTo(OutakeConfig.backPosition)
+                .thenAccept {
+                    println(it)
+                }
+        }
+
+    }
     fun toggleOuttakeGrip(): CompletableFuture<StateResult>
     {
         return if (currentClawState == ClawState.Closed)
@@ -109,6 +129,6 @@ class Outtake(opMode: LinearOpMode) : AbstractSubsystem()
     override fun doInitialize()
     {
         gripRotateTo(OutakeConfig.openPosition)
-        wristRotateTo(OutakeConfig.frontPosition)
+//        wristRotateTo(OutakeConfig.frontPosition)
     }
 }

@@ -1,101 +1,78 @@
 package org.riverdell.robotics.subsystems
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode
-import io.liftgate.robotics.mono.konfig.konfig
 import io.liftgate.robotics.mono.states.StateResult
 import io.liftgate.robotics.mono.subsystem.AbstractSubsystem
-import kotlinx.serialization.Serializable
-import org.riverdell.robotics.utilities.motionprofile.MotionProfileConstraints
+import org.riverdell.robotics.HypnoticRobot
+import org.riverdell.robotics.subsystems.Outtake.ClawState
+import java.util.Currency
 import java.util.concurrent.CompletableFuture
 
-class CompositeOuttake(opMode: LinearOpMode) : AbstractSubsystem()
+class CompositeOuttake(val robot: HypnoticRobot) : AbstractSubsystem()
 {
 
     enum class OuttakeState
     {
-        Idle,Placing
+        Idle,Outtake,Init
     }
 
-    fun toggleOuttake
+    private var currentOuttakeState = OuttakeState.Init
 
 
-
-    //toggles the intake grip
-    fun toggleIntakeGrip(): CompletableFuture<StateResult>
+    fun setOuttake(newState: OuttakeState): CompletableFuture<Void>
     {
-        return if (currentClawState == ClawState.Closed)
-        {
-            gripRotateTo(IntakeConfig.openPosition).apply {
-                currentClawState = ClawState.Open
-            }
-        } else
-        {
-            gripRotateTo(IntakeConfig.closePositon).apply {
-                currentClawState = ClawState.Closed
-            }
-        }
-    }
-    //sets intake grip to either open or close
-    fun setIntakeGrip(newState: ClawState): CompletableFuture<Void>
-    {
-        if (currentClawState == newState)
+        if (currentOuttakeState == newState)
         {
             return CompletableFuture.completedFuture(null)
         }
 
-        return if (newState == ClawState.Open)
+        return if (newState == OuttakeState.Idle)
         {
-            gripRotateTo(IntakeConfig.openPosition)
-                .thenAccept {
-                    println(it)
-                }
+            //idle outtake stuff here
+            robot.outtake.setOuttakeGrip(Outtake.ClawState.Open)
+            robot.ov4b.setPulley(OV4B.PulleyState.Intake)
+            robot.ov4b.setV4B(OV4B.OV4BState.Idle)
+            robot.extension.extendToAndStayAt(0)
+            robot.outtake.setWrist(Outtake.WristState.Front).apply { currentOuttakeState = OuttakeState.Idle }
         } else
         {
-            gripRotateTo(IntakeConfig.closePositon)
-                .thenAccept {
-                    println(it)
-                }
+            //closes the outtake claw and opens the intake claw, then the robot extends forwards
+            robot.outtake.setOuttakeGrip(Outtake.ClawState.Closed)
+            robot.intake.setIntakeGrip(Intake.ClawState.Open).thenCompose { robot.extension.extendToAndStayAt(200) }
+
+            //the outtake rotates outwards
+            robot.ov4b.setPulley(OV4B.PulleyState.Outtake)
+            robot.outtake.setWrist(Outtake.WristState.Front)
+            robot.ov4b.setV4B(OV4B.OV4BState.Outtake).apply { currentOuttakeState = OuttakeState.Outtake }
+        }
+    }
+    fun toggleOuttake(): CompletableFuture<Void>
+    {
+        return if (currentOuttakeState == OuttakeState.Outtake)
+        {
+            robot.outtake.setOuttakeGrip(Outtake.ClawState.Open)
+            robot.ov4b.setPulley(OV4B.PulleyState.Intake)
+            robot.ov4b.setV4B(OV4B.OV4BState.Idle)
+            robot.extension.extendToAndStayAt(0)
+            robot.outtake.setWrist(Outtake.WristState.Front).apply { currentOuttakeState = OuttakeState.Idle }
+        } else
+        {
+            //closes the outtake claw and opens the intake claw, then the robot extends forwards
+            robot.outtake.setOuttakeGrip(Outtake.ClawState.Closed)
+            robot.intake.setIntakeGrip(Intake.ClawState.Open).thenCompose { robot.extension.extendToAndStayAt(200) }
+
+            //the outtake rotates outwards
+            robot.ov4b.setPulley(OV4B.PulleyState.Outtake)
+            robot.outtake.setWrist(Outtake.WristState.Front)
+            robot.ov4b.setV4B(OV4B.OV4BState.Outtake).apply { currentOuttakeState = OuttakeState.Outtake }
         }
     }
 
-    fun setRotationPulley(newState: RotationState): CompletableFuture<Void>
-    {
-        if (currentrotationState == newState)
-        {
-            return CompletableFuture.completedFuture(null)
-        }
-
-        return if (newState == RotationState.Transfer)
-        {
-            pulleyRotateTo(IntakeConfig.transferPosition)
-                .thenAccept {
-                    println(it)
-                }
-        } else if (newState == RotationState.Grab){
-            pulleyRotateTo(IntakeConfig.grabPosition)
-                .thenAccept {
-                    println(it)
-                }
-        }
-        else
-        {
-            pulleyRotateTo(IntakeConfig.observePosition)
-                .thenAccept {
-                    println(it)
-                }
-        }
+    override fun doInitialize() {
+        setOuttake(OuttakeState.Idle)
     }
 
-
-    override fun start()
-    {
-
-    }
-
-    override fun doInitialize()
-    {
-//        gripRotateTo(intakeConfig.get().openPosition)
-//        wristRotateTo(intakeConfig.get().frontPosition)
-//        setRotationPulley(RotationState.Observe)
+    override fun start() {
+        setOuttake(OuttakeState.Idle)
     }
 }

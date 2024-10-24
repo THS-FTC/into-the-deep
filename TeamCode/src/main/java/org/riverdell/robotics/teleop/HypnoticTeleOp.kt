@@ -68,7 +68,7 @@ class HypnoticTeleOp : HypnoticRobot()
 
         gp1Commands.where(ButtonType.BumperLeft)
             .triggers {
-//                extension.extendToAndStayAt(-600)
+                extension.extendToAndStayAt(-400)
                 intake.setRotationPulley(Intake.RotationState.Observe)
                 iv4b.setV4B(IV4B.V4BState.Observe)
             }
@@ -76,9 +76,9 @@ class HypnoticTeleOp : HypnoticRobot()
 
         gp1Commands.where(ButtonType.BumperRight)
             .triggers {
-//                extension.extendToAndStayAt(200)
-//                intake.setRotationPulley(Intake.RotationState.Transfer)
-//                iv4b.setV4B(IV4B.V4BState.Transfer)
+                extension.extendToAndStayAt(-100)
+                intake.setRotationPulley(Intake.RotationState.Transfer)
+                iv4b.setV4B(IV4B.V4BState.Transfer)
             }
             .whenPressedOnce()
 
@@ -96,7 +96,7 @@ class HypnoticTeleOp : HypnoticRobot()
 //                lift.extendToAndStayAt(0)
             }
             .whenPressedOnce()
-        gp2Commands.where(ButtonType.ButtonB)
+        gp1Commands.where(ButtonType.ButtonB)
             .triggers {
                 outtake.toggleOuttakeGrip()
             }
