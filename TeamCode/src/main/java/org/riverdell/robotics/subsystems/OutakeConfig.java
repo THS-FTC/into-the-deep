@@ -4,8 +4,8 @@ import com.acmerobotics.dashboard.config.Config;
 
 @Config
 public class OutakeConfig {
-    public static double openPosition= 0.5;
-    public static double closePositon  = 0.0;
+    public static double openPosition= 0.7;
+    public static double closePositon  = 1.0;
 
     //rotation
     public static double transferPosition = 1.0;

@@ -8,7 +8,7 @@ public class IV4BConfig {
     public static double moveAwayPosition  = 0.5;
 
     //rotation
-    public static double transferPosition = 0.0;
+    public static double transferPosition = 0.05;
     public static double observePosition= 0.8;
     public static double grabPosition= 0.92;
 

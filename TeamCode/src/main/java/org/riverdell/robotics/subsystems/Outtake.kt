@@ -24,11 +24,11 @@ class Outtake(opMode: LinearOpMode) : AbstractSubsystem()
 
     enum class ClawState
     {
-        Closed, Open
+        Closed, Open, Idle
     }
     enum class WristState
     {
-        Front, Back
+        Front, Back , Idle
     }
 
 //    private val outtakeConfig = konfig<OuttakeConfig>()
@@ -36,7 +36,11 @@ class Outtake(opMode: LinearOpMode) : AbstractSubsystem()
 //            println("HORS ${get().openPosition}")
 //        }
 
-    fun wristRotateTo(position: Double) = wrist.setMotionProfileTarget(position)
+//    fun wristRotateTo(position: Double) = wrist.setMotionProfileTarget(position)
+    fun wristRotateTo(position: Double): CompletableFuture<Void>{
+        wrist.forcefullySetTarget(position)
+        return CompletableFuture.completedFuture(null)
+    }
     fun gripRotateTo(position: Double) = actuator.setMotionProfileTarget(position)
 
     private val wristConstraints = konfig<MotionProfileConstraints> { withCustomFileID("outtake_wrist_motionprofile") }
@@ -45,8 +49,8 @@ class Outtake(opMode: LinearOpMode) : AbstractSubsystem()
     private val rotationConstraints = konfig<MotionProfileConstraints> { withCustomFileID("outtake_grip_motionprofile") }
     private val actuator = motionProfiledServo("outtake_grip", rotationConstraints) // change to outtakegrip
 
-    private var currentClawState = ClawState.Open
-    private var currentWristState = WristState.Front
+    private var currentClawState = ClawState.Idle
+    private var currentWristState = WristState.Idle
 
     fun setOuttakeGrip(newState: ClawState): CompletableFuture<Void>
     {
@@ -105,7 +109,7 @@ class Outtake(opMode: LinearOpMode) : AbstractSubsystem()
         }
     }
 
-    fun toggleOuttakeRotation(state: WristState = WristState.Front): CompletableFuture<StateResult>
+    fun toggleOuttakeRotation(state: WristState = WristState.Front): CompletableFuture<Void>
     {
         if (currentWristState == state)
         {
@@ -128,6 +132,7 @@ class Outtake(opMode: LinearOpMode) : AbstractSubsystem()
 
     override fun doInitialize()
     {
+        setWrist(WristState.Front)
         gripRotateTo(OutakeConfig.openPosition)
 //        wristRotateTo(OutakeConfig.frontPosition)
     }

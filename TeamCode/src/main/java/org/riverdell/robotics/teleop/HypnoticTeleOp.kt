@@ -68,17 +68,18 @@ class HypnoticTeleOp : HypnoticRobot()
 
         gp1Commands.where(ButtonType.BumperLeft)
             .triggers {
-                extension.extendToAndStayAt(-400)
                 intake.setRotationPulley(Intake.RotationState.Observe)
                 iv4b.setV4B(IV4B.V4BState.Observe)
+                extension.extendToAndStayAt(-400)
+                intake.setWrist(Intake.WristState.Front)
             }
             .whenPressedOnce()
 
         gp1Commands.where(ButtonType.BumperRight)
             .triggers {
-                extension.extendToAndStayAt(-100)
-                intake.setRotationPulley(Intake.RotationState.Transfer)
+                //intake.setWrist(Intake.WristState.Back)
                 iv4b.setV4B(IV4B.V4BState.Transfer)
+                extension.extendToAndStayAt(-40).thenCompose { intake.setRotationPulley(Intake.RotationState.Transfer) }
             }
             .whenPressedOnce()
 

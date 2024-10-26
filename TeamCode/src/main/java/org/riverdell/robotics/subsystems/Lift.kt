@@ -44,6 +44,7 @@ class Lift(opMode: LinearOpMode) : AbstractSubsystem()
 
     override fun doInitialize()
     {
+        extendToAndStayAt(0)
     }
 
 }

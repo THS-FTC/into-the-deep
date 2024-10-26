@@ -28,11 +28,11 @@ class Intake(opMode: LinearOpMode) : AbstractSubsystem()
 
     enum class ClawState
     {
-        Closed, Open
+        Closed, Open,Idle
     }
     enum class WristState
     {
-        Front, Back
+        Front, Back, Idle
     }
     enum class RotationState
     {
@@ -44,8 +44,8 @@ class Intake(opMode: LinearOpMode) : AbstractSubsystem()
 //            println("HORS ${get().openPosition}")
 //        }
 
-    private var currentClawState = ClawState.Closed
-    private var currentwristState = WristState.Front
+    private var currentClawState = ClawState.Idle
+    private var currentwristState = WristState.Idle
     private var currentrotationState = RotationState.Idle
 
     private val wristConstraints = konfig<MotionProfileConstraints> { withCustomFileID("intake_wrist_motionprofile") }
@@ -57,21 +57,27 @@ class Intake(opMode: LinearOpMode) : AbstractSubsystem()
     private val rotationConstraints = konfig<MotionProfileConstraints> { withCustomFileID("intake_grip_motionprofile") }
     private val grip = motionProfiledServo("intake_grip", rotationConstraints)
 
-    fun wristRotateTo(position: Double) = wrist.setMotionProfileTarget(position)
+    fun wristRotateTo(position: Double): CompletableFuture<Void>{
+        wrist.forcefullySetTarget(position)
+        return CompletableFuture.completedFuture(null)
+    }
     fun gripRotateTo(position: Double) = grip.setMotionProfileTarget(position)
-    fun pulleyRotateTo(position: Double) = pulley.setMotionProfileTarget(position)
+    fun pulleyRotateTo(position: Double): CompletableFuture<Void>{
+        pulley.forcefullySetTarget(position)
+        return CompletableFuture.completedFuture(null)
+    }
 
     //toggles the intake grip
     fun toggleIntakeGrip(): CompletableFuture<StateResult>
     {
         return if (currentClawState == ClawState.Closed)
         {
-            gripRotateTo(IntakeConfig.openPosition).apply {
+            gripRotateTo(IntakeConfig.openPositon).apply {
                 currentClawState = ClawState.Open
             }
         } else
         {
-            gripRotateTo(IntakeConfig.closePositon).apply {
+            gripRotateTo(IntakeConfig.closePosition).apply {
                 currentClawState = ClawState.Closed
             }
         }
@@ -86,13 +92,34 @@ class Intake(opMode: LinearOpMode) : AbstractSubsystem()
 
         return if (newState == ClawState.Open)
         {
-            gripRotateTo(IntakeConfig.openPosition)
+            gripRotateTo(IntakeConfig.openPositon)
                 .thenAccept {
                     println(it)
                 }
         } else
         {
-            gripRotateTo(IntakeConfig.closePositon)
+            gripRotateTo(IntakeConfig.closePosition)
+                .thenAccept {
+                    println(it)
+                }
+        }
+    }
+    fun setWrist(newState: WristState): CompletableFuture<Void>
+    {
+        if (currentwristState == newState)
+        {
+            return CompletableFuture.completedFuture(null)
+        }
+
+        return if (newState == WristState.Front)
+        {
+            wristRotateTo(IntakeConfig.frontPosition)
+                .thenAccept {
+                    println(it)
+                }
+        } else
+        {
+            wristRotateTo(IntakeConfig.backPosition)
                 .thenAccept {
                     println(it)
                 }
@@ -135,7 +162,8 @@ class Intake(opMode: LinearOpMode) : AbstractSubsystem()
 
     override fun doInitialize()
     {
-//        gripRotateTo(intakeConfig.get().openPosition)
-//        wristRotateTo(intakeConfig.get().frontPosition)
+        setIntakeGrip(ClawState.Open)
+        setRotationPulley(RotationState.Observe)
+        setWrist(WristState.Front)
     }
 }

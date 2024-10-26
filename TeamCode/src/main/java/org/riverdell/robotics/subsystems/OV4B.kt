@@ -33,25 +33,36 @@ class OV4B(opMode: HypnoticRobot) : AbstractSubsystem()
     private var currentRotateState = PulleyState.Idle
 
 
-    private val rotationConstraints = konfig<MotionProfileConstraints> { withCustomFileID("v4b_rotation_motionprofile") }
+    private val rotationConstraints = konfig<MotionProfileConstraints> { withCustomFileID("ov4b_rotation_motionprofile") }
     private val leftRotation = motionProfiledServo("ov4b_rotation_left", rotationConstraints)
     private val rightRotation = motionProfiledServo("ov4b_rotation_right", rotationConstraints)
 
     private val clawConstraints = konfig<MotionProfileConstraints>()
     private val clawPulley = motionProfiledServo("ov4b_pulley", clawConstraints)
 
-    fun pulleyRotateTo(position: Double) = clawPulley.setMotionProfileTarget(position)
-    fun v4bRotateTo(position: Double) = CompletableFuture.allOf(
-        leftRotation.setMotionProfileTarget(
-            if (OV4BConfig.leftIsReverse)
-                (1.0 - position) else position
-        ),
-        rightRotation.setMotionProfileTarget(
-            if (!OV4BConfig.leftIsReverse)
-                (1.0 - position) else position
-        )
-    )
-    fun toggleOuttakeRotate(): CompletableFuture<StateResult>
+//    fun pulleyRotateTo(position: Double) = clawPulley.setMotionProfileTarget(position)
+fun pulleyRotateTo(position: Double): CompletableFuture<Void>{
+    clawPulley.forcefullySetTarget(position)
+    return CompletableFuture.completedFuture(null)
+}
+
+    fun v4bRotateTo(position: Double): CompletableFuture<Void> {
+        if (true) {
+            leftRotation.forcefullySetTarget(
+                if (OV4BConfig.leftIsReverse)
+                    (1.0 - position) else position
+            )
+            rightRotation.forcefullySetTarget(
+                if (!OV4BConfig.leftIsReverse)
+                    (1.0 - position) else position
+            )
+            return CompletableFuture.completedFuture(null)
+        }
+        else {
+            return CompletableFuture.completedFuture(null)
+        }
+    }
+    fun toggleOuttakeRotate(): CompletableFuture<Void> //state when changed to motion profiled
     {
         return if (currentRotateState == PulleyState.Outtake)
         {
@@ -151,7 +162,8 @@ class OV4B(opMode: HypnoticRobot) : AbstractSubsystem()
 
     override fun doInitialize()
     {
-        pulleyRotateTo(OV4BConfig.transferPosition)
-        setV4B(OV4BState.Transfer)
+        pulleyRotateTo(OV4BConfig.idlePulley)
+        v4bRotateTo(OV4BConfig.transferPosition)
+
     }
 }
