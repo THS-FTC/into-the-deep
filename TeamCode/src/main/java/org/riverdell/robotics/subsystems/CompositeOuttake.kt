@@ -67,12 +67,11 @@ class CompositeOuttake(val robot: HypnoticRobot) : AbstractSubsystem()
             robot.ov4b.setV4B(OV4B.OV4BState.Outtake).apply { currentOuttakeState = OuttakeState.Outtake }
         }
     }
-
+//    setOuttake(OuttakeState.Idle)
     override fun doInitialize() {
-        setOuttake(OuttakeState.Idle)
     }
-
+//    setOuttake(OuttakeState.Idle)
     override fun start() {
-        setOuttake(OuttakeState.Idle)
+//
     }
 }

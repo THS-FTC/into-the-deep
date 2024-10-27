@@ -41,7 +41,10 @@ class Outtake(opMode: LinearOpMode) : AbstractSubsystem()
         wrist.forcefullySetTarget(position)
         return CompletableFuture.completedFuture(null)
     }
-    fun gripRotateTo(position: Double) = actuator.setMotionProfileTarget(position)
+    fun gripRotateTo(position: Double): CompletableFuture<Void>{
+        actuator.forcefullySetTarget(position)
+        return CompletableFuture.completedFuture(null)
+    }
 
     private val wristConstraints = konfig<MotionProfileConstraints> { withCustomFileID("outtake_wrist_motionprofile") }
     private val wrist = motionProfiledServo("outtake_wrist", wristConstraints)
@@ -94,7 +97,7 @@ class Outtake(opMode: LinearOpMode) : AbstractSubsystem()
         }
 
     }
-    fun toggleOuttakeGrip(): CompletableFuture<StateResult>
+    fun toggleOuttakeGrip(): CompletableFuture<Void>
     {
         return if (currentClawState == ClawState.Closed)
         {
@@ -133,7 +136,6 @@ class Outtake(opMode: LinearOpMode) : AbstractSubsystem()
     override fun doInitialize()
     {
         setWrist(WristState.Front)
-        gripRotateTo(OutakeConfig.openPosition)
-//        wristRotateTo(OutakeConfig.frontPosition)
+        setOuttakeGrip(ClawState.Open)
     }
 }

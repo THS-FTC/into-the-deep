@@ -45,7 +45,6 @@ fun pulleyRotateTo(position: Double): CompletableFuture<Void>{
     clawPulley.forcefullySetTarget(position)
     return CompletableFuture.completedFuture(null)
 }
-
     fun v4bRotateTo(position: Double): CompletableFuture<Void> {
         if (true) {
             leftRotation.forcefullySetTarget(
@@ -163,7 +162,7 @@ fun pulleyRotateTo(position: Double): CompletableFuture<Void>{
     override fun doInitialize()
     {
         pulleyRotateTo(OV4BConfig.idlePulley)
-        v4bRotateTo(OV4BConfig.transferPosition)
+        v4bRotateTo(OV4BConfig.IdlePosition)
 
     }
 }

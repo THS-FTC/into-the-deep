@@ -79,7 +79,7 @@ class HypnoticTeleOp : HypnoticRobot()
             .triggers {
                 //intake.setWrist(Intake.WristState.Back)
                 iv4b.setV4B(IV4B.V4BState.Transfer)
-                extension.extendToAndStayAt(-40).thenCompose { intake.setRotationPulley(Intake.RotationState.Transfer) }
+                extension.extendToAndStayAt(-70).thenCompose { intake.setRotationPulley(Intake.RotationState.Transfer) }
             }
             .whenPressedOnce()
 
@@ -89,12 +89,11 @@ class HypnoticTeleOp : HypnoticRobot()
             }
             .whenPressedOnce()
 
-        gp2Commands.where(ButtonType.ButtonA)
+        gp1Commands.where(ButtonType.ButtonX)
             .triggers {
-//                outtake.setOuttakeGrip(Outtake.ClawState.Closed)
-//                intake.setIntakeGrip(Intake.ClawState.Open).thenCompose { extension.extendToAndStayAt(-300) }
-//                ov4b.setV4B(OV4B.OV4BState.Outtake)
-//                lift.extendToAndStayAt(0)
+                outtake.setOuttakeGrip(Outtake.ClawState.Closed)
+                intake.setIntakeGrip(Intake.ClawState.Open).thenAccept { extension.extendToAndStayAt(-200) }.thenAccept { ov4b.setV4B(OV4B.OV4BState.Outtake) }
+
             }
             .whenPressedOnce()
         gp1Commands.where(ButtonType.ButtonB)
