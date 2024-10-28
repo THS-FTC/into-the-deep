@@ -13,7 +13,7 @@ class CompositeOuttake(val robot: HypnoticRobot) : AbstractSubsystem()
 
     enum class OuttakeState
     {
-        Idle,Outtake,Init
+        Transfer,Outtake,Init
     }
 
     private var currentOuttakeState = OuttakeState.Init
@@ -26,19 +26,19 @@ class CompositeOuttake(val robot: HypnoticRobot) : AbstractSubsystem()
             return CompletableFuture.completedFuture(null)
         }
 
-        return if (newState == OuttakeState.Idle)
+        return if (newState == OuttakeState.Transfer)
         {
             //idle outtake stuff here
-            robot.outtake.setOuttakeGrip(Outtake.ClawState.Open)
+            robot.outtake.setOuttakeGrip(ClawState.Open)
             robot.ov4b.setPulley(OV4B.PulleyState.Intake)
             robot.ov4b.setV4B(OV4B.OV4BState.Idle)
             robot.lift.extendToAndStayAt(SlideConfig.liftClosed)
-            robot.outtake.setWrist(Outtake.WristState.Front).apply { currentOuttakeState = OuttakeState.Idle }
+            robot.outtake.setWrist(Outtake.WristState.Front).apply { currentOuttakeState = OuttakeState.Transfer }
         } else
         {
             //closes the outtake claw and opens the intake claw, then the robot extends forwards
-            robot.outtake.setOuttakeGrip(Outtake.ClawState.Closed)
-            robot.intake.setIntakeGrip(Intake.ClawState.Open).thenCompose { robot.extension.extendToAndStayAt(SlideConfig.extendoGetOut) }
+            robot.outtake.setOuttakeGrip(ClawState.Closed)
+            robot.intake.setIntakeGrip(Intake.ClawState.Open).thenAccept { robot.extension.extendToAndStayAt(SlideConfig.extendoGetOut) }
 
             //the outtake rotates outwards
             robot.ov4b.setPulley(OV4B.PulleyState.Outtake)
@@ -51,7 +51,7 @@ class CompositeOuttake(val robot: HypnoticRobot) : AbstractSubsystem()
     {
         return if (currentOuttakeState == OuttakeState.Outtake)
         {
-            setOuttake(OuttakeState.Idle)
+            setOuttake(OuttakeState.Transfer)
         } else
         {
             //closes the outtake claw and opens the intake claw, then the robot extends forwards
@@ -59,7 +59,7 @@ class CompositeOuttake(val robot: HypnoticRobot) : AbstractSubsystem()
         }
     }
     override fun doInitialize() {
-        setOuttake(OuttakeState.Idle)
+        setOuttake(OuttakeState.Transfer)
     }
 
     override fun start() {
