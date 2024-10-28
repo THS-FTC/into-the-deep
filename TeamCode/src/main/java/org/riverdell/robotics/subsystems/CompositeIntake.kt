@@ -5,7 +5,7 @@ import io.liftgate.robotics.mono.konfig.konfig
 import io.liftgate.robotics.mono.states.StateResult
 import io.liftgate.robotics.mono.subsystem.AbstractSubsystem
 import kotlinx.serialization.Serializable
-import org.riverdell.robotics.utilities.motionprofile.MotionProfileConstraints
+import org.riverdell.robotics.utilities.motionprofile.ProfileConstraints
 import java.util.concurrent.CompletableFuture
 
 class CompositeIntake(opMode: LinearOpMode) : AbstractSubsystem()
@@ -48,13 +48,13 @@ class CompositeIntake(opMode: LinearOpMode) : AbstractSubsystem()
 //    private var currentwristState = WristState.Front
 //    private var currentrotationState = RotationState.Idle
 //
-//    private val wristConstraints = konfig<MotionProfileConstraints> { withCustomFileID("intake_wrist_motionprofile") }
+//    private val wristConstraints = konfig<ProfileConstraints> { withCustomFileID("intake_wrist_motionprofile") }
 //    private val wrist = motionProfiledServo("intake_wrist", wristConstraints)
 //
-//    private val pulleyConstraints = konfig<MotionProfileConstraints> { withCustomFileID("intake_pulley_motionprofile") }
+//    private val pulleyConstraints = konfig<ProfileConstraints> { withCustomFileID("intake_pulley_motionprofile") }
 //    private val pulley = motionProfiledServo("intake_pulley", pulleyConstraints)
 //
-//    private val rotationConstraints = konfig<MotionProfileConstraints> { withCustomFileID("intake_grip_motionprofile") }
+//    private val rotationConstraints = konfig<ProfileConstraints> { withCustomFileID("intake_grip_motionprofile") }
 //    private val grip = motionProfiledServo("intake_grip", rotationConstraints)
 //
 //    fun wristRotateTo(position: Double) = wrist.setMotionProfileTarget(position)

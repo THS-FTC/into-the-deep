@@ -7,7 +7,8 @@ import kotlinx.serialization.Serializable
 import org.riverdell.robotics.HypnoticRobot
 import org.riverdell.robotics.subsystems.Intake.ClawState
 import org.riverdell.robotics.subsystems.Intake.RotationState
-import org.riverdell.robotics.utilities.motionprofile.MotionProfileConstraints
+import org.riverdell.robotics.utilities.motionprofile.Constraint
+import org.riverdell.robotics.utilities.motionprofile.ProfileConstraints
 import java.util.concurrent.CompletableFuture
 
 class IV4B(opMode: HypnoticRobot) : AbstractSubsystem()
@@ -28,9 +29,9 @@ class IV4B(opMode: HypnoticRobot) : AbstractSubsystem()
 //    private val v4bConfig = konfig<V4BConfig>()
     private val currentV4BState = V4BState.Idle
 
-    private val rotationConstraints = konfig<MotionProfileConstraints> { withCustomFileID("v4b_rotation_motionprofile") }
-    private val leftRotation = motionProfiledServo("iv4b_rotation_left", rotationConstraints)
-    private val rightRotation = motionProfiledServo("iv4b_rotation_right", rotationConstraints)
+    private val rotationConstraints = konfig<ProfileConstraints> { withCustomFileID("v4b_rotation_motionprofile") }
+    private val leftRotation = motionProfiledServo("iv4b_rotation_left", Constraint.HALF.scale(5.0))
+    private val rightRotation = motionProfiledServo("iv4b_rotation_right", Constraint.HALF.scale(5.0))
 
     fun v4bRotateTo(position: Double) = CompletableFuture.allOf(
         leftRotation.setMotionProfileTarget(

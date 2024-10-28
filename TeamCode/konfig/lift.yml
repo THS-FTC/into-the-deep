@@ -4,7 +4,7 @@ kD: 0.0
 kV: 0.0
 kA: 0.0
 kStatic: 0.0
-motionProfileConstraints: 
+ProfileConstraints: 
   velocity: 0.0
   acceleration: 0.0
   deceleration: 0.0
