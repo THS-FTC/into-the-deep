@@ -2,6 +2,7 @@ package org.riverdell.robotics.teleop.tests
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp
+import org.riverdell.robotics.autonomous.detection.VisionPipeline
 
 @TeleOp(
     name = "Sample Detection Test",
