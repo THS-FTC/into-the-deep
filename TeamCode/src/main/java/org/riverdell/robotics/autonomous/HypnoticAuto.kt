@@ -4,17 +4,14 @@ import io.liftgate.robotics.mono.Mono
 import io.liftgate.robotics.mono.konfig.konfig
 import io.liftgate.robotics.mono.pipeline.RootExecutionGroup
 import io.liftgate.robotics.mono.subsystem.AbstractSubsystem
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit
-import org.riverdell.robotics.autonomous.detection.VisionPipeline
-import org.riverdell.robotics.autonomous.movement.konfig.NavigationConfig
-import org.riverdell.robotics.autonomous.movement.localization.TwoWheelLocalizer
+import org.riverdell.robotics.HypnoticOpMode
 import org.riverdell.robotics.HypnoticRobot
-import java.util.concurrent.CountDownLatch
+import org.riverdell.robotics.autonomous.movement.konfig.NavigationConfig
 import kotlin.concurrent.thread
 
 abstract class HypnoticAuto(
     internal val blockExecutionGroup: RootExecutionGroup.(HypnoticAuto) -> Unit
-) : HypnoticRobot()
+) : HypnoticOpMode()
 {
     companion object
     {
@@ -22,51 +19,27 @@ abstract class HypnoticAuto(
         lateinit var instance: HypnoticAuto
     }
 
-    val navigationConfig by lazy {
-        konfig<NavigationConfig> {
-            withCustomFileID("navigation")
-        }
-    }
-
-//    val visionPipeline by lazy { VisionPipeline(this) } // TODO: new season
-
-    override fun additionalSubSystems() = listOf<AbstractSubsystem>(/*visionPipeline*/)
-    override fun initialize()
+    inner class HypnoticAutoRobot : HypnoticRobot(this@HypnoticAuto)
     {
-        instance = this
+        val navigationConfig by lazy {
+            konfig<NavigationConfig> {
+                withCustomFileID("navigation")
+            }
+        }
 
-        while (opModeInInit())
+//       val visionPipeline by lazy { VisionPipeline(this@HypnoticAuto) } // TODO: new season
+
+        override fun additionalSubSystems() = listOf<AbstractSubsystem>(/*visionPipeline*/)
+        override fun initialize()
         {
-            runPeriodics()
-            drivetrain.localizer.update()
+            HypnoticAuto.instance = this@HypnoticAuto
 
-            multipleTelemetry.addLine("--- Initialization ---")
-            multipleTelemetry.addData(
-                "Voltage",
-                drivetrain.voltage()
-            )
-            multipleTelemetry.addData(
-                "IMU",
-                drivetrain.imu()
-            )
-            multipleTelemetry.addData(
-                "Pose",
-                drivetrain.localizer.pose
-            )
-
-            multipleTelemetry.update()
-        }
-    }
-
-    override fun opModeStart()
-    {
-        thread {
-            while (!isStopRequested)
+            while (opModeInInit())
             {
                 runPeriodics()
                 drivetrain.localizer.update()
 
-                multipleTelemetry.addLine("--- Autonomous ---")
+                multipleTelemetry.addLine("--- Initialization ---")
                 multipleTelemetry.addData(
                     "Voltage",
                     drivetrain.voltage()
@@ -84,12 +57,41 @@ abstract class HypnoticAuto(
             }
         }
 
-        val executionGroup = Mono.buildExecutionGroup {
-            blockExecutionGroup(
-                this@HypnoticAuto
-            )
-        }
+        override fun opModeStart()
+        {
+            thread {
+                while (!isStopRequested)
+                {
+                    runPeriodics()
+                    drivetrain.localizer.update()
 
-        executionGroup.executeBlocking()
+                    multipleTelemetry.addLine("--- Autonomous ---")
+                    multipleTelemetry.addData(
+                        "Voltage",
+                        drivetrain.voltage()
+                    )
+                    multipleTelemetry.addData(
+                        "IMU",
+                        drivetrain.imu()
+                    )
+                    multipleTelemetry.addData(
+                        "Pose",
+                        drivetrain.localizer.pose
+                    )
+
+                    multipleTelemetry.update()
+                }
+            }
+
+            val executionGroup = Mono.buildExecutionGroup {
+                blockExecutionGroup(
+                    this@HypnoticAuto
+                )
+            }
+
+            executionGroup.executeBlocking()
+        }
     }
+
+    override fun buildRobot() = HypnoticAutoRobot()
 }

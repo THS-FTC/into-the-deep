@@ -5,7 +5,8 @@ import io.liftgate.robotics.mono.konfig.konfig
 import io.liftgate.robotics.mono.states.StateResult
 import io.liftgate.robotics.mono.subsystem.AbstractSubsystem
 import kotlinx.serialization.Serializable
-import org.riverdell.robotics.utilities.motionprofile.MotionProfileConstraints
+import org.riverdell.robotics.utilities.motionprofile.Constraint
+import org.riverdell.robotics.utilities.motionprofile.ProfileConstraints
 import java.util.concurrent.CompletableFuture
 
 class Outtake(opMode: LinearOpMode) : AbstractSubsystem()
@@ -46,11 +47,8 @@ class Outtake(opMode: LinearOpMode) : AbstractSubsystem()
         return CompletableFuture.completedFuture(null)
     }
 
-    private val wristConstraints = konfig<MotionProfileConstraints> { withCustomFileID("outtake_wrist_motionprofile") }
-    private val wrist = motionProfiledServo("outtake_wrist", wristConstraints)
-
-    private val rotationConstraints = konfig<MotionProfileConstraints> { withCustomFileID("outtake_grip_motionprofile") }
-    private val actuator = motionProfiledServo("outtake_grip", rotationConstraints) // change to outtakegrip
+    private val wrist = motionProfiledServo("outtake_wrist", Constraint.HALF.scale(5.0))
+    private val actuator = motionProfiledServo("outtake_grip", Constraint.HALF.scale(5.0)) // change to outtakegrip
 
     private var currentClawState = ClawState.Idle
     private var currentWristState = WristState.Idle

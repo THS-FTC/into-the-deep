@@ -5,7 +5,8 @@ import io.liftgate.robotics.mono.states.StateResult
 import io.liftgate.robotics.mono.subsystem.AbstractSubsystem
 import kotlinx.serialization.Serializable
 import org.riverdell.robotics.HypnoticRobot
-import org.riverdell.robotics.utilities.motionprofile.MotionProfileConstraints
+import org.riverdell.robotics.utilities.motionprofile.Constraint
+import org.riverdell.robotics.utilities.motionprofile.ProfileConstraints
 import java.util.concurrent.CompletableFuture
 
 class OV4B(opMode: HypnoticRobot) : AbstractSubsystem()
@@ -33,12 +34,9 @@ class OV4B(opMode: HypnoticRobot) : AbstractSubsystem()
     private var currentRotateState = PulleyState.Init
 
 
-    private val rotationConstraints = konfig<MotionProfileConstraints> { withCustomFileID("ov4b_rotation_motionprofile") }
-    private val leftRotation = motionProfiledServo("ov4b_rotation_left", rotationConstraints)
-    private val rightRotation = motionProfiledServo("ov4b_rotation_right", rotationConstraints)
-
-    private val clawConstraints = konfig<MotionProfileConstraints>()
-    private val clawPulley = motionProfiledServo("ov4b_pulley", clawConstraints)
+    private val leftRotation = motionProfiledServo("ov4b_rotation_left", Constraint.HALF.scale(5.0))
+    private val rightRotation = motionProfiledServo("ov4b_rotation_right", Constraint.HALF.scale(5.0))
+    private val clawPulley = motionProfiledServo("ov4b_pulley", Constraint.HALF.scale(5.0))
 
 //    fun pulleyRotateTo(position: Double) = clawPulley.setMotionProfileTarget(position)
 fun pulleyRotateTo(position: Double): CompletableFuture<Void>{

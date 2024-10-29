@@ -9,7 +9,6 @@ import io.liftgate.robotics.mono.subsystem.AbstractSubsystem
 import io.liftgate.robotics.mono.subsystem.Subsystem
 import io.liftgate.robotics.mono.subsystem.System
 import org.riverdell.robotics.autonomous.impl.tests.ExampleSystem
-import org.riverdell.robotics.subsystems.CompositeIntake
 import org.riverdell.robotics.subsystems.CompositeOuttake
 import org.riverdell.robotics.subsystems.Drivetrain
 import org.riverdell.robotics.subsystems.Extension
@@ -20,7 +19,7 @@ import org.riverdell.robotics.subsystems.OV4B
 import org.riverdell.robotics.subsystems.Outtake
 import java.util.concurrent.CompletableFuture
 
-abstract class HypnoticRobot : LinearOpMode(), System
+abstract class HypnoticRobot(val opMode: HypnoticOpMode) : System
 {
     companion object
     {
@@ -31,18 +30,17 @@ abstract class HypnoticRobot : LinearOpMode(), System
     override val subsystems: MutableSet<Subsystem> = mutableSetOf()
 
     val drivetrain by lazy { Drivetrain(this) }
-    val intake by lazy { Intake(this) }
+    val intake by lazy { Intake(opMode) }
     val iv4b by lazy { IV4B(this) }
-    val lift by lazy { Lift(this) }
-    val extension by lazy {Extension(this)}
-    val ov4b by lazy {OV4B(this)}
-    val outtake by lazy {Outtake(this)}
-    val compositeout by lazy {CompositeOuttake(this)}
-    val compositein by lazy {CompositeIntake(this)}
+    val lift by lazy { Lift(opMode) }
+    val extension by lazy { Extension(opMode) }
+    val ov4b by lazy { OV4B(this) }
+    val outtake by lazy { Outtake(opMode) }
+    val compositeout by lazy { CompositeOuttake(this) }
 
     val multipleTelemetry by lazy {
         MultipleTelemetry(
-            this.telemetry,
+            opMode.telemetry,
             FtcDashboard.getInstance().telemetry
         )
     }
@@ -69,12 +67,12 @@ abstract class HypnoticRobot : LinearOpMode(), System
         return emptyList()
     }
 
-    override fun runOpMode()
+    fun runOpMode()
     {
         instance = this
 
         register(
-            drivetrain, intake, iv4b, lift, extension,ov4b,outtake,compositeout,compositein,
+            drivetrain, intake, iv4b, lift, extension, ov4b, outtake, compositeout,
             *additionalSubSystems().toTypedArray()
         )
 
@@ -88,8 +86,8 @@ abstract class HypnoticRobot : LinearOpMode(), System
         initializeAll()
         initialize()
 
-        waitForStart()
-        if (isStopRequested)
+        opMode.waitForStart()
+        if (opMode.isStopRequested)
         {
             return
         }
