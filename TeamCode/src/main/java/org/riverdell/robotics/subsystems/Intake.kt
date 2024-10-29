@@ -162,8 +162,8 @@ class Intake(opMode: LinearOpMode) : AbstractSubsystem()
 
     override fun doInitialize()
     {
-        setIntakeGrip(ClawState.Open)
-        setRotationPulley(RotationState.Observe)
-        setWrist(WristState.Front)
+//        setIntakeGrip(ClawState.Open)
+//        setRotationPulley(RotationState.Observe)
+//        setWrist(WristState.Front)
     }
 }

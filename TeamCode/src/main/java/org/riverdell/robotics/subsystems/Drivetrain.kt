@@ -114,7 +114,7 @@ class Drivetrain(private val opMode: HypnoticRobot) : AbstractSubsystem()
         backLeft.inverted = true
 
         backingDriveBase = MecanumDrive(
-            frontLeft, backLeft, frontRight, backRight
+            frontLeft, frontRight, backLeft, backRight
         )
     }
 

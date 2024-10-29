@@ -23,10 +23,10 @@ class IV4B(opMode: HypnoticRobot) : AbstractSubsystem()
 //    )
     enum class V4BState
     {
-        Observe, Transfer, Grab, Idle, MoveAway
+        Observe, Transfer, Grab, Idle, MoveAway, Init
     }
 //    private val v4bConfig = konfig<V4BConfig>()
-    private val currentV4BState = V4BState.Idle
+    private val currentV4BState = V4BState.Init
 
     private val rotationConstraints = konfig<MotionProfileConstraints> { withCustomFileID("v4b_rotation_motionprofile") }
     private val leftRotation = motionProfiledServo("iv4b_rotation_left", rotationConstraints)
@@ -144,6 +144,6 @@ class IV4B(opMode: HypnoticRobot) : AbstractSubsystem()
 
     override fun doInitialize()
     {
-        setV4B(V4BState.Observe)
+//        setV4B(V4BState.Observe)
     }
 }

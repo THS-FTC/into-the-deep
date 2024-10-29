@@ -43,11 +43,11 @@ class HypnoticTeleOp : HypnoticRobot()
 
     override fun opModeStart()
     {
-        val robotDriver = GamepadEx(gamepad2)
+        val robotDriver = GamepadEx(gamepad1)
         buildCommands()
         while (opModeIsActive())
         {
-            val multiplier = 0.5 + gamepad2.right_trigger * 0.5
+            val multiplier = 0.5 + gamepad1.right_trigger * 0.5
             drivetrain.driveRobotCentric(robotDriver, multiplier)
 
             gp1Commands.run()
@@ -59,6 +59,8 @@ class HypnoticTeleOp : HypnoticRobot()
     private fun buildCommands()
     {
         //game pad 1 commands
+
+        //grab
         gp1Commands.where(ButtonType.ButtonA)
             .triggers {
                 iv4b.setV4B(IV4B.V4BState.Grab)
@@ -68,40 +70,42 @@ class HypnoticTeleOp : HypnoticRobot()
 
         gp1Commands.where(ButtonType.BumperLeft)
             .triggers {
-                intake.setRotationPulley(Intake.RotationState.Observe)
-                iv4b.setV4B(IV4B.V4BState.Observe)
-                extension.extendToAndStayAt(-400)
-                intake.setWrist(Intake.WristState.Front)
+//                intake.setRotationPulley(Intake.RotationState.Observe)
+//                iv4b.setV4B(IV4B.V4BState.Observe)
+//                extension.extendToAndStayAt(-400)
+//                intake.setWrist(Intake.WristState.Front)
+                compositein.toggle()
             }
             .whenPressedOnce()
 
         gp1Commands.where(ButtonType.BumperRight)
             .triggers {
-                //intake.setWrist(Intake.WristState.Back)
-                iv4b.setV4B(IV4B.V4BState.Transfer)
-                extension.extendToAndStayAt(-70).thenCompose { intake.setRotationPulley(Intake.RotationState.Transfer) }
+                compositeout.toggle()
             }
             .whenPressedOnce()
 
-        gp1Commands.where(ButtonType.ButtonY)
+
+        gp1Commands.where(ButtonType.ButtonX)
             .triggers {
                 intake.toggleIntakeGrip()
             }
             .whenPressedOnce()
 
-        gp1Commands.where(ButtonType.ButtonX)
-            .triggers {
-                outtake.setOuttakeGrip(Outtake.ClawState.Closed)
-                intake.setIntakeGrip(Intake.ClawState.Open).thenAccept { extension.extendToAndStayAt(-200) }.thenAccept { ov4b.setV4B(OV4B.OV4BState.Outtake) }
-
-            }
-            .whenPressedOnce()
+        //toggles outtake claw
         gp1Commands.where(ButtonType.ButtonB)
             .triggers {
                 outtake.toggleOuttakeGrip()
             }
             .whenPressedOnce()
 
+//        old code for transfer
+//        gp1Commands.where(ButtonType.BumperRight)
+//            .triggers {
+//                //intake.setWrist(Intake.WristState.Back)
+//                iv4b.setV4B(IV4B.V4BState.Transfer)
+//                extension.extendToAndStayAt(-70).thenCompose { intake.setRotationPulley(Intake.RotationState.Transfer) }
+//            }
+//            .whenPressedOnce()
 
         //game pad 2 commands
 

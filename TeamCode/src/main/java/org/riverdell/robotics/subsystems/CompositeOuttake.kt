@@ -32,46 +32,37 @@ class CompositeOuttake(val robot: HypnoticRobot) : AbstractSubsystem()
             robot.outtake.setOuttakeGrip(Outtake.ClawState.Open)
             robot.ov4b.setPulley(OV4B.PulleyState.Intake)
             robot.ov4b.setV4B(OV4B.OV4BState.Idle)
-            robot.extension.extendToAndStayAt(0)
+            robot.lift.extendToAndStayAt(SlideConfig.liftClosed)
             robot.outtake.setWrist(Outtake.WristState.Front).apply { currentOuttakeState = OuttakeState.Idle }
         } else
         {
             //closes the outtake claw and opens the intake claw, then the robot extends forwards
             robot.outtake.setOuttakeGrip(Outtake.ClawState.Closed)
-            robot.intake.setIntakeGrip(Intake.ClawState.Open).thenCompose { robot.extension.extendToAndStayAt(200) }
+            robot.intake.setIntakeGrip(Intake.ClawState.Open).thenCompose { robot.extension.extendToAndStayAt(SlideConfig.extendoGetOut) }
 
             //the outtake rotates outwards
             robot.ov4b.setPulley(OV4B.PulleyState.Outtake)
             robot.outtake.setWrist(Outtake.WristState.Front)
+            robot.lift.extendToAndStayAt(SlideConfig.liftHighBucket)
             robot.ov4b.setV4B(OV4B.OV4BState.Outtake).apply { currentOuttakeState = OuttakeState.Outtake }
         }
     }
-    fun toggleOuttake(): CompletableFuture<Void>
+    fun toggle(): CompletableFuture<Void>
     {
         return if (currentOuttakeState == OuttakeState.Outtake)
         {
-            robot.outtake.setOuttakeGrip(Outtake.ClawState.Open)
-            robot.ov4b.setPulley(OV4B.PulleyState.Intake)
-            robot.ov4b.setV4B(OV4B.OV4BState.Idle)
-            robot.extension.extendToAndStayAt(0)
-            robot.outtake.setWrist(Outtake.WristState.Front).apply { currentOuttakeState = OuttakeState.Idle }
+            setOuttake(OuttakeState.Idle)
         } else
         {
             //closes the outtake claw and opens the intake claw, then the robot extends forwards
-            robot.outtake.setOuttakeGrip(Outtake.ClawState.Closed)
-            robot.intake.setIntakeGrip(Intake.ClawState.Open).thenCompose { robot.extension.extendToAndStayAt(200) }
-
-            //the outtake rotates outwards
-            robot.ov4b.setPulley(OV4B.PulleyState.Outtake)
-            robot.outtake.setWrist(Outtake.WristState.Front)
-            robot.ov4b.setV4B(OV4B.OV4BState.Outtake).apply { currentOuttakeState = OuttakeState.Outtake }
+            setOuttake(OuttakeState.Outtake)
         }
     }
-//    setOuttake(OuttakeState.Idle)
     override fun doInitialize() {
+        setOuttake(OuttakeState.Idle)
     }
-//    setOuttake(OuttakeState.Idle)
+
     override fun start() {
-//
+
     }
 }

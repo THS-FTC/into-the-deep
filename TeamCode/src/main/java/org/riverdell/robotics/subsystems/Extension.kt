@@ -44,7 +44,7 @@ class Extension(opMode: LinearOpMode) : AbstractSubsystem()
 
     override fun doInitialize()
     {
-        slides.goTo(0)
+//        slides.goTo(0)
     }
 
 }

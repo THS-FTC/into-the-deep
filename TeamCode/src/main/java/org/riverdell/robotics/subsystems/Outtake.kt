@@ -135,7 +135,7 @@ class Outtake(opMode: LinearOpMode) : AbstractSubsystem()
 
     override fun doInitialize()
     {
-        setWrist(WristState.Front)
-        setOuttakeGrip(ClawState.Open)
+//        setWrist(WristState.Front)
+//        setOuttakeGrip(ClawState.Open)
     }
 }

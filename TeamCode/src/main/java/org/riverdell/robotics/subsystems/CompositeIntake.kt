@@ -5,136 +5,67 @@ import io.liftgate.robotics.mono.konfig.konfig
 import io.liftgate.robotics.mono.states.StateResult
 import io.liftgate.robotics.mono.subsystem.AbstractSubsystem
 import kotlinx.serialization.Serializable
+import org.riverdell.robotics.HypnoticRobot
 import org.riverdell.robotics.utilities.motionprofile.MotionProfileConstraints
 import java.util.concurrent.CompletableFuture
 
-class CompositeIntake(opMode: LinearOpMode) : AbstractSubsystem()
+class CompositeIntake(val robot : HypnoticRobot) : AbstractSubsystem()
 {
-//    @Serializable
-//    data class IntakeConfig(
-//        //claw
-//        val openPosition: Double = 0.4,
-//        val closedPosition: Double = 1.0,
-//
-//        //rotation
-//        val transferPosition: Double = 1.0,
-//        val observePosition: Double = 0.0,
-//        val grabPosition: Double = 0.0,
-//
-//        // wrist
-//        val frontPosition: Double = 0.0,
-//        val backPosition: Double = 1.0,
-//    )
-
-//    enum class ClawState
-//    {
-//        Closed, Open
-//    }
-//    enum class WristState
-//    {
-//        Front, Back
-//    }
-//    enum class RotationState
-//    {
-//        Transfer, Observe, Grab,Idle
-//    }
-//
-////    private val intakeConfig = konfig<IntakeConfig>()
-////        .apply {
-////            println("HORS ${get().openPosition}")
-////        }
-//
-//    private var currentClawState = ClawState.Closed
-//    private var currentwristState = WristState.Front
-//    private var currentrotationState = RotationState.Idle
-//
-//    private val wristConstraints = konfig<MotionProfileConstraints> { withCustomFileID("intake_wrist_motionprofile") }
-//    private val wrist = motionProfiledServo("intake_wrist", wristConstraints)
-//
-//    private val pulleyConstraints = konfig<MotionProfileConstraints> { withCustomFileID("intake_pulley_motionprofile") }
-//    private val pulley = motionProfiledServo("intake_pulley", pulleyConstraints)
-//
-//    private val rotationConstraints = konfig<MotionProfileConstraints> { withCustomFileID("intake_grip_motionprofile") }
-//    private val grip = motionProfiledServo("intake_grip", rotationConstraints)
-//
-//    fun wristRotateTo(position: Double) = wrist.setMotionProfileTarget(position)
-//    fun gripRotateTo(position: Double) = grip.setMotionProfileTarget(position)
-//    fun pulleyRotateTo(position: Double) = pulley.setMotionProfileTarget(position)
-//
-//    //toggles the intake grip
-//    fun toggleIntakeGrip(): CompletableFuture<StateResult>
-//    {
-//        return if (currentClawState == ClawState.Closed)
-//        {
-//            gripRotateTo(IntakeConfig.openPosition).apply {
-//                currentClawState = ClawState.Open
-//            }
-//        } else
-//        {
-//            gripRotateTo(IntakeConfig.closePositon).apply {
-//                currentClawState = ClawState.Closed
-//            }
-//        }
-//    }
-//    //sets intake grip to either open or close
-//    fun setIntakeGrip(newState: ClawState): CompletableFuture<Void>
-//    {
-//        if (currentClawState == newState)
-//        {
-//            return CompletableFuture.completedFuture(null)
-//        }
-//
-//        return if (newState == ClawState.Open)
-//        {
-//            gripRotateTo(IntakeConfig.openPosition)
-//                .thenAccept {
-//                    println(it)
-//                }
-//        } else
-//        {
-//            gripRotateTo(IntakeConfig.closePositon)
-//                .thenAccept {
-//                    println(it)
-//                }
-//        }
-//    }
-//
-//    fun setRotationPulley(newState: RotationState): CompletableFuture<Void>
-//    {
-//        if (currentrotationState == newState)
-//        {
-//            return CompletableFuture.completedFuture(null)
-//        }
-//
-//        return if (newState == RotationState.Transfer)
-//        {
-//            pulleyRotateTo(IntakeConfig.transferPosition)
-//                .thenAccept {
-//                    println(it)
-//                }
-//        } else if (newState == RotationState.Grab){
-//            pulleyRotateTo(IntakeConfig.grabPosition)
-//                .thenAccept {
-//                    println(it)
-//                }
-//        }
-//        else
-//        {
-//            pulleyRotateTo(IntakeConfig.observePosition)
-//                .thenAccept {
-//                    println(it)
-//                }
-//        }
-//    }
-//
-//
-   override fun start()
-   {
-
-   }
-
-    override fun doInitialize()
+    enum class IntakeState
     {
+        Intake,Idle,Transfer,Init
+    }
 
-   }
+    private var currentIntakeState = IntakeState.Init
+
+
+    fun setIntake(newState: IntakeState): CompletableFuture<Void>
+    {
+        if (currentIntakeState == newState)
+        {
+            return CompletableFuture.completedFuture(null)
+        }
+
+        return if (newState == IntakeState.Idle)
+        {
+            //idle outtake stuff here
+            robot.intake.setIntakeGrip(Intake.ClawState.Open)
+            robot.iv4b.setV4B(IV4B.V4BState.Idle)
+            robot.intake.setRotationPulley(Intake.RotationState.Idle) //works idk i am him
+            robot.extension.extendToAndStayAt(SlideConfig.extendoClosed)
+            robot.intake.setWrist(Intake.WristState.Front).apply { currentIntakeState = IntakeState.Idle }
+        } else if (newState == IntakeState.Transfer)
+        {
+           //this is for transfer
+            robot.iv4b.setV4B(IV4B.V4BState.Idle)
+            robot.intake.setRotationPulley(Intake.RotationState.Idle) //works idk i am him
+            robot.extension.extendToAndStayAt(SlideConfig.extendoTransfer)
+            robot.intake.setWrist(Intake.WristState.Front).apply { currentIntakeState = IntakeState.Transfer }
+        }
+        else {
+            //this is for observing/intaking
+            robot.iv4b.setV4B(IV4B.V4BState.Observe)
+            robot.intake.setRotationPulley(Intake.RotationState.Observe) //works idk i am him
+            robot.extension.extendToAndStayAt(SlideConfig.extendoIntake)
+            robot.intake.setWrist(Intake.WristState.Front).apply { currentIntakeState = IntakeState.Intake }
+        }
+    }
+    fun toggle(): CompletableFuture<Void>
+    {
+        return if (currentIntakeState == IntakeState.Transfer || currentIntakeState == IntakeState.Idle )
+        {
+            setIntake(IntakeState.Intake)
+        } else
+        {
+           setIntake(IntakeState.Transfer)
+        }
+    }
+
+    override fun doInitialize() {
+        setIntake(IntakeState.Idle)
+    }
+
+    override fun start() {
+
+    }
 }

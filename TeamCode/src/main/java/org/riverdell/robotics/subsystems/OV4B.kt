@@ -22,15 +22,15 @@ class OV4B(opMode: HypnoticRobot) : AbstractSubsystem()
 //    )
     enum class OV4BState
     {
-        Transfer,Outtake,Idle
+        Transfer,Outtake,Idle,Init
     }
     enum class PulleyState
     {
-        Outtake,Intake,Idle
+        Outtake,Intake,Idle,Init
     }
 //    private val ov4bConfig = konfig<V4BConfig>()
-    private val currentV4BState = OV4BState.Idle
-    private var currentRotateState = PulleyState.Idle
+    private var currentV4BState = OV4BState.Init
+    private var currentRotateState = PulleyState.Init
 
 
     private val rotationConstraints = konfig<MotionProfileConstraints> { withCustomFileID("ov4b_rotation_motionprofile") }
@@ -105,21 +105,20 @@ fun pulleyRotateTo(position: Double): CompletableFuture<Void>{
 
         return if (newState == OV4BState.Transfer)
         {
-            v4bRotateTo(OV4BConfig.transferPosition)
-                .thenAccept {
-                    println(it)
-                }
+            v4bRotateTo(OV4BConfig.transferPosition).apply {
+                currentV4BState = OV4BState.Transfer
+            }
         } else if (newState == OV4BState.Outtake){
             v4bRotateTo(OV4BConfig.OuttakePosition)
-                .thenAccept {
-                    println(it)
+                .apply {
+                    currentV4BState = OV4BState.Outtake
                 }
         }
         else
         {
             v4bRotateTo(OV4BConfig.IdlePosition)
-                .thenAccept {
-                    println(it)
+                .apply {
+                    currentV4BState = OV4BState.Idle
                 }
         }
 
@@ -161,8 +160,8 @@ fun pulleyRotateTo(position: Double): CompletableFuture<Void>{
 
     override fun doInitialize()
     {
-        pulleyRotateTo(OV4BConfig.idlePulley)
-        v4bRotateTo(OV4BConfig.IdlePosition)
+//        pulleyRotateTo(OV4BConfig.idlePulley)
+//        v4bRotateTo(OV4BConfig.IdlePosition)
 
     }
 }
