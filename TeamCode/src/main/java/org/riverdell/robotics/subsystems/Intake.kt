@@ -1,15 +1,12 @@
 package org.riverdell.robotics.subsystems
 
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode
-import io.liftgate.robotics.mono.konfig.konfig
 import io.liftgate.robotics.mono.states.StateResult
 import io.liftgate.robotics.mono.subsystem.AbstractSubsystem
-import kotlinx.serialization.Serializable
+import org.riverdell.robotics.HypnoticRobot
 import org.riverdell.robotics.utilities.motionprofile.Constraint
-import org.riverdell.robotics.utilities.motionprofile.ProfileConstraints
 import java.util.concurrent.CompletableFuture
 
-class Intake(opMode: LinearOpMode) : AbstractSubsystem()
+class Intake(private val robot: HypnoticRobot) : AbstractSubsystem()
 {
 //    @Serializable
 //    data class IntakeConfig(
@@ -45,9 +42,9 @@ class Intake(opMode: LinearOpMode) : AbstractSubsystem()
     private var currentwristState = WristState.Init
     private var currentrotationState = RotationState.Init
 
-    private val wrist = motionProfiledServo("intake_wrist", Constraint.HALF.scale(5.0))
-    private val pulley = motionProfiledServo("intake_pulley", Constraint.HALF.scale(5.0))
-    private val grip = motionProfiledServo("intake_grip", Constraint.HALF.scale(5.0))
+    private val wrist = motionProfiledServo(robot.hardware.intakeWrist, Constraint.HALF.scale(5.0))
+    private val pulley = motionProfiledServo(robot.hardware.intakePulley, Constraint.HALF.scale(5.0))
+    private val grip = motionProfiledServo(robot.hardware.intakeGrip, Constraint.HALF.scale(5.0))
 
     fun wristRotateTo(position: Double): CompletableFuture<Void>{
         wrist.forcefullySetTarget(position)

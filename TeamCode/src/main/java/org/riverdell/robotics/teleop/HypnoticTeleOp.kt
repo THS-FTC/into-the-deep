@@ -2,21 +2,17 @@ package org.riverdell.robotics.teleop
 
 import com.arcrobotics.ftclib.gamepad.GamepadEx
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp
-import com.qualcomm.robotcore.hardware.Servo
 import io.liftgate.robotics.mono.Mono.commands
 import io.liftgate.robotics.mono.gamepad.ButtonType
 import org.riverdell.robotics.HypnoticOpMode
 import org.riverdell.robotics.HypnoticRobot
-import org.riverdell.robotics.autonomous.detection.SampleType
 import org.riverdell.robotics.autonomous.detection.VisionPipeline
-import org.riverdell.robotics.subsystems.CompositeOuttake.OuttakeState
 import org.riverdell.robotics.subsystems.IV4B
 import org.riverdell.robotics.subsystems.Intake
 import org.riverdell.robotics.subsystems.OV4B
 import org.riverdell.robotics.subsystems.Outtake
 import org.riverdell.robotics.subsystems.Outtake.ClawState
 import org.riverdell.robotics.subsystems.SlideConfig
-import org.riverdell.robotics.utilities.hardware
 
 @TeleOp(
     name = "Bit-By-Bit Drive",

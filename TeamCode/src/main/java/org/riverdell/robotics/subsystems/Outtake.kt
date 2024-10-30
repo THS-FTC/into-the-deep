@@ -1,15 +1,11 @@
 package org.riverdell.robotics.subsystems
 
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode
-import io.liftgate.robotics.mono.konfig.konfig
-import io.liftgate.robotics.mono.states.StateResult
 import io.liftgate.robotics.mono.subsystem.AbstractSubsystem
-import kotlinx.serialization.Serializable
+import org.riverdell.robotics.HypnoticRobot
 import org.riverdell.robotics.utilities.motionprofile.Constraint
-import org.riverdell.robotics.utilities.motionprofile.ProfileConstraints
 import java.util.concurrent.CompletableFuture
 
-class Outtake(opMode: LinearOpMode) : AbstractSubsystem()
+class Outtake(private val robot: HypnoticRobot) : AbstractSubsystem()
 {
 //    @Serializable
 //    data class OuttakeConfig(
@@ -47,8 +43,8 @@ class Outtake(opMode: LinearOpMode) : AbstractSubsystem()
         return CompletableFuture.completedFuture(null)
     }
 
-    private val wrist = motionProfiledServo("outtake_wrist", Constraint.HALF.scale(5.0))
-    private val actuator = motionProfiledServo("outtake_grip", Constraint.HALF.scale(5.0)) // change to outtakegrip
+    private val wrist = motionProfiledServo(robot.hardware.outtakeWrist, Constraint.HALF.scale(5.0))
+    private val actuator = motionProfiledServo(robot.hardware.outtakeGrip, Constraint.HALF.scale(5.0)) // change to outtakegrip
 
     private var currentClawState = ClawState.Idle
     private var currentWristState = WristState.Idle

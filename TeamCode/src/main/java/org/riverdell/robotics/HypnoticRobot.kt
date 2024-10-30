@@ -3,12 +3,10 @@ package org.riverdell.robotics
 import android.util.Log
 import com.acmerobotics.dashboard.FtcDashboard
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode
 import io.liftgate.robotics.mono.Mono
 import io.liftgate.robotics.mono.subsystem.AbstractSubsystem
 import io.liftgate.robotics.mono.subsystem.Subsystem
 import io.liftgate.robotics.mono.subsystem.System
-import org.riverdell.robotics.autonomous.impl.tests.ExampleSystem
 import org.riverdell.robotics.subsystems.CompositeIntake
 import org.riverdell.robotics.subsystems.CompositeOuttake
 import org.riverdell.robotics.subsystems.Drivetrain
@@ -18,7 +16,6 @@ import org.riverdell.robotics.subsystems.Intake
 import org.riverdell.robotics.subsystems.Lift
 import org.riverdell.robotics.subsystems.OV4B
 import org.riverdell.robotics.subsystems.Outtake
-import java.util.concurrent.CompletableFuture
 
 abstract class HypnoticRobot(val opMode: HypnoticOpMode) : System
 {
@@ -29,6 +26,7 @@ abstract class HypnoticRobot(val opMode: HypnoticOpMode) : System
     }
 
     override val subsystems: MutableSet<Subsystem> = mutableSetOf()
+    lateinit var hardware: HypnoticRobotHardware
 
     val drivetrain by lazy { Drivetrain(this) }
     val intake by lazy { Intake(opMode) }
@@ -57,13 +55,6 @@ abstract class HypnoticRobot(val opMode: HypnoticOpMode) : System
             .forEach { it.allPeriodic() }
     }
 
-    //my own function idc
-    fun intakeSequence() = CompletableFuture.allOf(
-        //
-    ).thenCompose {
-        intake.setIntakeGrip(Intake.ClawState.Open)
-    }
-
     open fun additionalSubSystems(): List<AbstractSubsystem>
     {
         return emptyList()
@@ -73,8 +64,11 @@ abstract class HypnoticRobot(val opMode: HypnoticOpMode) : System
     {
         instance = this
 
+        hardware = HypnoticRobotHardware(opMode)
+        hardware.initializeHardware()
+
         register(
-            drivetrain, intake, iv4b, lift, extension, ov4b, outtake, compositeout,compositein,
+            drivetrain, intake, iv4b, lift, extension, ov4b, outtake, compositeout, compositein,
             *additionalSubSystems().toTypedArray()
         )
 

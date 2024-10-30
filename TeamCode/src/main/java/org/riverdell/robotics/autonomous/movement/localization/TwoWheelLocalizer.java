@@ -52,9 +52,9 @@ public class TwoWheelLocalizer extends TwoTrackingWheelLocalizer {
     @NonNull
     @Override
     public List<Double> getWheelPositions() {
-        hypnoticRobot.getDrivetrain().getPinpointDriver().update();
+        hypnoticRobot.getHardware().getPinpointDriver().update();
 
-        Pose2D pose = hypnoticRobot.getDrivetrain().getPinpointDriver().getPosition();
+        Pose2D pose = hypnoticRobot.getHardware().getPinpointDriver().getPosition();
         return Arrays.asList(
                 pose.getX(DistanceUnit.INCH),
                 pose.getY(DistanceUnit.INCH)

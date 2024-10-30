@@ -9,7 +9,7 @@ import org.riverdell.robotics.utilities.motionprofile.Constraint
 import org.riverdell.robotics.utilities.motionprofile.ProfileConstraints
 import java.util.concurrent.CompletableFuture
 
-class OV4B(opMode: HypnoticRobot) : AbstractSubsystem()
+class OV4B(private val robot: HypnoticRobot) : AbstractSubsystem()
 {
 //    @Serializable
 //    data class V4BConfig(
@@ -34,9 +34,9 @@ class OV4B(opMode: HypnoticRobot) : AbstractSubsystem()
     private var currentRotateState = PulleyState.Init
 
 
-    private val leftRotation = motionProfiledServo("ov4b_rotation_left", Constraint.HALF.scale(5.0))
-    private val rightRotation = motionProfiledServo("ov4b_rotation_right", Constraint.HALF.scale(5.0))
-    private val clawPulley = motionProfiledServo("ov4b_pulley", Constraint.HALF.scale(5.0))
+    private val leftRotation = motionProfiledServo(robot.hardware.outtakeRotationLeft, Constraint.HALF.scale(5.0))
+    private val rightRotation = motionProfiledServo(robot.hardware.outtakeRotationRight, Constraint.HALF.scale(5.0))
+    private val clawPulley = motionProfiledServo(robot.hardware.outtakePulley, Constraint.HALF.scale(5.0))
 
 //    fun pulleyRotateTo(position: Double) = clawPulley.setMotionProfileTarget(position)
 fun pulleyRotateTo(position: Double): CompletableFuture<Void>{
