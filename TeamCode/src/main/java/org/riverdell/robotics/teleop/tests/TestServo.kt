@@ -6,6 +6,7 @@ import com.qualcomm.robotcore.hardware.Servo
 import io.liftgate.robotics.mono.konfig.konfig
 import kotlinx.serialization.Serializable
 import org.riverdell.robotics.autonomous.movement.konfig.NavigationNodeCollection
+import org.riverdell.robotics.subsystems.IV4B
 import org.riverdell.robotics.utilities.hardware
 
 @TeleOp(
@@ -24,12 +25,19 @@ class TestServo : LinearOpMode()
 
         while (opModeIsActive())
         {
-            val hardware1 = hardware<Servo>(ServoConfig.name1)
-            hardware1.position = ServoConfig.position1
-//            val hardware2 = hardware<Servo>(ServoConfig.name2)
-//            hardware2.position = ServoConfig.position2
-//            val hardware3 = hardware<Servo>(ServoConfig.name3)
-//            hardware3.position = ServoConfig.position3
+            //different servos to test
+
+//            val hardware1 = hardware<Servo>(ServoConfig.OV4BL)
+//            hardware1.position = ServoConfig.OL
+            val hardware2 = hardware<Servo>(ServoConfig.intakePulley)
+            hardware2.position = ServoConfig.IP
+            val hardware3 = hardware<Servo>(ServoConfig.outtakePulley)
+            hardware3.position = ServoConfig.OP
+//            val hardware4 = hardware<Servo>(ServoConfig.OV4BR)
+//            hardware4.position = ServoConfig.OR
+            val hardware5 = hardware<Servo>(ServoConfig.intakeWrist)
+            hardware5.position = ServoConfig.IW
+
             Thread.sleep(50L)
         }
     }

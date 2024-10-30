@@ -33,7 +33,7 @@ class Intake(opMode: LinearOpMode) : AbstractSubsystem()
     }
     enum class WristState
     {
-        Front, Back, Init
+        Front, Back,Vertical,Left,Right, Init
     }
     enum class RotationState
     {
@@ -49,18 +49,16 @@ class Intake(opMode: LinearOpMode) : AbstractSubsystem()
     private val pulley = motionProfiledServo("intake_pulley", Constraint.HALF.scale(5.0))
     private val grip = motionProfiledServo("intake_grip", Constraint.HALF.scale(5.0))
 
-    fun wristRotateTo(position: Double): CompletableFuture<Void>{
-        wrist.forcefullySetTarget(position)
+    fun wristRotateTo(position: Double) = wrist.setMotionProfileTarget(position)
+    //grip.setMotionProfileTarget(position)
+    fun gripRotateTo(position: Double): CompletableFuture<Void>{
+        grip.forcefullySetTarget(position)
         return CompletableFuture.completedFuture(null)
     }
-    fun gripRotateTo(position: Double) = grip.setMotionProfileTarget(position)
-    fun pulleyRotateTo(position: Double): CompletableFuture<Void>{
-        pulley.forcefullySetTarget(position)
-        return CompletableFuture.completedFuture(null)
-    }
+    fun pulleyRotateTo(position: Double) = pulley.setMotionProfileTarget(position)
 
     //toggles the intake grip
-    fun toggleIntakeGrip(): CompletableFuture<StateResult>
+    fun toggleIntakeGrip(): CompletableFuture<Void>
     {
         return if (currentClawState == ClawState.Closed)
         {
@@ -109,9 +107,29 @@ class Intake(opMode: LinearOpMode) : AbstractSubsystem()
                 .thenAccept {
                     println(it)
                 }
-        } else
+        } else if (newState == WristState.Back)
         {
             wristRotateTo(IntakeConfig.backPosition)
+                .thenAccept {
+                    println(it)
+                }
+        }
+        else if (newState == WristState.Left)
+        {
+            wristRotateTo(IntakeConfig.leftPosition)
+                .thenAccept {
+                    println(it)
+                }
+        }
+        else if (newState == WristState.Vertical)
+        {
+            wristRotateTo(IntakeConfig.veritcalPosition)
+                .thenAccept {
+                    println(it)
+                }
+        }
+        else {
+            wristRotateTo(IntakeConfig.rightPosition)
                 .thenAccept {
                     println(it)
                 }

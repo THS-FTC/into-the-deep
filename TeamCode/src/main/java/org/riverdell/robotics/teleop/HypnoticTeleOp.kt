@@ -63,9 +63,8 @@ class HypnoticTeleOp : HypnoticOpMode() {
             //grab
             gp1Commands.where(ButtonType.ButtonA)
                 .triggers {
-//                    iv4b.setV4B(IV4B.V4BState.Grab)
-//                    intake.setRotationPulley(Intake.RotationState.Grab)
-                    iv4b.setV4B(IV4B.V4BState.Idle)
+                    iv4b.setV4B(IV4B.V4BState.Grab)
+                    intake.setRotationPulley(Intake.RotationState.Grab)
                 }
                 .whenPressedOnce()
 
@@ -92,8 +91,8 @@ class HypnoticTeleOp : HypnoticOpMode() {
                     //the outtake rotates outwards
                     robot.ov4b.setPulley(OV4B.PulleyState.Outtake)
                     robot.outtake.setWrist(Outtake.WristState.Front)
-                    robot.lift.extendToAndStayAt(SlideConfig.liftHighBucket)
                     robot.ov4b.setV4B(OV4B.OV4BState.Outtake)
+                    robot.lift.extendToAndStayAt(SlideConfig.liftHighBucket)
                 }
                 .whenPressedOnce()
 

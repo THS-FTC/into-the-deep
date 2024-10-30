@@ -29,7 +29,7 @@ class IV4B(opMode: HypnoticRobot) : AbstractSubsystem()
 //    private val v4bConfig = konfig<V4BConfig>()
     private val currentV4BState = V4BState.Init
 
-    private val rotationConstraints = konfig<ProfileConstraints> { withCustomFileID("v4b_rotation_motionprofile") }
+    //private val rotationConstraints = konfig<ProfileConstraints> { withCustomFileID("v4b_rotation_motionprofile") }
     private val leftRotation = motionProfiledServo("iv4b_rotation_left", Constraint.HALF.scale(5.0))
     private val rightRotation = motionProfiledServo("iv4b_rotation_right", Constraint.HALF.scale(5.0))
 
