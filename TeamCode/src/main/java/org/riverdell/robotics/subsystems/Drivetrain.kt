@@ -4,29 +4,18 @@ import com.arcrobotics.ftclib.drivebase.MecanumDrive
 import com.arcrobotics.ftclib.gamepad.GamepadEx
 import com.arcrobotics.ftclib.hardware.motors.Motor
 import com.qualcomm.robotcore.hardware.DcMotor
-import com.qualcomm.robotcore.hardware.DcMotorEx
 import com.qualcomm.robotcore.hardware.DcMotorSimple
 import io.liftgate.robotics.mono.subsystem.AbstractSubsystem
 import org.riverdell.robotics.HypnoticRobot
 import org.riverdell.robotics.autonomous.HypnoticAuto
 import org.riverdell.robotics.autonomous.movement.localization.TwoWheelLocalizer
-import org.riverdell.robotics.gobilda.GoBildaPinpointDriver
-import org.riverdell.robotics.utilities.hardware
 
 class Drivetrain(private val robot: HypnoticRobot) : AbstractSubsystem()
 {
-    lateinit var frontRight: DcMotorEx
-    lateinit var frontLeft: DcMotorEx
+    private val voltageSensor = robot.opMode.hardwareMap.voltageSensor.first()
 
-    lateinit var backRight: DcMotorEx
-    lateinit var backLeft: DcMotorEx
-
-    lateinit var pinpointDriver: GoBildaPinpointDriver
-
-    private val imuState by state(write = { _ -> }, read = { pinpointDriver.heading })
-    private val voltageState by state(write = { _ -> }, read = {
-        robot.opMode.hardwareMap.voltageSensor.first().voltage
-    })
+    private val imuState by state(write = { _ -> }, read = { robot.hardware.pinpointDriver.heading })
+    private val voltageState by state(write = { _ -> }, read = voltageSensor::getVoltage)
 
     val localizer by lazy {
         TwoWheelLocalizer(robot)
@@ -69,31 +58,19 @@ class Drivetrain(private val robot: HypnoticRobot) : AbstractSubsystem()
      */
     override fun doInitialize()
     {
-        pinpointDriver = robot.hardware<GoBildaPinpointDriver>("pinpoint")
-
         if (robot.opMode is HypnoticAuto)
         {
-            pinpointDriver.setOffsets(-84.0, -168.0) // TUNE THIS
-            pinpointDriver.setEncoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD)
-            pinpointDriver.recalibrateIMU()
-            pinpointDriver.resetPosAndIMU()
+            robot.hardware.frontLeft.direction = DcMotorSimple.Direction.FORWARD
+            robot.hardware.frontLeft.zeroPowerBehavior = DcMotor.ZeroPowerBehavior.BRAKE
 
-            frontLeft = robot.opMode.hardware<DcMotorEx>("frontLeft")
-            frontRight = robot.opMode.hardware<DcMotorEx>("frontRight")
-            backLeft = robot.opMode.hardware<DcMotorEx>("backLeft")
-            backRight = robot.opMode.hardware<DcMotorEx>("backRight")
+            robot.hardware.frontRight.direction = DcMotorSimple.Direction.FORWARD
+            robot.hardware.frontRight.zeroPowerBehavior = DcMotor.ZeroPowerBehavior.BRAKE
 
-            frontLeft.direction = DcMotorSimple.Direction.FORWARD
-            frontLeft.zeroPowerBehavior = DcMotor.ZeroPowerBehavior.BRAKE
+            robot.hardware.backLeft.direction = DcMotorSimple.Direction.FORWARD
+            robot.hardware.backLeft.zeroPowerBehavior = DcMotor.ZeroPowerBehavior.BRAKE
 
-            frontRight.direction = DcMotorSimple.Direction.FORWARD
-            frontRight.zeroPowerBehavior = DcMotor.ZeroPowerBehavior.BRAKE
-
-            backLeft.direction = DcMotorSimple.Direction.FORWARD
-            backLeft.zeroPowerBehavior = DcMotor.ZeroPowerBehavior.BRAKE
-
-            backRight.direction = DcMotorSimple.Direction.FORWARD
-            backRight.zeroPowerBehavior = DcMotor.ZeroPowerBehavior.BRAKE
+            robot.hardware.backRight.direction = DcMotorSimple.Direction.FORWARD
+            robot.hardware.backRight.zeroPowerBehavior = DcMotor.ZeroPowerBehavior.BRAKE
 
             runWithoutEncoders()
         } else
@@ -126,7 +103,7 @@ class Drivetrain(private val robot: HypnoticRobot) : AbstractSubsystem()
 
     private fun configureMotorsToDo(consumer: (DcMotor) -> Unit)
     {
-        listOf(backLeft, frontLeft, frontRight, backRight).forEach(consumer::invoke)
+        listOf(robot.hardware.backLeft, robot.hardware.frontLeft, robot.hardware.frontRight, robot.hardware.backRight).forEach(consumer::invoke)
     }
 
     override fun isCompleted() = true
