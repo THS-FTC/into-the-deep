@@ -47,7 +47,7 @@ class OV4B(opMode: HypnoticRobot) : AbstractSubsystem()
                 (1.0 - position) else position
         ),
         rightRotation.setMotionProfileTarget(
-            if (OV4BConfig.leftIsReverse)
+            if (!OV4BConfig.leftIsReverse)
                 (1.0 - position) else position
         )
     )

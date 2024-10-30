@@ -60,7 +60,9 @@ class HypnoticTeleOp : HypnoticOpMode() {
         private fun buildCommands() {
             //game pad 1 commands
 
-            //grab
+
+
+            //grab positions
             gp1Commands.where(ButtonType.ButtonA)
                 .triggers {
                     iv4b.setV4B(IV4B.V4BState.Grab)
@@ -68,58 +70,69 @@ class HypnoticTeleOp : HypnoticOpMode() {
                 }
                 .whenPressedOnce()
 
+
+
+
+            //Composite Intake and Out
             gp1Commands.where(ButtonType.BumperLeft)
                 .triggers {
-//                intake.setRotationPulley(Intake.RotationState.Observe)
-//                iv4b.setV4B(IV4B.V4BState.Observe)
-//                extension.extendToAndStayAt(-400)
-//                intake.setWrist(Intake.WristState.Front)
                     compositein.toggle()
                 }
                 .whenPressedOnce()
 
             gp1Commands.where(ButtonType.BumperRight)
                 .triggers {
-//                    compositeout.toggle()
-
-
-                    //testing the outtake sequence
-                    robot.outtake.setOuttakeGrip(ClawState.Closed)
-                    robot.intake.setIntakeGrip(Intake.ClawState.Open).thenAccept { robot.extension.extendToAndStayAt(
-                        SlideConfig.extendoGetOut) }
-
-                    //the outtake rotates outwards
-                    robot.ov4b.setPulley(OV4B.PulleyState.Outtake)
-                    robot.outtake.setWrist(Outtake.WristState.Front)
-                    robot.ov4b.setV4B(OV4B.OV4BState.Outtake)
-                    robot.lift.extendToAndStayAt(SlideConfig.liftHighBucket)
+                    compositeout.toggle()
                 }
                 .whenPressedOnce()
 
 
+
+
+
+
+            //Wrist rotations
+            gp1Commands.where(ButtonType.DPadDown)
+                .triggers {
+                    intake.setWrist(Intake.WristState.Vertical)
+                }
+                .whenPressedOnce()
+
+            gp1Commands.where(ButtonType.DPadLeft)
+                .triggers {
+                    intake.setWrist(Intake.WristState.Left)
+                }
+                .whenPressedOnce()
+
+            gp1Commands.where(ButtonType.DPadRight)
+                .triggers {
+                    intake.setWrist(Intake.WristState.Right)
+                }
+                .whenPressedOnce()
+            gp1Commands.where(ButtonType.DPadUp)
+                .triggers {
+                    intake.setWrist(Intake.WristState.Front)
+                }
+                .whenPressedOnce()
+
+
+
+
+
+
+            //Grips
             gp1Commands.where(ButtonType.ButtonX)
                 .triggers {
                     intake.toggleIntakeGrip()
                 }
                 .whenPressedOnce()
-
-            //toggles outtake claw
             gp1Commands.where(ButtonType.ButtonB)
                 .triggers {
                     outtake.toggleOuttakeGrip()
                 }
                 .whenPressedOnce()
 
-//        old code for transfer
-//        gp1Commands.where(ButtonType.BumperRight)
-//            .triggers {
-//                //intake.setWrist(Intake.WristState.Back)
-//                iv4b.setV4B(IV4B.V4BState.Transfer)
-//                extension.extendToAndStayAt(-70).thenCompose { intake.setRotationPulley(Intake.RotationState.Transfer) }
-//            }
-//            .whenPressedOnce()
-
-            //game pad 2 commands
+            //game pad 2 commands (NA rn)
 
 
             gp1Commands.doButtonUpdatesManually()
