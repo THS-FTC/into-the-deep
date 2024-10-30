@@ -83,13 +83,13 @@ class Drivetrain(private val robot: HypnoticRobot) : AbstractSubsystem()
             backLeft = robot.opMode.hardware<DcMotorEx>("backLeft")
             backRight = robot.opMode.hardware<DcMotorEx>("backRight")
 
-            frontLeft.direction = DcMotorSimple.Direction.REVERSE
+            frontLeft.direction = DcMotorSimple.Direction.FORWARD
             frontLeft.zeroPowerBehavior = DcMotor.ZeroPowerBehavior.BRAKE
 
             frontRight.direction = DcMotorSimple.Direction.FORWARD
             frontRight.zeroPowerBehavior = DcMotor.ZeroPowerBehavior.BRAKE
 
-            backLeft.direction = DcMotorSimple.Direction.REVERSE
+            backLeft.direction = DcMotorSimple.Direction.FORWARD
             backLeft.zeroPowerBehavior = DcMotor.ZeroPowerBehavior.BRAKE
 
             backRight.direction = DcMotorSimple.Direction.FORWARD

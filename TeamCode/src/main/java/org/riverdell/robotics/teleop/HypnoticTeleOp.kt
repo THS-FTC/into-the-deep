@@ -63,8 +63,9 @@ class HypnoticTeleOp : HypnoticOpMode() {
             //grab
             gp1Commands.where(ButtonType.ButtonA)
                 .triggers {
-                    iv4b.setV4B(IV4B.V4BState.Grab)
-                    intake.setRotationPulley(Intake.RotationState.Grab)
+//                    iv4b.setV4B(IV4B.V4BState.Grab)
+//                    intake.setRotationPulley(Intake.RotationState.Grab)
+                    iv4b.setV4B(IV4B.V4BState.Idle)
                 }
                 .whenPressedOnce()
 

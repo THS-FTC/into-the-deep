@@ -29,21 +29,21 @@ class Intake(opMode: LinearOpMode) : AbstractSubsystem()
 
     enum class ClawState
     {
-        Closed, Open,Idle
+        Closed, Open,Init
     }
     enum class WristState
     {
-        Front, Back, Idle
+        Front, Back, Init
     }
     enum class RotationState
     {
-        Transfer, Observe, Grab,Idle
+        Transfer, Observe, Grab,Idle,Init
     }
 
 
-    private var currentClawState = ClawState.Idle
-    private var currentwristState = WristState.Idle
-    private var currentrotationState = RotationState.Idle
+    private var currentClawState = ClawState.Init
+    private var currentwristState = WristState.Init
+    private var currentrotationState = RotationState.Init
 
     private val wrist = motionProfiledServo("intake_wrist", Constraint.HALF.scale(5.0))
     private val pulley = motionProfiledServo("intake_pulley", Constraint.HALF.scale(5.0))

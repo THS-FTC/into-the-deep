@@ -4,7 +4,7 @@ import com.acmerobotics.dashboard.config.Config;
 
 @Config
 public class IV4BConfig {
-    public static double idlePosition= 0.0;
+    public static double idlePosition= 0.2;
     public static double moveAwayPosition  = 0.5;
 
     //rotation

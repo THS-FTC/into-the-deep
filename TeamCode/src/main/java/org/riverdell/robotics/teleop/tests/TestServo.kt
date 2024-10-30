@@ -24,8 +24,12 @@ class TestServo : LinearOpMode()
 
         while (opModeIsActive())
         {
-            val hardware = hardware<Servo>(ServoConfig.name)
-            hardware.position = ServoConfig.position
+            val hardware1 = hardware<Servo>(ServoConfig.name1)
+            hardware1.position = ServoConfig.position1
+//            val hardware2 = hardware<Servo>(ServoConfig.name2)
+//            hardware2.position = ServoConfig.position2
+//            val hardware3 = hardware<Servo>(ServoConfig.name3)
+//            hardware3.position = ServoConfig.position3
             Thread.sleep(50L)
         }
     }
