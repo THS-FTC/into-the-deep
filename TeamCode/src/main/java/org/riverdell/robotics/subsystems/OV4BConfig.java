@@ -6,9 +6,9 @@ import com.acmerobotics.dashboard.config.Config;
 public class OV4BConfig {
 
     //rotation
-    public static double transferPosition = 0.0; //0.2
+    public static double transferPosition = 0.05; //0.2
     public static double OuttakePosition= 0.9;
-    public static double IdlePosition= 0.0;
+    public static double IdlePosition= 0.05;
 
     // wrist
     public static boolean leftIsReverse = false;

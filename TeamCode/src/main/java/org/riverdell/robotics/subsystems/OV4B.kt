@@ -38,41 +38,20 @@ class OV4B(private val robot: HypnoticRobot) : AbstractSubsystem()
     private val rightRotation = motionProfiledServo(robot.hardware.outtakeRotationRight, Constraint.HALF.scale(5.0))
     private val clawPulley = motionProfiledServo(robot.hardware.outtakePulley, Constraint.HALF.scale(5.0))
 
-//    fun pulleyRotateTo(position: Double) = clawPulley.setMotionProfileTarget(position)
-fun pulleyRotateTo(position: Double): CompletableFuture<Void>{
-    clawPulley.forcefullySetTarget(position)
-    return CompletableFuture.completedFuture(null)
-}
-    fun v4bRotateTo(position: Double): CompletableFuture<Void> {
-        if (true) {
-            leftRotation.forcefullySetTarget(
-                if (OV4BConfig.leftIsReverse)
-                    (1.0 - position) else position
-            )
-            rightRotation.forcefullySetTarget(
-                if (!OV4BConfig.leftIsReverse)
-                    (1.0 - position) else position
-            )
-            return CompletableFuture.completedFuture(null)
-        }
-        else {
-            return CompletableFuture.completedFuture(null)
-        }
-    }
-    fun toggleOuttakeRotate(): CompletableFuture<Void> //state when changed to motion profiled
-    {
-        return if (currentRotateState == PulleyState.Outtake)
-        {
-            pulleyRotateTo(OV4BConfig.transferPosition).apply {
-                currentRotateState = PulleyState.Intake
-            }
-        } else
-        {
-            pulleyRotateTo(OV4BConfig.OuttakePosition).apply {
-                currentRotateState = PulleyState.Outtake
-            }
-        }
-    }
+
+    fun pulleyRotateTo(position: Double) = clawPulley.setMotionProfileTarget(position)
+
+    fun v4bRotateTo(position: Double) = CompletableFuture.allOf(
+        leftRotation.setMotionProfileTarget(
+            if (OV4BConfig.leftIsReverse)
+                (1.0 - position) else position
+        ),
+        rightRotation.setMotionProfileTarget(
+            if (OV4BConfig.leftIsReverse)
+                (1.0 - position) else position
+        )
+    )
+
     fun setPulley(newState: PulleyState): CompletableFuture<Void>
     {
         if (currentRotateState == newState)
