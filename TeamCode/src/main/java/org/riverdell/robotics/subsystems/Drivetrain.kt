@@ -63,13 +63,13 @@ class Drivetrain(private val robot: HypnoticRobot) : AbstractSubsystem()
             robot.hardware.frontLeft.direction = DcMotorSimple.Direction.FORWARD
             robot.hardware.frontLeft.zeroPowerBehavior = DcMotor.ZeroPowerBehavior.BRAKE
 
-            robot.hardware.frontRight.direction = DcMotorSimple.Direction.FORWARD
+            robot.hardware.frontRight.direction = DcMotorSimple.Direction.REVERSE
             robot.hardware.frontRight.zeroPowerBehavior = DcMotor.ZeroPowerBehavior.BRAKE
 
             robot.hardware.backLeft.direction = DcMotorSimple.Direction.FORWARD
             robot.hardware.backLeft.zeroPowerBehavior = DcMotor.ZeroPowerBehavior.BRAKE
 
-            robot.hardware.backRight.direction = DcMotorSimple.Direction.FORWARD
+            robot.hardware.backRight.direction = DcMotorSimple.Direction.REVERSE
             robot.hardware.backRight.zeroPowerBehavior = DcMotor.ZeroPowerBehavior.BRAKE
 
             runWithoutEncoders()
@@ -85,10 +85,9 @@ class Drivetrain(private val robot: HypnoticRobot) : AbstractSubsystem()
         val backRight = Motor(robot.opMode.hardwareMap, "backRight")
         val frontLeft = Motor(robot.opMode.hardwareMap, "frontLeft")
         val frontRight = Motor(robot.opMode.hardwareMap, "frontRight")
-        backLeft.inverted = true
 
         backingDriveBase = MecanumDrive(
-            frontLeft, frontRight, backLeft, backRight
+            frontLeft, backLeft, frontRight, backRight
         )
     }
 

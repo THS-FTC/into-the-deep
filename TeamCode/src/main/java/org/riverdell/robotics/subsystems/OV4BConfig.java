@@ -5,14 +5,14 @@ import com.acmerobotics.dashboard.config.Config;
 @Config
 public class OV4BConfig {
 
-    //rotation
-    public static double transferPosition = 0.05; //0.2
-    public static double OuttakePosition= 0.9;
-    public static double IdlePosition= 0.05;
+    //v4b
+    public static double transferPosition = 1.0; //0.2
+    public static double OuttakePosition= 0.3;
+    public static double IdlePosition= 1.0;
 
-    // wrist
+    // pulley
     public static boolean leftIsReverse = false;
-    public static double  idlePulley = 0.45;
-    public static double  backPulley = 0.4;
+    public static double  idlePulley = 0.3;
+    public static double  backPulley = 0.3;
 
 }

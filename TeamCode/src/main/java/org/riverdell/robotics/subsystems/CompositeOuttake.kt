@@ -32,7 +32,7 @@ class CompositeOuttake(val robot: HypnoticRobot) : AbstractSubsystem()
             robot.outtake.setOuttakeGrip(ClawState.Open)
             robot.ov4b.setPulley(OV4B.PulleyState.Intake)
             robot.ov4b.setV4B(OV4B.OV4BState.Idle)
-            robot.lift.extendToAndStayAt(SlideConfig.liftClosed)
+            robot.lift.extendToAndStayAt(SlideConfig.liftClosed).thenAccept{robot.lift.idle() }
             robot.outtake.setWrist(Outtake.WristState.Front).apply { currentOuttakeState = OuttakeState.Transfer }
         } else
         {
@@ -59,7 +59,7 @@ class CompositeOuttake(val robot: HypnoticRobot) : AbstractSubsystem()
         }
     }
     override fun doInitialize() {
-        setOuttake(OuttakeState.Transfer)
+//        setOuttake(OuttakeState.Transfer)
     }
 
     override fun start() {

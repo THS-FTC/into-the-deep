@@ -46,7 +46,7 @@ class Intake(private val robot: HypnoticRobot) : AbstractSubsystem()
     private val pulley = motionProfiledServo(robot.hardware.intakePulley, Constraint.HALF.scale(5.0))
     private val grip = motionProfiledServo(robot.hardware.intakeGrip, Constraint.HALF.scale(5.0))
 
-    fun wristRotateTo(position: Double) = wrist.setMotionProfileTarget(position)
+    fun wristRotateTo(position: Double) =  wrist.setMotionProfileTarget(position)
     //grip.setMotionProfileTarget(position)
     fun gripRotateTo(position: Double): CompletableFuture<Void>{
         grip.forcefullySetTarget(position)

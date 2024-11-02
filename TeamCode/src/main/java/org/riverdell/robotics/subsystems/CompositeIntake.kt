@@ -37,22 +37,21 @@ class CompositeIntake(val robot : HypnoticRobot) : AbstractSubsystem()
         } else if (newState == IntakeState.Transfer)
         {
            //this is for transfer
-            robot.iv4b.setV4B(IV4B.V4BState.Idle)
-            robot.intake.setRotationPulley(Intake.RotationState.Idle) //works idk i am him
-            robot.extension.extendToAndStayAt(SlideConfig.extendoTransfer)
-            robot.intake.setWrist(Intake.WristState.Back).apply { currentIntakeState = IntakeState.Transfer }
+            robot.iv4b.setV4B(IV4B.V4BState.Transfer)
+            robot.intake.setRotationPulley(Intake.RotationState.Transfer).thenCompose {  robot.extension.extendToAndStayAt(SlideConfig.extendoTransfer) } //works idk i am him
+            robot.intake.setWrist(Intake.WristState.Front).apply { currentIntakeState = IntakeState.Transfer }
         }
         else {
             //this is for observing/intaking
-            robot.iv4b.setV4B(IV4B.V4BState.Observe)
-            robot.intake.setRotationPulley(Intake.RotationState.Observe) //works idk i am him
+            robot.iv4b.setV4B(IV4B.V4BState.Grab) //set it to observe later
+            robot.intake.setRotationPulley(Intake.RotationState.Grab) //set it to observe later
             robot.extension.extendToAndStayAt(SlideConfig.extendoIntake)
             robot.intake.setWrist(Intake.WristState.Front).apply { currentIntakeState = IntakeState.Intake }
         }
     }
     fun toggle(): CompletableFuture<Void>
     {
-        return if (currentIntakeState == IntakeState.Transfer || currentIntakeState == IntakeState.Idle )
+        return if (currentIntakeState == IntakeState.Transfer || currentIntakeState == IntakeState.Init )
         {
             setIntake(IntakeState.Intake)
         } else
@@ -62,7 +61,7 @@ class CompositeIntake(val robot : HypnoticRobot) : AbstractSubsystem()
     }
 
     override fun doInitialize() {
-        setIntake(IntakeState.Idle)
+//        setIntake(IntakeState.Idle)
     }
 
     override fun start() {

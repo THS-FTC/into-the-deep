@@ -29,12 +29,12 @@ abstract class HypnoticRobot(val opMode: HypnoticOpMode) : System
     lateinit var hardware: HypnoticRobotHardware
 
     val drivetrain by lazy { Drivetrain(this) }
-    val intake by lazy { Intake(opMode) }
+    val intake by lazy { Intake(this) }
     val iv4b by lazy { IV4B(this) }
-    val lift by lazy { Lift(opMode) }
-    val extension by lazy { Extension(opMode) }
+    val lift by lazy { Lift(this) }
+    val extension by lazy { Extension(this) }
     val ov4b by lazy { OV4B(this) }
-    val outtake by lazy { Outtake(opMode) }
+    val outtake by lazy { Outtake(this) }
     val compositeout by lazy { CompositeOuttake(this) }
     val compositein by lazy { CompositeIntake(this) }
 

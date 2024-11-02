@@ -20,7 +20,10 @@ class Extension(val robot: HypnoticRobot) : AbstractSubsystem()
 
     fun position() = robot.hardware.extensionMotorRight.currentPosition
     fun extendToAndStayAt(position: Int) = slides.goTo(position)
+    fun idle() = slides.idle();
+
     fun isExtending() = slides.isTravelling()
+
 
     override fun start()
     {

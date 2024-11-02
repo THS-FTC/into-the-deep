@@ -51,11 +51,14 @@ class HypnoticRobotHardware(private val opMode: HypnoticOpMode)
         backLeft = opMode.hardwareMap.get(DcMotorEx::class.java, "backLeft")
         backRight = opMode.hardwareMap.get(DcMotorEx::class.java, "backRight")
 
+        backRight.direction = DcMotorSimple.Direction.REVERSE
+        backLeft.direction = DcMotorSimple.Direction.FORWARD
+
         liftMotorLeft = opMode.hardwareMap["lift_motor_left"] as DcMotorEx
-        liftMotorLeft.direction = DcMotorSimple.Direction.REVERSE
+        liftMotorLeft.direction = DcMotorSimple.Direction.FORWARD
 
         liftMotorRight = opMode.hardwareMap["lift_motor_right"] as DcMotorEx
-        liftMotorLeft.direction = DcMotorSimple.Direction.FORWARD
+        liftMotorLeft.direction = DcMotorSimple.Direction.REVERSE
 
         extensionMotorLeft = opMode.hardwareMap["extension_motor_left"] as DcMotorEx
         extensionMotorLeft.direction = DcMotorSimple.Direction.REVERSE

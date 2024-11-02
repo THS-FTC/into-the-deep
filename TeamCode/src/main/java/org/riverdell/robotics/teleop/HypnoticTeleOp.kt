@@ -7,6 +7,7 @@ import io.liftgate.robotics.mono.gamepad.ButtonType
 import org.riverdell.robotics.HypnoticOpMode
 import org.riverdell.robotics.HypnoticRobot
 import org.riverdell.robotics.autonomous.detection.VisionPipeline
+import org.riverdell.robotics.subsystems.CompositeOuttake
 import org.riverdell.robotics.subsystems.IV4B
 import org.riverdell.robotics.subsystems.Intake
 import org.riverdell.robotics.subsystems.OV4B
@@ -62,6 +63,7 @@ class HypnoticTeleOp : HypnoticOpMode() {
             gp1Commands.where(ButtonType.ButtonA)
                 .triggers {
                     iv4b.setV4B(IV4B.V4BState.Grab)
+                    intake.setWrist(Intake.WristState.Front)
                     intake.setRotationPulley(Intake.RotationState.Grab)
                 }
                 .whenPressedOnce()
@@ -78,7 +80,7 @@ class HypnoticTeleOp : HypnoticOpMode() {
 
             gp1Commands.where(ButtonType.BumperRight)
                 .triggers {
-                    compositeout.toggle()
+                   compositeout.toggle()
                 }
                 .whenPressedOnce()
 
@@ -108,6 +110,7 @@ class HypnoticTeleOp : HypnoticOpMode() {
             gp1Commands.where(ButtonType.DPadUp)
                 .triggers {
                     intake.setWrist(Intake.WristState.Front)
+
                 }
                 .whenPressedOnce()
 

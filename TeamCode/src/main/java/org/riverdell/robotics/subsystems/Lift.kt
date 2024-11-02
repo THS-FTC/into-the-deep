@@ -21,6 +21,7 @@ class Lift(val robot: HypnoticRobot) : AbstractSubsystem()
     fun position() = robot.hardware.liftMotorRight.currentPosition
     fun extendToAndStayAt(position: Int) = slides.goTo(position)
     fun isExtending() = slides.isTravelling()
+    fun idle() = slides.idle();
 
     override fun start()
     {

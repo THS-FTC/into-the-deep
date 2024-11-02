@@ -3,11 +3,6 @@ package org.riverdell.robotics.teleop.tests
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp
 import com.qualcomm.robotcore.hardware.Servo
-import io.liftgate.robotics.mono.konfig.konfig
-import kotlinx.serialization.Serializable
-import org.riverdell.robotics.autonomous.movement.konfig.NavigationNodeCollection
-import org.riverdell.robotics.subsystems.IV4B
-import org.riverdell.robotics.utilities.hardware
 
 @TeleOp(
     name = "Servo Test",
@@ -25,18 +20,20 @@ class TestServo : LinearOpMode()
 
         while (opModeIsActive())
         {
-            //different servos to test
-
-//            val hardware1 = hardware<Servo>(ServoConfig.OV4BL)
-//            hardware1.position = ServoConfig.OL
-            val hardware2 = hardware<Servo>(ServoConfig.intakePulley)
-            hardware2.position = ServoConfig.IP
-            val hardware3 = hardware<Servo>(ServoConfig.outtakePulley)
-            hardware3.position = ServoConfig.OP
-//            val hardware4 = hardware<Servo>(ServoConfig.OV4BR)
-//            hardware4.position = ServoConfig.OR
-            val hardware5 = hardware<Servo>(ServoConfig.intakeWrist)
-            hardware5.position = ServoConfig.IW
+            val hardware = hardwareMap[ServoConfig.intakePulley] as Servo
+            hardware.position = ServoConfig.IP
+//            val hardware1 = hardwareMap[ServoConfig.outtakePulley] as Servo
+//            hardware1.position = ServoConfig.OP
+            val hardware2 = hardwareMap[ServoConfig.intakeWrist] as Servo
+            hardware2.position = ServoConfig.IW
+//            val hardware3 = hardwareMap[ServoConfig.IV4BL] as Servo
+//            hardware3.position = ServoConfig.IL_changer
+//            val hardware4 = hardwareMap[ServoConfig.IV4BR] as Servo
+//            hardware4.position = ServoConfig.IR
+//            val hardware5 = hardwareMap[ServoConfig.OV4BL] as Servo
+//            hardware5.position = ServoConfig.OL_changer
+//            val hardware6 = hardwareMap[ServoConfig.OV4BR] as Servo
+//            hardware6.position = ServoConfig.OR
 
             Thread.sleep(50L)
         }
