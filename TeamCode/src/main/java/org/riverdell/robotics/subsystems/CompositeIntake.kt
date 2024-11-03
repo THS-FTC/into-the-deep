@@ -31,7 +31,7 @@ class CompositeIntake(val robot : HypnoticRobot) : AbstractSubsystem()
             //idle intake stuff here
             robot.intake.setIntakeGrip(Intake.ClawState.Open)
             robot.iv4b.setV4B(IV4B.V4BState.Idle)
-            robot.intake.setRotationPulley(Intake.RotationState.Idle) //works idk i am him
+            robot.intake.setRotationPulley(Intake.RotationState.Idle)
             robot.extension.extendToAndStayAt(SlideConfig.extendoClosed)
             robot.intake.setWrist(Intake.WristState.Front).apply { currentIntakeState = IntakeState.Idle }
         } else if (newState == IntakeState.Transfer)

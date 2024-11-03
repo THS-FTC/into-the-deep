@@ -41,8 +41,9 @@ class HypnoticRobotHardware(private val opMode: HypnoticOpMode)
     fun initializeHardware()
     {
         pinpointDriver = opMode.hardwareMap.get(GoBildaPinpointDriver::class.java, "pinpoint")
-        pinpointDriver.setOffsets(-84.0, -168.0) // TUNE THIS
-        pinpointDriver.setEncoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD)
+        pinpointDriver.setOffsets(-69.2125, -72.33931) // Done
+        pinpointDriver.setEncoderResolution(37.2499090578) // TODO:("this is the encoder values, make sure it is right")
+        pinpointDriver.setEncoderDirections(EncoderDirection FORWARD, Encoder Direction REVERSE) //tune this!!!!
         pinpointDriver.recalibrateIMU()
         pinpointDriver.resetPosAndIMU()
 
