@@ -42,10 +42,10 @@ class HypnoticTeleOp : HypnoticOpMode() {
         }
 
         override fun opModeStart() {
-            val robotDriver = GamepadEx(gamepad1)
+            val robotDriver = GamepadEx(gamepad2)
             buildCommands()
             while (opModeIsActive()) {
-                val multiplier = 0.5 + gamepad1.right_trigger * 0.5
+                val multiplier = 0.5 + gamepad2.right_trigger * 0.5
                 drivetrain.driveRobotCentric(robotDriver, multiplier)
 
                 gp1Commands.run()
@@ -62,6 +62,7 @@ class HypnoticTeleOp : HypnoticOpMode() {
             //grab positions
             gp1Commands.where(ButtonType.ButtonA)
                 .triggers {
+                    intake.setIntakeGrip(Intake.ClawState.Open)
                     intake.setRotationPulley(Intake.RotationState.Grab)
                     iv4b.setV4B(IV4B.V4BState.Grab).thenCompose { intake.setIntakeGrip(Intake.ClawState.Closed) }.thenCompose { iv4b.setV4B(IV4B.V4BState.Observe) }
                     intake.setRotationPulley(Intake.RotationState.Observe)
