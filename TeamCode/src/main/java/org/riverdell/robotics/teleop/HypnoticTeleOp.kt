@@ -62,9 +62,9 @@ class HypnoticTeleOp : HypnoticOpMode() {
             //grab positions
             gp1Commands.where(ButtonType.ButtonA)
                 .triggers {
-                    iv4b.setV4B(IV4B.V4BState.Grab)
-                    intake.setWrist(Intake.WristState.Front)
                     intake.setRotationPulley(Intake.RotationState.Grab)
+                    iv4b.setV4B(IV4B.V4BState.Grab).thenCompose { intake.setIntakeGrip(Intake.ClawState.Closed) }.thenCompose { iv4b.setV4B(IV4B.V4BState.Observe) }
+                    intake.setRotationPulley(Intake.RotationState.Observe)
                 }
                 .whenPressedOnce()
 
@@ -80,7 +80,7 @@ class HypnoticTeleOp : HypnoticOpMode() {
 
             gp1Commands.where(ButtonType.BumperRight)
                 .triggers {
-                   compositeout.toggle()
+                   compositeout.toggleBucket()
                 }
                 .whenPressedOnce()
 
@@ -130,6 +130,12 @@ class HypnoticTeleOp : HypnoticOpMode() {
                     outtake.toggleOuttakeGrip()
                 }
                 .whenPressedOnce()
+            gp1Commands.where(ButtonType.ButtonY)
+                .triggers {
+                    compositeout.toggleSpecimen()
+                }
+                .whenPressedOnce()
+
 
             //game pad 2 commands (NA rn)
 

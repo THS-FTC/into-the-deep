@@ -43,8 +43,8 @@ class CompositeIntake(val robot : HypnoticRobot) : AbstractSubsystem()
         }
         else {
             //this is for observing/intaking
-            robot.iv4b.setV4B(IV4B.V4BState.Grab) //set it to observe later
-            robot.intake.setRotationPulley(Intake.RotationState.Grab) //set it to observe later
+            robot.iv4b.setV4B(IV4B.V4BState.Observe) //set it to observe later
+            robot.intake.setRotationPulley(Intake.RotationState.Observe) //set it to observe later
             robot.extension.extendToAndStayAt(SlideConfig.extendoIntake)
             robot.intake.setWrist(Intake.WristState.Front).apply { currentIntakeState = IntakeState.Intake }
         }
