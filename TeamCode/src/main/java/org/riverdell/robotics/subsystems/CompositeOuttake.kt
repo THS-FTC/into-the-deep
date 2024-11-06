@@ -45,13 +45,10 @@ class CompositeOuttake(val robot: HypnoticRobot) : AbstractSubsystem()
             robot.ov4b.setV4B(OV4B.OV4BState.Outtake).apply { currentOuttakeState = OuttakeState.Outtake }
         }
         else {
-            robot.outtake.setOuttakeGrip(ClawState.Closed).thenCompose { robot.intake.setIntakeGrip(Intake.ClawState.Open) }.thenCompose { robot.extension.extendToAndStayAt(SlideConfig.extendoGetOut) }
-            //the outtake rotates outwards
-            //robot.ov4b.setPulley(OV4B.PulleyState.Outtake)
-            robot.outtake.setWrist(Outtake.WristState.Front)
-            robot.lift.extendToAndStayAt(SlideConfig.liftSpecimen).thenCompose {  robot.ov4b.setV4B(OV4B.OV4BState.Outtake) }.thenAccept { robot.lift.extendToAndStayAt(SlideConfig.downSpecimen) }
-                .thenAccept{ setOuttake(OuttakeState.Transfer)}
-                .apply { currentOuttakeState = OuttakeState.Transfer }
+            robot.intake.setIntakeGrip(Intake.ClawState.Open).thenCompose { robot.extension.extendToAndStayAt(SlideConfig.extendoGetOut) }
+            robot.outtake.setWrist(Outtake.WristState.Front).thenCompose {  robot.ov4b.setV4B(OV4B.OV4BState.Specimen) }.thenCompose { robot.outtake.setOuttakeGrip(ClawState.Open) }.thenCompose { robot.ov4b.setV4B(OV4B.OV4BState.Transfer) }
+                .apply { currentOuttakeState = OuttakeState.Specimen }
+
         }
     }
     fun toggleBucket(): CompletableFuture<Void>

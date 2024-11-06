@@ -23,7 +23,7 @@ class OV4B(private val robot: HypnoticRobot) : AbstractSubsystem()
 //    )
     enum class OV4BState
     {
-        Transfer,Outtake,Idle,Init
+        Transfer,Outtake,Idle,Init,Specimen
     }
     enum class PulleyState
     {
@@ -93,9 +93,9 @@ class OV4B(private val robot: HypnoticRobot) : AbstractSubsystem()
         }
         else
         {
-            v4bRotateTo(OV4BConfig.IdlePosition)
+            v4bRotateTo(OV4BConfig.SpecimenPosition)
                 .apply {
-                    currentV4BState = OV4BState.Idle
+                    currentV4BState = OV4BState.Specimen
                 }
         }
 
