@@ -3,6 +3,7 @@ package org.riverdell.robotics.subsystems
 import io.liftgate.robotics.mono.states.StateResult
 import io.liftgate.robotics.mono.subsystem.AbstractSubsystem
 import org.riverdell.robotics.HypnoticRobot
+import org.riverdell.robotics.subsystems.Outtake.ClawState
 import org.riverdell.robotics.utilities.motionprofile.Constraint
 import java.util.concurrent.CompletableFuture
 
@@ -42,8 +43,8 @@ class Intake(private val robot: HypnoticRobot) : AbstractSubsystem()
     private var currentwristState = WristState.Init
     private var currentrotationState = RotationState.Init
 
-    private val wrist = motionProfiledServo(robot.hardware.intakeWrist, Constraint.HALF.scale(5.0))
-    private val pulley = motionProfiledServo(robot.hardware.intakePulley, Constraint.HALF.scale(5.0))
+    private val wrist = motionProfiledServo(robot.hardware.intakeWrist, Constraint.HALF.scale(15.0))
+    private val pulley = motionProfiledServo(robot.hardware.intakePulley, Constraint.HALF.scale(15.0))
     private val grip = motionProfiledServo(robot.hardware.intakeGrip, Constraint.HALF.scale(5.0))
 
     fun wristRotateTo(position: Double) =  wrist.setMotionProfileTarget(position)

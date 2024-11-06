@@ -61,13 +61,13 @@ class Outtake(private val robot: HypnoticRobot) : AbstractSubsystem()
             gripRotateTo(OutakeConfig.openPosition)
                 .thenAccept {
                     println(it)
-                }
+                }.apply{ currentClawState = ClawState.Open }
         } else
         {
             gripRotateTo(OutakeConfig.closePositon)
                 .thenAccept {
                     println(it)
-                }
+                }.apply{ currentClawState = ClawState.Open }
         }
     }
     fun setWrist(newState: WristState): CompletableFuture<Void>

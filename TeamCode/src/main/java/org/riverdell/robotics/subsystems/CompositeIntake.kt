@@ -51,12 +51,12 @@ class CompositeIntake(val robot : HypnoticRobot) : AbstractSubsystem()
     }
     fun toggle(): CompletableFuture<Void>
     {
-        return if (currentIntakeState == IntakeState.Transfer || currentIntakeState == IntakeState.Init )
+        return if (currentIntakeState == IntakeState.Intake )
         {
-            setIntake(IntakeState.Intake)
+            setIntake(IntakeState.Transfer)
         } else
         {
-           setIntake(IntakeState.Transfer)
+           setIntake(IntakeState.Intake)
         }
     }
 

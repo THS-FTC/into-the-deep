@@ -8,7 +8,7 @@ public class IntakeConfig {
     public static double openPositon  = 0.2;
 
     //rotation
-    public static double transferPosition = 0.58;
+    public static double transferPosition = 0.56;
     public static double observePosition= 0.95;
     public static double grabPosition= 0.95;
 

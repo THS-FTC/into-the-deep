@@ -34,8 +34,8 @@ class OV4B(private val robot: HypnoticRobot) : AbstractSubsystem()
     private var currentRotateState = PulleyState.Init
 
 
-    private val leftRotation = motionProfiledServo(robot.hardware.outtakeRotationLeft, Constraint.HALF.scale(5.0))
-    private val rightRotation = motionProfiledServo(robot.hardware.outtakeRotationRight, Constraint.HALF.scale(5.0))
+    private val leftRotation = motionProfiledServo(robot.hardware.outtakeRotationLeft, Constraint.HALF.scale(15.0))
+    private val rightRotation = motionProfiledServo(robot.hardware.outtakeRotationRight, Constraint.HALF.scale(15.0))
     private val clawPulley = motionProfiledServo(robot.hardware.outtakePulley, Constraint.HALF.scale(5.0))
 
 
