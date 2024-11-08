@@ -16,7 +16,7 @@ class CompositeOuttake(val robot: HypnoticRobot) : AbstractSubsystem()
         Transfer,Outtake,Init,Specimen
     }
 
-    private var currentOuttakeState = OuttakeState.Init
+    var currentOuttakeState = OuttakeState.Init
 
 
     fun setOuttake(newState: OuttakeState): CompletableFuture<Void>
@@ -29,11 +29,12 @@ class CompositeOuttake(val robot: HypnoticRobot) : AbstractSubsystem()
         return if (newState == OuttakeState.Transfer)
         {
             //idle outtake stuff here
-            robot.ov4b.setPulley(OV4B.PulleyState.Intake)
-            robot.ov4b.setV4B(OV4B.OV4BState.Idle)
-            robot.lift.extendToAndStayAt(SlideConfig.liftClosed).thenAccept{robot.lift.idle() }
-            robot.outtake.setWrist(Outtake.WristState.Front).thenCompose { robot.compositein.setIntake(CompositeIntake.IntakeState.Idle) }
-                .apply { currentOuttakeState = OuttakeState.Transfer }
+            robot.compositein.setIntake(CompositeIntake.IntakeState.Idle).thenCompose { CompletableFuture.allOf(
+                    robot.ov4b.setPulley(OV4B.PulleyState.Intake),
+                    robot.ov4b.setV4B(OV4B.OV4BState.Transfer),
+                    robot.lift.extendToAndStayAt(SlideConfig.liftClosed),
+                    robot.outtake.setWrist(Outtake.WristState.Front),
+            )}.thenAccept { robot.lift.idle() } .apply { currentOuttakeState = OuttakeState.Transfer }
         } else if (newState == OuttakeState.Outtake)
         {
             //closes the outtake claw and opens the intake claw, then the robot extends forwards
@@ -46,8 +47,8 @@ class CompositeOuttake(val robot: HypnoticRobot) : AbstractSubsystem()
         }
         else {
             robot.intake.setIntakeGrip(Intake.ClawState.Open).thenCompose { robot.extension.extendToAndStayAt(SlideConfig.extendoGetOut) }
-            robot.outtake.setWrist(Outtake.WristState.Front).thenCompose {  robot.ov4b.setV4B(OV4B.OV4BState.Specimen) }.thenCompose { robot.outtake.setOuttakeGrip(ClawState.Open) }.thenCompose { robot.ov4b.setV4B(OV4B.OV4BState.Transfer) }
-                .apply { currentOuttakeState = OuttakeState.Specimen }
+            robot.outtake.setWrist(Outtake.WristState.Front).thenCompose {  robot.ov4b.setV4B(OV4B.OV4BState.Specimen) }.thenCompose { robot.outtake.toggleOuttakeGrip()}.thenCompose { robot.ov4b.setV4B(OV4B.OV4BState.Transfer) }
+                .apply { currentOuttakeState = OuttakeState.Transfer }
 
         }
     }

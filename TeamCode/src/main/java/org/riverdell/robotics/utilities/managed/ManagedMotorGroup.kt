@@ -85,8 +85,21 @@ class ManagedMotorGroup(
         }
     }
 
+    companion object
+    {
+        var autonomous = false
+    }
+
     init
     {
+        if (!autonomous)
+        {
+            resetEncoders()
+        } else
+        {
+            autonomous = false
+        }
+
         master.mode = DcMotor.RunMode.RUN_WITHOUT_ENCODER
         slaves.forEach {
             it.mode = DcMotor.RunMode.RUN_WITHOUT_ENCODER
@@ -217,6 +230,15 @@ class ManagedMotorGroup(
         master.power = 0.0
         slaves.forEach {
             it.power = 0.0
+        }
+    }
+
+    fun currentPosition() = state.current()
+
+    fun supplyPowerToAll(power: Double) {
+        master.power = power
+        slaves.forEach { slave ->
+            slave.power = power
         }
     }
 }

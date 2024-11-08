@@ -7,6 +7,7 @@ import io.liftgate.robotics.mono.gamepad.ButtonType
 import org.riverdell.robotics.HypnoticOpMode
 import org.riverdell.robotics.HypnoticRobot
 import org.riverdell.robotics.autonomous.detection.VisionPipeline
+import org.riverdell.robotics.subsystems.CompositeIntake
 import org.riverdell.robotics.subsystems.CompositeOuttake
 import org.riverdell.robotics.subsystems.IV4B
 import org.riverdell.robotics.subsystems.Intake
@@ -14,6 +15,7 @@ import org.riverdell.robotics.subsystems.OV4B
 import org.riverdell.robotics.subsystems.Outtake
 import org.riverdell.robotics.subsystems.Outtake.ClawState
 import org.riverdell.robotics.subsystems.SlideConfig
+import kotlin.math.absoluteValue
 
 @TeleOp(
     name = "Bit-By-Bit Drive",
@@ -47,6 +49,40 @@ class HypnoticTeleOp : HypnoticOpMode() {
             while (opModeIsActive()) {
                 val multiplier = 0.5 + gamepad2.right_trigger * 0.5
                 drivetrain.driveRobotCentric(robotDriver, multiplier)
+                if ((compositein.currentIntakeState == CompositeIntake.IntakeState.Intake) || (compositein.currentIntakeState == CompositeIntake.IntakeState.Transfer) )
+                {
+                    val wantedPower = -opMode.gamepad1.left_trigger + opMode.gamepad1.right_trigger
+                    if (wantedPower.absoluteValue > 0.1 && !extension.slides.isTravelling())
+                    {
+                        if (wantedPower < 0)
+                        {
+                            if (extension.slides.currentPosition() >= -10)
+                            {
+                                extension.slides.supplyPowerToAll(0.0)
+                            } else
+                            {
+                                extension.slides.supplyPowerToAll(-wantedPower.toDouble() / 2.0)
+                            }
+                        } else
+                        {
+                            if (extension.slides.currentPosition() < -435)
+                            {
+                                extension.slides.supplyPowerToAll(0.0)
+                            } else
+                            {
+                                extension.slides.supplyPowerToAll(-wantedPower.toDouble() / 2.0)
+                            }
+                        }
+                    } else if (!extension.slides.isTravelling())
+                    {
+                        extension.slides.supplyPowerToAll(0.0)
+                    }
+                }
+
+                telemetry.addLine("Composite State: ${compositein.currentIntakeState}")
+                telemetry.addLine("Extendo Left Position: ${hardware.extensionMotorLeft.currentPosition}")
+                telemetry.addLine("Extendo Right Position: ${hardware.extensionMotorRight.currentPosition}")
+                telemetry.update()
 
                 gp1Commands.run()
                 gp2Commands.run()
@@ -60,86 +96,79 @@ class HypnoticTeleOp : HypnoticOpMode() {
 
 
             //grab positions
-            gp1Commands.where(ButtonType.ButtonA)
-                .triggers {
-                    intake.setIntakeGrip(Intake.ClawState.Open)
-                    intake.setRotationPulley(Intake.RotationState.Grab)
-                    iv4b.setV4B(IV4B.V4BState.Grab).thenCompose { intake.setIntakeGrip(Intake.ClawState.Closed) }.thenCompose { iv4b.setV4B(IV4B.V4BState.Observe) }
-                    intake.setRotationPulley(Intake.RotationState.Observe)
-                   // intake.toggleIntakeGrip()
-                }
-                .whenPressedOnce()
+            gp1Commands.apply {
+                where(ButtonType.ButtonA)
+                    .triggers {
+                        intake.setIntakeGrip(Intake.ClawState.Open)
+                        intake.setRotationPulley(Intake.RotationState.Grab)
+                        iv4b.setV4B(IV4B.V4BState.Grab).thenCompose { intake.setIntakeGrip(Intake.ClawState.Closed) }.thenCompose { iv4b.setV4B(IV4B.V4BState.Observe) }
+                        intake.setRotationPulley(Intake.RotationState.Observe)
+                        // intake.toggleIntakeGrip()
+                    }
+                    .whenPressedOnce()
 
+                where(ButtonType.BumperLeft)
+                    .triggers {
+                        compositein.toggle()
+                    }
+                    .whenPressedOnce()
 
+                where(ButtonType.BumperRight)
+                    .triggers {
+                        compositeout.toggleBucket()
+                    }
+                    .whenPressedOnce()
 
+                /*where(ButtonType.BumperRight)
+                    .triggers {
+                        compositeout.toggleBucket()
+                    }
+                    .whenPressedOnce()*/
 
-            //Composite Intake and Out
-            gp1Commands.where(ButtonType.BumperLeft)
-                .triggers {
-                    compositein.toggle()
-                }
-                .whenPressedOnce()
+                where(ButtonType.DPadDown)
+                    .triggers {
+                        intake.setWrist(Intake.WristState.Vertical)
+                    }
+                    .whenPressedOnce()
 
-            gp1Commands.where(ButtonType.BumperRight)
-                .triggers {
-                   compositeout.toggleBucket()
-                }
-                .whenPressedOnce()
+                where(ButtonType.DPadLeft)
+                    .triggers {
+                        intake.setWrist(Intake.WristState.Left)
+                    }
+                    .whenPressedOnce()
 
+                where(ButtonType.DPadRight)
+                    .triggers {
+                        intake.setWrist(Intake.WristState.Right)
+                    }
+                    .whenPressedOnce()
 
+                where(ButtonType.DPadUp)
+                    .triggers {
+                        intake.setWrist(Intake.WristState.Front)
 
+                    }
+                    .whenPressedOnce()
 
+                where(ButtonType.ButtonX)
+                    .triggers {
+                        intake.toggleIntakeGrip()
+                    }
+                    .whenPressedOnce()
 
+                where(ButtonType.ButtonB)
+                    .triggers {
+                        outtake.toggleOuttakeGrip()
+                    }
+                    .whenPressedOnce()
+                where(ButtonType.ButtonY)
+                    .triggers {
+                        compositeout.toggleSpecimen()
+                    }
+                    .whenPressedOnce()
 
-            //Wrist rotations
-            gp1Commands.where(ButtonType.DPadDown)
-                .triggers {
-                    intake.setWrist(Intake.WristState.Vertical)
-                }
-                .whenPressedOnce()
+            }
 
-            gp1Commands.where(ButtonType.DPadLeft)
-                .triggers {
-                    intake.setWrist(Intake.WristState.Left)
-                }
-                .whenPressedOnce()
-
-            gp1Commands.where(ButtonType.DPadRight)
-                .triggers {
-                    intake.setWrist(Intake.WristState.Right)
-                }
-                .whenPressedOnce()
-            gp1Commands.where(ButtonType.DPadUp)
-                .triggers {
-                    intake.setWrist(Intake.WristState.Front)
-
-                }
-                .whenPressedOnce()
-
-
-
-
-
-
-            //Grips
-            gp1Commands.where(ButtonType.ButtonX)
-                .triggers {
-                    intake.toggleIntakeGrip()
-                }
-                .whenPressedOnce()
-            gp1Commands.where(ButtonType.ButtonB)
-                .triggers {
-                    outtake.toggleOuttakeGrip()
-                }
-                .whenPressedOnce()
-            gp1Commands.where(ButtonType.ButtonY)
-                .triggers {
-                    compositeout.toggleSpecimen()
-                }
-                .whenPressedOnce()
-
-
-            //game pad 2 commands (NA rn)
 
 
             gp1Commands.doButtonUpdatesManually()

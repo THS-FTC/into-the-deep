@@ -43,7 +43,7 @@ class HypnoticRobotHardware(private val opMode: HypnoticOpMode)
         pinpointDriver = opMode.hardwareMap.get(GoBildaPinpointDriver::class.java, "pinpoint")
         pinpointDriver.setOffsets(-69.2125, -72.33931) // Done
         pinpointDriver.setEncoderResolution(37.2499090578) // TODO:("this is the encoder values, make sure it is right")
-        pinpointDriver.setEncoderDirections(GoBildaPinpointDriver.EncoderDirection.FORWARD,GoBildaPinpointDriver.EncoderDirection.REVERSED ) //tune this!!!!
+        pinpointDriver.setEncoderDirections(GoBildaPinpointDriver.EncoderDirection.REVERSED,GoBildaPinpointDriver.EncoderDirection.FORWARD ) //tune this!!!!
         pinpointDriver.recalibrateIMU()
         pinpointDriver.resetPosAndIMU()
 

@@ -8,11 +8,17 @@ import org.riverdell.robotics.utilities.managed.pidf.PIDFConfig
 
 class Extension(val robot: HypnoticRobot) : AbstractSubsystem()
 {
-    private val slides = with(PIDFConfig(0.01, 0.0, 0.0)) {
+    val slides = with(PIDFConfig(0.01, 0.0, 0.0)) {
         ManagedMotorGroup(
             this@Extension,
             PIDCoefficients(kP, kI, kD),
             kV, kA, kStatic,
+//            kF =  { position, velocity ->
+//                if (position > -100 && velocity!! > 0) {
+//                    0.35
+//                } else {
+//                    0.0
+//                }
             master = robot.hardware.extensionMotorLeft,
             slaves = listOf(robot.hardware.extensionMotorRight)
         ).withTimeout(1500L)
