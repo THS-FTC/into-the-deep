@@ -59,7 +59,8 @@ dependencies {
     testImplementation "org.mockito:mockito-core:$mockitoVersion"
     testImplementation "org.mockito.kotlin:mockito-kotlin:$mockitoKotlinVersion"
     testImplementation "io.mockk:mockk:$mockkVersion"
-
+    implementation 'com.fasterxml/jackson.core:jacson-databind:2.12.7'
+    implementation 'org.jetbrains.kotlin:kotlin-stdlib:1.4.21'
     api project(":FtcRobotController")
     annotationProcessor files("lib/OpModeAnnotationProcessor.jar")
 }

@@ -49,7 +49,7 @@ class HypnoticTeleOp : HypnoticOpMode() {
             while (opModeIsActive()) {
                 val multiplier = 0.5 + gamepad2.right_trigger * 0.5
                 drivetrain.driveRobotCentric(robotDriver, multiplier)
-                if ((compositein.currentIntakeState == CompositeIntake.IntakeState.Intake) || (compositein.currentIntakeState == CompositeIntake.IntakeState.Transfer) )
+                if ((compositein.currentIntakeState == CompositeIntake.IntakeState.Intake))
                 {
                     val wantedPower = -opMode.gamepad1.left_trigger + opMode.gamepad1.right_trigger
                     if (wantedPower.absoluteValue > 0.1 && !extension.slides.isTravelling())
@@ -66,6 +66,33 @@ class HypnoticTeleOp : HypnoticOpMode() {
                         } else
                         {
                             if (extension.slides.currentPosition() < -435)
+                            {
+                                extension.slides.supplyPowerToAll(0.0)
+                            } else
+                            {
+                                extension.slides.supplyPowerToAll(-wantedPower.toDouble() / 2.0)
+                            }
+                        }
+                    } else if (!extension.slides.isTravelling())
+                    {
+                        extension.slides.supplyPowerToAll(0.0)
+                    }
+                } else if ((compositein.currentIntakeState == CompositeIntake.IntakeState.Transfer) ){
+                    val wantedPower = opMode.gamepad1.left_trigger - opMode.gamepad1.right_trigger
+                    if (wantedPower.absoluteValue > 0.1 && !extension.slides.isTravelling())
+                    {
+                        if (wantedPower < 0)
+                        {
+                            if (extension.slides.currentPosition() > -80)
+                            {
+                                extension.slides.supplyPowerToAll(0.0)
+                            } else
+                            {
+                                extension.slides.supplyPowerToAll(-wantedPower.toDouble() / 2.0)
+                            }
+                        } else
+                        {
+                            if (extension.slides.currentPosition() <= -92)
                             {
                                 extension.slides.supplyPowerToAll(0.0)
                             } else
@@ -119,12 +146,6 @@ class HypnoticTeleOp : HypnoticOpMode() {
                     }
                     .whenPressedOnce()
 
-                /*where(ButtonType.BumperRight)
-                    .triggers {
-                        compositeout.toggleBucket()
-                    }
-                    .whenPressedOnce()*/
-
                 where(ButtonType.DPadDown)
                     .triggers {
                         intake.setWrist(Intake.WristState.Vertical)
@@ -152,7 +173,7 @@ class HypnoticTeleOp : HypnoticOpMode() {
 
                 where(ButtonType.ButtonX)
                     .triggers {
-                        intake.toggleIntakeGrip()
+                        compositeout.setOuttake(CompositeOuttake.OuttakeState.Transfer)
                     }
                     .whenPressedOnce()
 
@@ -161,6 +182,7 @@ class HypnoticTeleOp : HypnoticOpMode() {
                         outtake.toggleOuttakeGrip()
                     }
                     .whenPressedOnce()
+
                 where(ButtonType.ButtonY)
                     .triggers {
                         compositeout.toggleSpecimen()

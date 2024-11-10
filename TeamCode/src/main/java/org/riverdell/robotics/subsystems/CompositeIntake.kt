@@ -51,7 +51,6 @@ class CompositeIntake(val robot: HypnoticRobot) : AbstractSubsystem() {
                 } //works idk i am him
 
 
-
         } else {
             //this is for observing/intaking
             robot.iv4b.setV4B(IV4B.V4BState.Observe) //set it to observe later
