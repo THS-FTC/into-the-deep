@@ -9,7 +9,8 @@ import com.qualcomm.robotcore.hardware.IMU;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import pedroPathing.pathGeneration.MathFunctions;
 import pedroPathing.pathGeneration.Vector;
-import org.firstinspires.ftc.teamcode.pedroPathing.util.NanoTimer;
+import pedroPathing.util.NanoTimer;
+
 
 /**
  * This is the TwoWheelLocalizer class. This class extends the Localizer superclass and is a
@@ -93,7 +94,7 @@ public class TwoWheelLocalizer extends Localizer { // todo: make two wheel odo w
         setStartPose(setStartPose);
         timer = new NanoTimer();
         deltaTimeNano = 1;
-        displacementPose = new Pose();
+        displacementPose = new Pose(10,20);
         currentVelocity = new Pose();
 
         previousIMUOrientation = MathFunctions.normalizeAngle(imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS));
