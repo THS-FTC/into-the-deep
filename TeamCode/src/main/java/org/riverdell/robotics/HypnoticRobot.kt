@@ -7,6 +7,8 @@ import io.liftgate.robotics.mono.Mono
 import io.liftgate.robotics.mono.subsystem.AbstractSubsystem
 import io.liftgate.robotics.mono.subsystem.Subsystem
 import io.liftgate.robotics.mono.subsystem.System
+import org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.hardwareMap
+import org.riverdell.robotics.pedroPathing.follower.Follower
 import org.riverdell.robotics.subsystems.CompositeIntake
 import org.riverdell.robotics.subsystems.CompositeOuttake
 import org.riverdell.robotics.subsystems.Drivetrain
@@ -37,6 +39,7 @@ abstract class HypnoticRobot(val opMode: HypnoticOpMode) : System
     val outtake by lazy { Outtake(this) }
     val compositeout by lazy { CompositeOuttake(this) }
     val compositein by lazy { CompositeIntake(this) }
+    val follower by lazy { Follower(opMode.hardwareMap) }
 
     val multipleTelemetry by lazy {
         MultipleTelemetry(

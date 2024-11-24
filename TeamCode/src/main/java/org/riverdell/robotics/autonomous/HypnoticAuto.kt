@@ -4,6 +4,8 @@ import io.liftgate.robotics.mono.Mono
 import io.liftgate.robotics.mono.konfig.konfig
 import io.liftgate.robotics.mono.pipeline.RootExecutionGroup
 import io.liftgate.robotics.mono.subsystem.AbstractSubsystem
+import org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion
+import org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.hardwareMap
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit
 import org.riverdell.robotics.HypnoticOpMode
 import org.riverdell.robotics.autonomous.detection.VisionPipeline
@@ -11,6 +13,7 @@ import org.riverdell.robotics.autonomous.movement.konfig.NavigationConfig
 import org.riverdell.robotics.autonomous.movement.localization.TwoWheelLocalizer
 import org.riverdell.robotics.HypnoticRobot
 import org.riverdell.robotics.autonomous.HypnoticAuto.Companion
+import org.riverdell.robotics.pedroPathing.follower.Follower
 import org.riverdell.robotics.utilities.managed.ManagedMotorGroup
 import java.util.concurrent.CountDownLatch
 import kotlin.concurrent.thread
@@ -38,7 +41,8 @@ abstract class HypnoticAuto(
             while (opModeInInit())
             {
                 runPeriodics()
-                drivetrain.localizer.update()
+                //drivetrain.localizer.update()
+                robot.follower.update()
 
                 multipleTelemetry.addLine("--- Initialization ---")
                 multipleTelemetry.addData(
@@ -49,10 +53,10 @@ abstract class HypnoticAuto(
                     "IMU",
                     drivetrain.imu()
                 )
-                multipleTelemetry.addData(
-                    "Pose",
-                    drivetrain.localizer.pose
-                )
+//                multipleTelemetry.addData(
+//                    "Pose",
+//                    drivetrain.localizer.pose
+//                )
 
                 multipleTelemetry.update()
             }
@@ -60,11 +64,14 @@ abstract class HypnoticAuto(
 
         override fun opModeStart()
         {
+
             thread {
                 while (!isStopRequested)
                 {
                     runPeriodics()
-                    drivetrain.localizer.update()
+                    robot.follower.update()
+                    //drivetrain.localizer.update()
+                    // add later when using hypnotic follower
 
                     multipleTelemetry.addLine("--- Autonomous ---")
                     multipleTelemetry.addData(
@@ -75,10 +82,10 @@ abstract class HypnoticAuto(
                         "IMU",
                         drivetrain.imu()
                     )
-                    multipleTelemetry.addData(
-                        "Pose",
-                        drivetrain.localizer.pose
-                    )
+//                    multipleTelemetry.addData(
+//                        "Pose",
+//                        drivetrain.localizer.pose
+                    //)
 
                     multipleTelemetry.update()
                 }
