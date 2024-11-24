@@ -8,23 +8,18 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple
 import io.liftgate.robotics.mono.subsystem.AbstractSubsystem
 import org.riverdell.robotics.HypnoticRobot
 import org.riverdell.robotics.autonomous.HypnoticAuto
-import org.riverdell.robotics.autonomous.movement.localization.TwoWheelLocalizer
 
 class Drivetrain(private val robot: HypnoticRobot) : AbstractSubsystem()
 {
     private val voltageSensor = robot.opMode.hardwareMap.voltageSensor.first()
 
-    private val imuState by state(write = { _ -> }, read = { robot.hardware.pinpointDriver.heading })
+    //private val imuState by state(write = { _ -> }, read = { robot.hardware.pinpointDriver.heading })
     private val voltageState by state(write = { _ -> }, read = voltageSensor::getVoltage)
-
-    val localizer by lazy {
-        TwoWheelLocalizer(robot)
-    }
 
     private lateinit var backingDriveBase: MecanumDrive
 
     fun voltage() = voltageState.current()
-    fun imu() = imuState.current()
+    //fun imu() = imuState.current()
 
     fun driveRobotCentric(driverOp: GamepadEx, scaleFactor: Double)
     {
@@ -36,7 +31,7 @@ class Drivetrain(private val robot: HypnoticRobot) : AbstractSubsystem()
         )
     }
 
-    fun driveFieldCentric(driverOp: GamepadEx, scaleFactor: Double)
+    /*fun driveFieldCentric(driverOp: GamepadEx, scaleFactor: Double)
     {
         val heading = imuState.current()
         backingDriveBase.driveFieldCentric(
@@ -46,7 +41,7 @@ class Drivetrain(private val robot: HypnoticRobot) : AbstractSubsystem()
             heading,
             true
         )
-    }
+    } */
 
     override fun start()
     {
@@ -58,22 +53,7 @@ class Drivetrain(private val robot: HypnoticRobot) : AbstractSubsystem()
      */
     override fun doInitialize()
     {
-        if (robot.opMode is HypnoticAuto)
-        {
-            robot.hardware.frontLeft.direction = DcMotorSimple.Direction.FORWARD
-            robot.hardware.frontLeft.zeroPowerBehavior = DcMotor.ZeroPowerBehavior.BRAKE
-
-            robot.hardware.frontRight.direction = DcMotorSimple.Direction.REVERSE
-            robot.hardware.frontRight.zeroPowerBehavior = DcMotor.ZeroPowerBehavior.BRAKE
-
-            robot.hardware.backLeft.direction = DcMotorSimple.Direction.FORWARD
-            robot.hardware.backLeft.zeroPowerBehavior = DcMotor.ZeroPowerBehavior.BRAKE
-
-            robot.hardware.backRight.direction = DcMotorSimple.Direction.FORWARD
-            robot.hardware.backRight.zeroPowerBehavior = DcMotor.ZeroPowerBehavior.BRAKE
-
-            runWithoutEncoders()
-        } else
+        if (robot.opMode !is HypnoticAuto)
         {
             setupDriveBase()
         }

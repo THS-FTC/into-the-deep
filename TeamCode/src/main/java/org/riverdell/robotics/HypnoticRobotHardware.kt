@@ -3,7 +3,7 @@ package org.riverdell.robotics
 import com.qualcomm.robotcore.hardware.DcMotorEx
 import com.qualcomm.robotcore.hardware.DcMotorSimple
 import com.qualcomm.robotcore.hardware.ServoImplEx
-import org.riverdell.robotics.gobilda.GoBildaPinpointDriver
+import org.riverdell.robotics.pedroPathing.localization.GoBildaPinpointDriver
 import org.riverdell.robotics.subsystems.IV4BConfig
 import org.riverdell.robotics.subsystems.IntakeConfig
 import org.riverdell.robotics.subsystems.OV4BConfig
@@ -40,12 +40,12 @@ class HypnoticRobotHardware(private val opMode: HypnoticOpMode)
 
     fun initializeHardware()
     {
-        pinpointDriver = opMode.hardwareMap.get(GoBildaPinpointDriver::class.java, "pinpoint")
-        pinpointDriver.setOffsets(-69.2125, -72.33931) // Done
+        //pinpointDriver = opMode.hardwareMap.get(GoBildaPinpointDriver::class.java, "pinpoint")
+        /*pinpointDriver.setOffsets(-69.2125, -72.33931) // Done
         pinpointDriver.setEncoderResolution(37.2499090578) // TODO:("this is the encoder values, make sure it is right")
         pinpointDriver.setEncoderDirections(GoBildaPinpointDriver.EncoderDirection.FORWARD,GoBildaPinpointDriver.EncoderDirection.REVERSED ) //tune this!!!!
         pinpointDriver.recalibrateIMU()
-        pinpointDriver.resetPosAndIMU()
+        pinpointDriver.resetPosAndIMU() */
 
         frontLeft = opMode.hardwareMap.get(DcMotorEx::class.java, "frontLeft")
         frontRight = opMode.hardwareMap.get(DcMotorEx::class.java, "frontRight")

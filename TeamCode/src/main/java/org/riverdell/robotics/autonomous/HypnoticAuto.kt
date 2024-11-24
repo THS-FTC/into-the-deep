@@ -8,10 +8,8 @@ import org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion
 import org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.hardwareMap
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit
 import org.riverdell.robotics.HypnoticOpMode
-import org.riverdell.robotics.autonomous.detection.VisionPipeline
-import org.riverdell.robotics.autonomous.movement.konfig.NavigationConfig
-import org.riverdell.robotics.autonomous.movement.localization.TwoWheelLocalizer
 import org.riverdell.robotics.HypnoticRobot
+import org.riverdell.robotics.PedroAuto.Constants.Points
 import org.riverdell.robotics.autonomous.HypnoticAuto.Companion
 import org.riverdell.robotics.pedroPathing.follower.Follower
 import org.riverdell.robotics.utilities.managed.ManagedMotorGroup
@@ -30,13 +28,14 @@ abstract class HypnoticAuto(
 
     inner class HypnoticAutoRobot : HypnoticRobot(this@HypnoticAuto)
     {
-        val navigationConfig = NavigationConfig()
+        //val navigationConfig = NavigationConfig()
 //       val visionPipeline by lazy { VisionPipeline(this@HypnoticAuto) } // TODO: new season
 
         override fun additionalSubSystems() = listOf<AbstractSubsystem>(/*visionPipeline*/)
         override fun initialize()
         {
             HypnoticAuto.instance = this@HypnoticAuto
+            robot.follower.setStartingPose(Points.slantStartPose)
 
             while (opModeInInit())
             {
@@ -49,10 +48,10 @@ abstract class HypnoticAuto(
                     "Voltage",
                     drivetrain.voltage()
                 )
-                multipleTelemetry.addData(
-                    "IMU",
-                    drivetrain.imu()
-                )
+//                multipleTelemetry.addData(
+//                    "IMU",
+//                    drivetrain.imu()
+//                )
 //                multipleTelemetry.addData(
 //                    "Pose",
 //                    drivetrain.localizer.pose
@@ -78,10 +77,10 @@ abstract class HypnoticAuto(
                         "Voltage",
                         drivetrain.voltage()
                     )
-                    multipleTelemetry.addData(
-                        "IMU",
-                        drivetrain.imu()
-                    )
+//                    multipleTelemetry.addData(
+//                        "IMU",
+//                        drivetrain.imu()
+//                    )
 //                    multipleTelemetry.addData(
 //                        "Pose",
 //                        drivetrain.localizer.pose

@@ -6,7 +6,6 @@ import io.liftgate.robotics.mono.Mono.commands
 import io.liftgate.robotics.mono.gamepad.ButtonType
 import org.riverdell.robotics.HypnoticOpMode
 import org.riverdell.robotics.HypnoticRobot
-import org.riverdell.robotics.autonomous.detection.VisionPipeline
 import org.riverdell.robotics.subsystems.CompositeIntake
 import org.riverdell.robotics.subsystems.CompositeOuttake
 import org.riverdell.robotics.subsystems.IV4B
@@ -27,10 +26,10 @@ class SoloZoom : HypnoticOpMode() {
     inner class TeleOpRobot : HypnoticRobot(this@SoloZoom) {
         private val gp1Commands by lazy { commands(gamepad1) }
         private val gp2Commands by lazy { commands(gamepad2) }
-        val visionPipeline by lazy { VisionPipeline(this@SoloZoom) }
+        //val visionPipeline by lazy { VisionPipeline(this@SoloZoom) }
 //    val wrist by lazy { hardware<Servo>("intake_wrist") }
 
-        override fun additionalSubSystems() = listOf(gp1Commands, gp2Commands, visionPipeline)
+        override fun additionalSubSystems() = listOf(gp1Commands, gp2Commands)
         override fun initialize() {
 //        wrist.position = 0.5
 //        visionPipeline.sampleDetection.supplyCurrentWristPosition { wrist.position }
