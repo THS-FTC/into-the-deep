@@ -5,11 +5,11 @@ import com.acmerobotics.dashboard.config.Config;
 @Config
 public class IV4BConfig {
 
-    public static double idlePosition= 0.4;
+    public static double idlePosition= 0.3;
     public static double moveAwayPosition  = 0.4;
     public static double transferPosition = 0.30;
-    public static double observePosition= 0.58;
-    public static double grabPosition= 0.72;
+    public static double observePosition= 0.65;
+    public static double grabPosition= 0.77;
 
     public static boolean leftIsReversed = false;
 }

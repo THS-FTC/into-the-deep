@@ -54,13 +54,12 @@ tasks.withType(Test).configureEach {
 }
 
 dependencies {
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.12.7'
     testImplementation "junit:junit:$jUnitVersion"// https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-api
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.11.0'
     testImplementation "org.mockito:mockito-core:$mockitoVersion"
     testImplementation "org.mockito.kotlin:mockito-kotlin:$mockitoKotlinVersion"
     testImplementation "io.mockk:mockk:$mockkVersion"
-    implementation 'com.fasterxml/jackson.core:jacson-databind:2.12.7'
-    implementation 'org.jetbrains.kotlin:kotlin-stdlib:1.4.21'
     api project(":FtcRobotController")
     annotationProcessor files("lib/OpModeAnnotationProcessor.jar")
 }

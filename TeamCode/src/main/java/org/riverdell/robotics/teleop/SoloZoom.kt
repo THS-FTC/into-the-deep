@@ -21,13 +21,13 @@ import kotlin.math.absoluteValue
     name = "Bit-By-Bit Drive",
     group = "Drive"
 )
-class HypnoticTeleOp : HypnoticOpMode() {
+class SoloZoom : HypnoticOpMode() {
     override fun buildRobot() = TeleOpRobot()
 
-    inner class TeleOpRobot : HypnoticRobot(this@HypnoticTeleOp) {
+    inner class TeleOpRobot : HypnoticRobot(this@SoloZoom) {
         private val gp1Commands by lazy { commands(gamepad1) }
         private val gp2Commands by lazy { commands(gamepad2) }
-        val visionPipeline by lazy { VisionPipeline(this@HypnoticTeleOp) }
+        val visionPipeline by lazy { VisionPipeline(this@SoloZoom) }
 //    val wrist by lazy { hardware<Servo>("intake_wrist") }
 
         override fun additionalSubSystems() = listOf(gp1Commands, gp2Commands, visionPipeline)
@@ -44,67 +44,67 @@ class HypnoticTeleOp : HypnoticOpMode() {
         }
 
         override fun opModeStart() {
-            val robotDriver = GamepadEx(gamepad2)
+            val robotDriver = GamepadEx(gamepad1)
             buildCommands()
             while (opModeIsActive()) {
-                val multiplier = 0.55 + gamepad2.right_trigger * 0.5
+                val multiplier = 0.55 + gamepad1.right_trigger * 0.5
                 drivetrain.driveRobotCentric(robotDriver, multiplier)
-                if ((compositein.currentIntakeState == CompositeIntake.IntakeState.Intake))
-                {
-                    val wantedPower = -opMode.gamepad1.left_trigger + opMode.gamepad1.right_trigger
-                    if (wantedPower.absoluteValue > 0.1 && !extension.slides.isTravelling())
-                    {
-                        if (wantedPower < 0)
-                        {
-                            if (extension.slides.currentPosition() >= -10)
-                            {
-                                extension.slides.supplyPowerToAll(0.0)
-                            } else
-                            {
-                                extension.slides.supplyPowerToAll(-wantedPower.toDouble() / 2.0)
-                            }
-                        } else
-                        {
-                            if (extension.slides.currentPosition() < -435)
-                            {
-                                extension.slides.supplyPowerToAll(0.0)
-                            } else
-                            {
-                                extension.slides.supplyPowerToAll(-wantedPower.toDouble() / 2.0)
-                            }
-                        }
-                    } else if (!extension.slides.isTravelling())
-                    {
-                        extension.slides.supplyPowerToAll(0.0)
-                    }
-                } else if ((compositein.currentIntakeState == CompositeIntake.IntakeState.Transfer) ){
-                    val wantedPower = opMode.gamepad1.left_trigger - opMode.gamepad1.right_trigger
-                    if (wantedPower.absoluteValue > 0.1 && !extension.slides.isTravelling())
-                    {
-                        if (wantedPower < 0)
-                        {
-                            if (extension.slides.currentPosition() > -80)
-                            {
-                                extension.slides.supplyPowerToAll(0.0)
-                            } else
-                            {
-                                extension.slides.supplyPowerToAll(-wantedPower.toDouble() / 2.0)
-                            }
-                        } else
-                        {
-                            if (extension.slides.currentPosition() <= -92)
-                            {
-                                extension.slides.supplyPowerToAll(0.0)
-                            } else
-                            {
-                                extension.slides.supplyPowerToAll(-wantedPower.toDouble() / 2.0)
-                            }
-                        }
-                    } else if (!extension.slides.isTravelling())
-                    {
-                        extension.slides.supplyPowerToAll(0.0)
-                    }
-                }
+//                if ((compositein.currentIntakeState == CompositeIntake.IntakeState.Intake))
+//                {
+//                    val wantedPower = -opMode.gamepad1.left_trigger + opMode.gamepad1.right_trigger
+//                    if (wantedPower.absoluteValue > 0.1 && !extension.slides.isTravelling())
+//                    {
+//                        if (wantedPower < 0)
+//                        {
+//                            if (extension.slides.currentPosition() >= -10)
+//                            {
+//                                extension.slides.supplyPowerToAll(0.0)
+//                            } else
+//                            {
+//                                extension.slides.supplyPowerToAll(-wantedPower.toDouble() / 2.0)
+//                            }
+//                        } else
+//                        {
+//                            if (extension.slides.currentPosition() < -435)
+//                            {
+//                                extension.slides.supplyPowerToAll(0.0)
+//                            } else
+//                            {
+//                                extension.slides.supplyPowerToAll(-wantedPower.toDouble() / 2.0)
+//                            }
+//                        }
+//                    } else if (!extension.slides.isTravelling())
+//                    {
+//                        extension.slides.supplyPowerToAll(0.0)
+//                    }
+//                } else if ((compositein.currentIntakeState == CompositeIntake.IntakeState.Transfer) ){
+//                    val wantedPower = opMode.gamepad1.left_trigger - opMode.gamepad1.right_trigger
+//                    if (wantedPower.absoluteValue > 0.1 && !extension.slides.isTravelling())
+//                    {
+//                        if (wantedPower < 0)
+//                        {
+//                            if (extension.slides.currentPosition() > -80)
+//                            {
+//                                extension.slides.supplyPowerToAll(0.0)
+//                            } else
+//                            {
+//                                extension.slides.supplyPowerToAll(-wantedPower.toDouble() / 2.0)
+//                            }
+//                        } else
+//                        {
+//                            if (extension.slides.currentPosition() <= -92)
+//                            {
+//                                extension.slides.supplyPowerToAll(0.0)
+//                            } else
+//                            {
+//                                extension.slides.supplyPowerToAll(-wantedPower.toDouble() / 2.0)
+//                            }
+//                        }
+//                    } else if (!extension.slides.isTravelling())
+//                    {
+//                        extension.slides.supplyPowerToAll(0.0)
+//                    }
+//                }
 
                 telemetry.addLine("Composite State: ${compositein.currentIntakeState}")
                 telemetry.addLine("Extendo Left Position: ${hardware.extensionMotorLeft.currentPosition}")

@@ -2,6 +2,7 @@ package org.riverdell.robotics.subsystems
 
 import io.liftgate.robotics.mono.subsystem.AbstractSubsystem
 import org.riverdell.robotics.HypnoticRobot
+import org.riverdell.robotics.subsystems.Intake.ClawState
 import org.riverdell.robotics.utilities.motionprofile.Constraint
 import java.util.concurrent.CompletableFuture
 
@@ -57,15 +58,17 @@ class Outtake(private val robot: HypnoticRobot) : AbstractSubsystem() {
         }
 
         return if (newState == ClawState.Open) {
+            currentClawState = ClawState.Open
             gripRotateTo(OutakeConfig.openPosition)
                 .thenAccept {
                     println(it)
-                }.apply { currentClawState = ClawState.Open }
+                }
         } else {
+            currentClawState = ClawState.Closed
             gripRotateTo(OutakeConfig.closePositon)
                 .thenAccept {
                     println(it)
-                }.apply { currentClawState = ClawState.Open }
+                }
         }
     }
 

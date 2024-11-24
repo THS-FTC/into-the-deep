@@ -43,7 +43,7 @@ class HypnoticRobotHardware(private val opMode: HypnoticOpMode)
         pinpointDriver = opMode.hardwareMap.get(GoBildaPinpointDriver::class.java, "pinpoint")
         pinpointDriver.setOffsets(-69.2125, -72.33931) // Done
         pinpointDriver.setEncoderResolution(37.2499090578) // TODO:("this is the encoder values, make sure it is right")
-        pinpointDriver.setEncoderDirections(GoBildaPinpointDriver.EncoderDirection.REVERSED,GoBildaPinpointDriver.EncoderDirection.FORWARD ) //tune this!!!!
+        pinpointDriver.setEncoderDirections(GoBildaPinpointDriver.EncoderDirection.FORWARD,GoBildaPinpointDriver.EncoderDirection.REVERSED ) //tune this!!!!
         pinpointDriver.recalibrateIMU()
         pinpointDriver.resetPosAndIMU()
 
@@ -57,9 +57,11 @@ class HypnoticRobotHardware(private val opMode: HypnoticOpMode)
 
         liftMotorLeft = opMode.hardwareMap["lift_motor_left"] as DcMotorEx
         liftMotorLeft.direction = DcMotorSimple.Direction.FORWARD
+        liftMotorLeft.direction = DcMotorSimple.Direction.FORWARD// idk why this works
 
         liftMotorRight = opMode.hardwareMap["lift_motor_right"] as DcMotorEx
-        liftMotorLeft.direction = DcMotorSimple.Direction.REVERSE
+        liftMotorRight.direction = DcMotorSimple.Direction.REVERSE
+        liftMotorRight.direction = DcMotorSimple.Direction.REVERSE// idk why this works
 
         extensionMotorLeft = opMode.hardwareMap["extension_motor_left"] as DcMotorEx
         extensionMotorLeft.direction = DcMotorSimple.Direction.REVERSE
@@ -97,6 +99,6 @@ class HypnoticRobotHardware(private val opMode: HypnoticOpMode)
         outtakeWrist.position = OutakeConfig.frontPosition
 
         outtakeGrip = opMode.hardwareMap.get(ServoImplEx::class.java, "outtake_grip")
-        outtakeGrip.position = OutakeConfig.openPosition
+        outtakeGrip.position = OutakeConfig.closePositon
     }
 }

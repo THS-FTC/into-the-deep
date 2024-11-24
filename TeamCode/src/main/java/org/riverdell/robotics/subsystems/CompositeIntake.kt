@@ -39,15 +39,14 @@ class CompositeIntake(val robot: HypnoticRobot) : AbstractSubsystem() {
 
             robot.intake.setRotationPulley(Intake.RotationState.Transfer)
                 .thenCompose {
-
-                    robot.extension.extendToAndStayAt(SlideConfig.extendoTransfer).thenRun {
-                        robot.extension.idle()
+                    robot.intake.setWrist(Intake.WristState.Front).thenCompose { robot.extension.extendToAndStayAt(SlideConfig.extendoTransfer) }
                     }
-
-                    robot.intake.setWrist(Intake.WristState.Front).apply {
+                        .thenCompose {
+                        robot.outtake.setOuttakeGrip(Outtake.ClawState.Closed)
+                    }
+                        .apply {
                         println("updated to transfer")
                         currentIntakeState = IntakeState.Transfer
-                    }
                 } //works idk i am him
 
 

@@ -78,6 +78,6 @@ public class TwoWheelLocalizer extends TwoTrackingWheelLocalizer {
 
     public Pose getPose() {
         Pose2d pose = getPoseEstimate();
-        return new Pose(-pose.getY(), pose.getX(), pose.getHeading());
+        return new Pose(-pose.getX(), pose.getY(), pose.getHeading());
     }
 }

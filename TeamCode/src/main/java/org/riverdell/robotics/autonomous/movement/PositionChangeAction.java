@@ -1,5 +1,6 @@
 package org.riverdell.robotics.autonomous.movement;
 
+import com.acmerobotics.dashboard.config.Config;
 import com.arcrobotics.ftclib.controller.PIDFController;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
@@ -18,6 +19,7 @@ import io.liftgate.robotics.mono.pipeline.RootExecutionGroup;
 import kotlin.Unit;
 import kotlin.jvm.functions.Function1;
 
+@Config
 public class PositionChangeAction {
     private static final DrivetrainUpdates ZERO = new DrivetrainUpdates(0.0, 0.0, 0.0, 0.0);
 
@@ -26,14 +28,14 @@ public class PositionChangeAction {
 
     public double K_STATIC = 1.85;
 
-    public double xP = 0.07;
-    public double xD = 0.012;
+    public static double xP = 0.06;
+    public static double xD = 0.00007;
 
-    public double yP = 0.07;
-    public double yD = 0.012;
+    public static double yP = 0.06;
+    public static double yD = 0.00007;
 
-    public double hP = 1;
-    public double hD = 0.075;
+    public static double hP = 1;
+    public static double hD = 0.00;
 
     public double MINIMUM_TRANSLATIONAL_DIFF_FROM_TARGET = 0.75;
     public double MINIMUM_ROTATIONAL_DIFF_FROM_TARGET = 0.02;
@@ -62,7 +64,7 @@ public class PositionChangeAction {
         this.targetPose = targetPose;
         this.executionGroup = executionGroup;
 
-        populateDefaults();
+//        populateDefaults();
 
         xController = new PIDFController(xP, 0.0, xD, 0);
         yController = new PIDFController(yP, 0.0, yD, 0);

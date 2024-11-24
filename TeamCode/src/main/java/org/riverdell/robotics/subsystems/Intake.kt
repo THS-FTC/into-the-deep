@@ -80,16 +80,16 @@ class Intake(private val robot: HypnoticRobot) : AbstractSubsystem()
 
         return if (newState == ClawState.Open)
         {
+            currentClawState = ClawState.Open
             gripRotateTo(IntakeConfig.openPositon)
                 .thenAccept {
-                    currentClawState = ClawState.Open
                     println(it)
                 }
         } else
         {
+            currentClawState = ClawState.Closed
             gripRotateTo(IntakeConfig.closePosition)
                 .thenAccept {
-                    currentClawState = ClawState.Closed
                     println(it)
                 }
         }
