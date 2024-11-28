@@ -1,6 +1,5 @@
-package org.riverdell.robotics.PedroAuto.Paths;
+package org.riverdell.robotics.PedroAuto.Paths.initialAndRightSamples;
 
-import org.riverdell.robotics.pedroPathing.pathGeneration.BezierCurve;
 import org.riverdell.robotics.pedroPathing.pathGeneration.BezierLine;
 import org.riverdell.robotics.pedroPathing.pathGeneration.PathBuilder;
 import org.riverdell.robotics.pedroPathing.pathGeneration.PathChain;
@@ -28,7 +27,7 @@ public class toBasketFromSlant {
             .addPath(
                     // Line 2
                     new BezierLine(
-                            new Point(23.000, 10.000, Point.CARTESIAN),
+                            new Point(23.000, 8.000, Point.CARTESIAN),
                             new Point(19.000, 12.000, Point.CARTESIAN)
                     )
             ).setLinearHeadingInterpolation(Math.toRadians(270), Math.toRadians(270));

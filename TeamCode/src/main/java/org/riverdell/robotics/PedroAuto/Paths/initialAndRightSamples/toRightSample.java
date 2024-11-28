@@ -1,4 +1,4 @@
-package org.riverdell.robotics.PedroAuto.Paths;
+package org.riverdell.robotics.PedroAuto.Paths.initialAndRightSamples;
 
 import org.riverdell.robotics.pedroPathing.pathGeneration.BezierLine;
 import org.riverdell.robotics.pedroPathing.pathGeneration.PathBuilder;
@@ -14,11 +14,11 @@ public class toRightSample {
             .addPath(
                     // Line 1
                     new BezierLine(
-                            new Point(17.400, 127.147, Point.CARTESIAN),
-                            new Point(32.770, 121.155, Point.CARTESIAN)
+                            new Point(19.000, 12.000, Point.CARTESIAN),
+                            //new Point(30.500, 5.000, Point.CARTESIAN)
+                            new Point(26.000, 5.000, Point.CARTESIAN)
                     )
-            )
-            .setLinearHeadingInterpolation(Math.toRadians(158), Math.toRadians(180));
+            ).setLinearHeadingInterpolation(Math.toRadians(270),Math.toRadians(320));
     return builder.build();
   }
 }
