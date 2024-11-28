@@ -10,13 +10,34 @@ import org.riverdell.robotics.PedroAuto.Constants.Points
 import org.riverdell.robotics.PedroAuto.Paths.Paths
 import org.riverdell.robotics.autonomous.HypnoticAuto
 import org.riverdell.robotics.subsystems.CompositeOuttake
+import org.riverdell.robotics.subsystems.IV4B
+import org.riverdell.robotics.subsystems.Intake
 import org.riverdell.robotics.subsystems.Outtake
+import java.util.concurrent.CompletableFuture
 
 @Autonomous(name = "4+0 Bucket", group = "Comp")
 class BucketHigh : HypnoticAuto({ opmode ->
-    simultaneous("Intial Bucket Path") {
+    single("subsystems") {
+        opmode.robot.compositeout.setOuttake(CompositeOuttake.OuttakeState.Outtake)
+        Thread.sleep(50L)
+        opmode.robot.follower.followPath(Paths.slant_to_basket)
+        while (!opmode.robot.follower.atParametricEnd()) {
+            if (!opmode.opModeIsActive()) {
+                break;
+            }
+            Thread.sleep(50L)
+        }
+    }
+    single("Drop Sample") {
+        Thread.sleep(700)
+        opmode.robot.outtake.setOuttakeGrip(Outtake.ClawState.Open)
+        Thread.sleep(700)
+
+    }
+
+    //simultaneous("First Sample") {
         single("pathing") {
-            opmode.robot.follower.followPath(Paths.slant_to_basket)
+            opmode.robot.follower.followPath(Paths.basket_to_right)
             while (!opmode.robot.follower.atParametricEnd()) {
                 if (!opmode.opModeIsActive()) {
                     break;
@@ -25,13 +46,22 @@ class BucketHigh : HypnoticAuto({ opmode ->
             }
         }
         single("subsystems") {
-            opmode.robot.compositeout.setOuttake(CompositeOuttake.OuttakeState.Outtake)
-            Thread.sleep(4000)
+            Thread.sleep(800)
+            opmode.robot.compositeout.setOuttake(CompositeOuttake.OuttakeState.Transfer)
+            opmode.robot.iv4b.setV4B(IV4B.V4BState.Observe)
+            opmode.robot.intake.setRotationPulley(Intake.RotationState.Grab)
         }
-    }
-    single("Drop Sample"){
-        opmode.robot.outtake.setOuttakeGrip(Outtake.ClawState.Open)
-        Thread.sleep(1500)
-
+    //}
+    single("Grab Right") {
+        opmode.robot.intake.setIntakeGrip(Intake.ClawState.Open)
+        opmode.robot.intake.setRotationPulley(Intake.RotationState.Grab)
+        opmode.robot.iv4b.setV4B(IV4B.V4BState.Grab)
+            .thenCompose { opmode.robot.intake.setIntakeGrip(Intake.ClawState.Closed) }
+            .thenCompose {
+                opmode.robot.iv4b.setV4B(
+                    IV4B.V4BState.Observe
+                )
+            }
+        opmode.robot.intake.setRotationPulley(Intake.RotationState.Observe)
     }
 })

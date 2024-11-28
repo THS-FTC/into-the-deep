@@ -1,5 +1,6 @@
 package org.riverdell.robotics.PedroAuto.Paths;
 
+import org.riverdell.robotics.pedroPathing.pathGeneration.BezierCurve;
 import org.riverdell.robotics.pedroPathing.pathGeneration.BezierLine;
 import org.riverdell.robotics.pedroPathing.pathGeneration.PathBuilder;
 import org.riverdell.robotics.pedroPathing.pathGeneration.PathChain;
@@ -11,22 +12,26 @@ public class toBasketFromSlant {
     PathBuilder builder = new PathBuilder();
 
     builder
-      .addPath(
-        // Line 1
-        new BezierLine(
-          new Point(0.000, 0.000, Point.CARTESIAN), //8 to 100
-          new Point(20.000, 20.000, Point.CARTESIAN)//20 to 123
-        )
-      )
-      .setLinearHeadingInterpolation(Math.toRadians(90), Math.toRadians(135))
-      .addPath(
-        // Line 2
-        new BezierLine(
-          new Point(20.000, 20.000, Point.CARTESIAN), //20 to 123
-          new Point(0.000, 0.000, Point.CARTESIAN) //17 to 126
-        )
-      )
-      .setTangentHeadingInterpolation();
+//            .addPath(
+//                    new BezierCurve(
+//                            new Point(0.000, 0.000, Point.CARTESIAN),
+//                            new Point(20.00, 5.00, Point.CARTESIAN),
+//                            new Point(18.00, 14.00, Point.CARTESIAN)
+//                    )
+            .addPath(
+                    // Line 1
+                    new BezierLine(
+                            new Point(0.000, 0.000, Point.CARTESIAN),
+                            new Point(23.000, 8.000, Point.CARTESIAN)
+                    )
+            ).setLinearHeadingInterpolation(Math.toRadians(225), Math.toRadians(270))
+            .addPath(
+                    // Line 2
+                    new BezierLine(
+                            new Point(23.000, 10.000, Point.CARTESIAN),
+                            new Point(19.000, 12.000, Point.CARTESIAN)
+                    )
+            ).setLinearHeadingInterpolation(Math.toRadians(270), Math.toRadians(270));
     return builder.build();
   }
 }
