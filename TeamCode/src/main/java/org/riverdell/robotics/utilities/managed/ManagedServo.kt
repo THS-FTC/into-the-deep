@@ -1,10 +1,12 @@
 package org.riverdell.robotics.utilities.managed
 
 import com.qualcomm.robotcore.hardware.Servo
+import com.qualcomm.robotcore.hardware.ServoImplEx
 import com.qualcomm.robotcore.util.ElapsedTime
 import io.liftgate.robotics.mono.states.StateHolder
 import org.riverdell.robotics.utilities.motionprofile.AsymmetricMotionProfile
 import org.riverdell.robotics.utilities.motionprofile.ProfileConstraints
+import org.riverdell.robotics.utilities.motionprofile.ProfileState
 import java.util.concurrent.CompletableFuture
 import kotlin.math.abs
 
@@ -14,53 +16,55 @@ import kotlin.math.abs
  * @author Subham
  */
 class ManagedServo(
-    private val servo: Servo,
+    private val servo: ServoImplEx,
     stateHolder: StateHolder,
     private val constraints: () -> ProfileConstraints
-)
-{
+) {
     private var motionProfile: AsymmetricMotionProfile? = null
     private var timer = ElapsedTime()
+    private var behavior = ServoBehavior.MotionProfile
+    private var profileState: ProfileState? = null
 
     private val state by stateHolder.state<Double>({
         timer = ElapsedTime()
-        motionProfile = AsymmetricMotionProfile(
-            servo.position,
-            it,
-            constraints()
-        )
-    }, {
-        if (motionProfile == null)
+        if (behavior == ServoBehavior.MotionProfile)
         {
-            timer = ElapsedTime()
-            return@state 0.0
-        }
-
-        val motionProfileState = motionProfile!!.calculate(timer.time())
-
-        servo.position = motionProfileState.x
-        servo.position
-    }, { current, finalPosition ->
-        if (current == finalPosition)
+            println("Motion profile going from ${servo.position} to $it")
+            motionProfile = AsymmetricMotionProfile(
+                servo.position,
+                it,
+                constraints()
+            )
+        } else
         {
             motionProfile = null
         }
+    }, { _ ->
+        servo.position
+    }, { _, target ->
+        if (behavior == ServoBehavior.Direct) {
+            servo.position = target
+            return@state true
+        } else
+        {
+            profileState = motionProfile!!.calculate(timer.time())
+            if (profileState!!.v == 0.0) {
+                return@state true
+            }
 
-        motionProfile == null
+            servo.position = profileState!!.x
+            return@state false
+        }
     })
 
     fun unwrapServo() = servo
-    fun setMotionProfileTarget(target: Double) = state.override(target, 0L)
-    fun cancelMotionProfile() = state.reset()
-
-    /**
-     * Overrides any existing motion profile and sets
-     * the target position of the backing servo.
-     */
-    fun forcefullySetTarget(targetPosition: Double): CompletableFuture<Void>
-    {
-        state.reset()
-        servo.position = targetPosition
-        return CompletableFuture.completedFuture(null)
+    fun setTarget(
+        target: Double,
+        behavior: ServoBehavior = ServoBehavior.MotionProfile
+    ): CompletableFuture<*> {
+        this.behavior = behavior
+        return state.override(target)
     }
+
+    fun cancelMotionProfile() = state.reset()
 }

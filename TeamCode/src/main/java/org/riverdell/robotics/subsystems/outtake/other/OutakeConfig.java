@@ -1,4 +1,4 @@
-package org.riverdell.robotics.subsystems;
+package org.riverdell.robotics.subsystems.outtake.other;
 
 import com.acmerobotics.dashboard.config.Config;
 

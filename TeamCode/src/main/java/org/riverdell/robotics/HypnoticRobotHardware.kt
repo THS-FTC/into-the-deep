@@ -4,10 +4,7 @@ import com.qualcomm.robotcore.hardware.DcMotorEx
 import com.qualcomm.robotcore.hardware.DcMotorSimple
 import com.qualcomm.robotcore.hardware.ServoImplEx
 import org.riverdell.robotics.pedroPathing.localization.GoBildaPinpointDriver
-import org.riverdell.robotics.subsystems.IV4BConfig
-import org.riverdell.robotics.subsystems.IntakeConfig
-import org.riverdell.robotics.subsystems.OV4BConfig
-import org.riverdell.robotics.subsystems.OutakeConfig
+import org.riverdell.robotics.subsystems.outtake.other.OutakeConfig
 
 class HypnoticRobotHardware(private val opMode: HypnoticOpMode)
 {

@@ -7,17 +7,16 @@ import io.liftgate.robotics.mono.Mono
 import io.liftgate.robotics.mono.subsystem.AbstractSubsystem
 import io.liftgate.robotics.mono.subsystem.Subsystem
 import io.liftgate.robotics.mono.subsystem.System
-import org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.hardwareMap
 import org.riverdell.robotics.pedroPathing.follower.Follower
-import org.riverdell.robotics.subsystems.CompositeIntake
-import org.riverdell.robotics.subsystems.CompositeOuttake
+import org.riverdell.robotics.subsystems.composite.CompositeIntake
+import org.riverdell.robotics.subsystems.composite.CompositeOuttake
 import org.riverdell.robotics.subsystems.Drivetrain
-import org.riverdell.robotics.subsystems.Extension
-import org.riverdell.robotics.subsystems.IV4B
-import org.riverdell.robotics.subsystems.Intake
-import org.riverdell.robotics.subsystems.Lift
-import org.riverdell.robotics.subsystems.OV4B
-import org.riverdell.robotics.subsystems.Outtake
+import org.riverdell.robotics.subsystems.slides.Extension
+import org.riverdell.robotics.subsystems.intake.v4b.IV4B
+import org.riverdell.robotics.subsystems.intake.other.
+import org.riverdell.robotics.subsystems.slides.Lift
+import org.riverdell.robotics.subsystems.outtake.v4b.OV4B
+import org.riverdell.robotics.subsystems.outtake.other.Outtake
 
 abstract class HypnoticRobot(val opMode: HypnoticOpMode) : System
 {

@@ -6,15 +6,9 @@ import io.liftgate.robotics.mono.Mono.commands
 import io.liftgate.robotics.mono.gamepad.ButtonType
 import org.riverdell.robotics.HypnoticOpMode
 import org.riverdell.robotics.HypnoticRobot
-import org.riverdell.robotics.subsystems.CompositeIntake
-import org.riverdell.robotics.subsystems.CompositeOuttake
-import org.riverdell.robotics.subsystems.IV4B
-import org.riverdell.robotics.subsystems.Intake
-import org.riverdell.robotics.subsystems.OV4B
-import org.riverdell.robotics.subsystems.Outtake
-import org.riverdell.robotics.subsystems.Outtake.ClawState
-import org.riverdell.robotics.subsystems.SlideConfig
-import kotlin.math.absoluteValue
+import org.riverdell.robotics.subsystems.composite.CompositeOuttake
+import org.riverdell.robotics.subsystems.intake.v4b.IV4B
+import org.riverdell.robotics.subsystems.intake.other.Intake
 
 @TeleOp(
     name = "Bit-By-Bit Drive",
@@ -127,7 +121,8 @@ class SoloZoom : HypnoticOpMode() {
                     .triggers {
                         intake.setIntakeGrip(Intake.ClawState.Open)
                         intake.setRotationPulley(Intake.RotationState.Grab)
-                        iv4b.setV4B(IV4B.V4BState.Grab).thenCompose { intake.setIntakeGrip(Intake.ClawState.Closed) }.thenCompose { iv4b.setV4B(IV4B.V4BState.Observe) }
+                        iv4b.setV4B(IV4B.V4BState.Grab).thenCompose { intake.setIntakeGrip(Intake.ClawState.Closed) }.thenCompose { iv4b.setV4B(
+                            IV4B.V4BState.Observe) }
                         intake.setRotationPulley(Intake.RotationState.Observe)
                         // intake.toggleIntakeGrip()
                     }

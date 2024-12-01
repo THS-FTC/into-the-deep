@@ -1,12 +1,11 @@
-package org.riverdell.robotics.subsystems
+package org.riverdell.robotics.subsystems.composite
 
-import android.transition.Slide
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode
-import io.liftgate.robotics.mono.states.StateResult
 import io.liftgate.robotics.mono.subsystem.AbstractSubsystem
 import org.riverdell.robotics.HypnoticRobot
-import org.riverdell.robotics.subsystems.Outtake.ClawState
-import java.util.Currency
+import org.riverdell.robotics.subsystems.intake.other.Intake
+import org.riverdell.robotics.subsystems.outtake.other.Outtake
+import org.riverdell.robotics.subsystems.slides.SlideConfig
+import org.riverdell.robotics.subsystems.outtake.v4b.OV4B
 import java.util.concurrent.CompletableFuture
 
 class CompositeOuttake(val robot: HypnoticRobot) : AbstractSubsystem() {
@@ -54,7 +53,8 @@ class CompositeOuttake(val robot: HypnoticRobot) : AbstractSubsystem() {
             robot.ov4b.setV4B(OV4B.OV4BState.Specimen)
                 .apply { currentOuttakeState = OuttakeState.SpecimenUp }
         }else if (newState == OuttakeState.SpecimenDown) {
-            robot.lift.extendToAndStayAt(SlideConfig.downSpecimen).thenCompose { robot.ov4b.setV4B(OV4B.OV4BState.Specimen) }
+            robot.lift.extendToAndStayAt(SlideConfig.downSpecimen).thenCompose { robot.ov4b.setV4B(
+                OV4B.OV4BState.Specimen) }
 //            robot.outtake.toggleOuttakeGrip().thenCompose{robot.ov4b.setV4B(OV4B.OV4BState.Transfer)}
                 .apply { currentOuttakeState = OuttakeState.SpecimenDown }
         }

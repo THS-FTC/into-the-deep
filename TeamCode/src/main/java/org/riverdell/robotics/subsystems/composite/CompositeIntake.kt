@@ -1,12 +1,11 @@
-package org.riverdell.robotics.subsystems
+package org.riverdell.robotics.subsystems.composite
 
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode
-import io.liftgate.robotics.mono.konfig.konfig
-import io.liftgate.robotics.mono.states.StateResult
 import io.liftgate.robotics.mono.subsystem.AbstractSubsystem
-import kotlinx.serialization.Serializable
 import org.riverdell.robotics.HypnoticRobot
-import org.riverdell.robotics.utilities.motionprofile.ProfileConstraints
+import org.riverdell.robotics.subsystems.intake.other.Intake
+import org.riverdell.robotics.subsystems.slides.SlideConfig
+import org.riverdell.robotics.subsystems.intake.v4b.IV4B
+import org.riverdell.robotics.subsystems.outtake.other.Outtake
 import java.util.concurrent.CompletableFuture
 
 class CompositeIntake(val robot: HypnoticRobot) : AbstractSubsystem() {
@@ -39,7 +38,8 @@ class CompositeIntake(val robot: HypnoticRobot) : AbstractSubsystem() {
 
             robot.intake.setRotationPulley(Intake.RotationState.Transfer)
                 .thenCompose {
-                    robot.intake.setWrist(Intake.WristState.Front).thenCompose { robot.extension.extendToAndStayAt(SlideConfig.extendoTransfer) }
+                    robot.intake.setWrist(Intake.WristState.Front).thenCompose { robot.extension.extendToAndStayAt(
+                        SlideConfig.extendoTransfer) }
                     }
                         .thenCompose {
                         robot.outtake.setOuttakeGrip(Outtake.ClawState.Closed)
