@@ -95,9 +95,6 @@ class HypnoticRobotHardware(private val opMode: HypnoticOpMode)
         outtakePulley = opMode.hardwareMap.get(ServoImplEx::class.java, "ov4b_pulley")
         outtakePulley.position = OV4BConfig.idlePulley
 
-        outtakeWrist = opMode.hardwareMap.get(ServoImplEx::class.java, "outtake_wrist")
-        outtakeWrist.position = OutakeConfig.frontPosition
-
         outtakeGrip = opMode.hardwareMap.get(ServoImplEx::class.java, "outtake_grip")
         outtakeGrip.position = OutakeConfig.closePositon
     }

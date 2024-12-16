@@ -27,15 +27,15 @@ class OV4B(private val robot: HypnoticRobot) : AbstractSubsystem()
     }
     enum class PulleyState
     {
-        Outtake,Intake,Idle,Init
+        Bucket,Intake,Idle,Init,Specimen
     }
 //    private val ov4bConfig = konfig<V4BConfig>()
     private var currentV4BState = OV4BState.Init
     private var currentRotateState = PulleyState.Init
 
 
-    private val leftRotation = motionProfiledServo(robot.hardware.outtakeRotationLeft, Constraint.HALF.scale(10.0))
-    private val rightRotation = motionProfiledServo(robot.hardware.outtakeRotationRight, Constraint.HALF.scale(10.0))
+    private val leftRotation = motionProfiledServo(robot.hardware.outtakeRotationLeft, Constraint.HALF.scale(15.0))
+    private val rightRotation = motionProfiledServo(robot.hardware.outtakeRotationRight, Constraint.HALF.scale(15.0))
     private val clawPulley = motionProfiledServo(robot.hardware.outtakePulley, Constraint.HALF.scale(5.0))
 
 
@@ -65,8 +65,14 @@ class OV4B(private val robot: HypnoticRobot) : AbstractSubsystem()
                 .thenAccept {
                     println(it)
                 }
-        } else {
-            pulleyRotateTo(OV4BConfig.backPulley)
+        } else if (newState == PulleyState.Specimen) {
+            pulleyRotateTo(OV4BConfig.specimenPulley)
+                .thenAccept {
+                    println(it)
+                }
+        }
+        else{
+            pulleyRotateTo(OV4BConfig.bucketPulley)
                 .thenAccept {
                     println(it)
                 }

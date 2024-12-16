@@ -23,8 +23,8 @@ class Outtake(private val robot: HypnoticRobot) : AbstractSubsystem() {
         Closed, Open, Idle
     }
 
-    enum class WristState {
-        Front, Back, Idle
+    enum class PulleyState {
+        Transfer, Bucket, Idle, Specimen
     }
 
 //    private val outtakeConfig = konfig<OuttakeConfig>()
@@ -33,8 +33,8 @@ class Outtake(private val robot: HypnoticRobot) : AbstractSubsystem() {
 //        }
 
     //    fun wristRotateTo(position: Double) = wrist.setMotionProfileTarget(position)
-    fun wristRotateTo(position: Double): CompletableFuture<Void> {
-        wrist.forcefullySetTarget(position)
+    fun pulleyRotateTo(position: Double): CompletableFuture<Void> {
+//        pulley.forcefullySetTarget(position)
         return CompletableFuture.completedFuture(null)
     }
 
@@ -43,14 +43,13 @@ class Outtake(private val robot: HypnoticRobot) : AbstractSubsystem() {
         return CompletableFuture.completedFuture(null)
     }
 
-    private val wrist = motionProfiledServo(robot.hardware.outtakeWrist, Constraint.HALF.scale(5.0))
+//    private val pulley = motionProfiledServo(robot.hardware.outtakeWrist, Constraint.HALF.scale(5.0))
     private val actuator = motionProfiledServo(
         robot.hardware.outtakeGrip,
         Constraint.HALF.scale(5.0)
     ) // change to outtakegrip
 
     private var currentClawState = ClawState.Idle
-    private var currentWristState = WristState.Idle
 
     fun setOuttakeGrip(newState: ClawState): CompletableFuture<Void> {
         if (currentClawState == newState) {
@@ -72,25 +71,6 @@ class Outtake(private val robot: HypnoticRobot) : AbstractSubsystem() {
         }
     }
 
-    fun setWrist(newState: WristState): CompletableFuture<Void> {
-        if (currentWristState == newState) {
-            return CompletableFuture.completedFuture(null)
-        }
-
-        return if (newState == WristState.Front) {
-            wristRotateTo(OutakeConfig.frontPosition)
-                .thenAccept {
-                    println(it)
-                }
-        } else {
-            wristRotateTo(OutakeConfig.backPosition)
-                .thenAccept {
-                    println(it)
-                }
-        }
-
-    }
-
     fun toggleOuttakeGrip(): CompletableFuture<Void> {
         return if (currentClawState == ClawState.Closed) {
             gripRotateTo(OutakeConfig.openPosition).apply {
@@ -100,18 +80,6 @@ class Outtake(private val robot: HypnoticRobot) : AbstractSubsystem() {
             gripRotateTo(OutakeConfig.closePositon).apply {
                 currentClawState = ClawState.Closed
             }
-        }
-    }
-
-    fun toggleOuttakeRotation(state: WristState = WristState.Front): CompletableFuture<Void> {
-        if (currentWristState == state) {
-            return CompletableFuture.completedFuture(null)
-        }
-
-        return if (state == WristState.Front) {
-            wristRotateTo(OutakeConfig.frontPosition)
-        } else {
-            wristRotateTo(OutakeConfig.backPosition)
         }
     }
 
