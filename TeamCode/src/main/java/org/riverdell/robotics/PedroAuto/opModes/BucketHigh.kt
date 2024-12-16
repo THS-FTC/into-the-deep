@@ -15,12 +15,12 @@ import org.riverdell.robotics.subsystems.Intake
 import org.riverdell.robotics.subsystems.Outtake
 import java.util.concurrent.CompletableFuture
 
-@Autonomous(name = "4+0 Bucket", group = "Comp")
+@Autonomous(name = "1+0 Bucket", group = "Comp")
 class BucketHigh : HypnoticAuto({ opmode ->
     single("subsystems") {
         opmode.robot.compositeout.setOuttake(CompositeOuttake.OuttakeState.Outtake)
         Thread.sleep(50L)
-        opmode.robot.follower.followPath(Paths.slant_to_basket)
+        opmode.robot.follower.followPath(Paths.slant_to_bucket)
         while (!opmode.robot.follower.atParametricEnd()) {
             if (!opmode.opModeIsActive()) {
                 break;
@@ -37,7 +37,7 @@ class BucketHigh : HypnoticAuto({ opmode ->
 
     //simultaneous("First Sample") {
         single("pathing") {
-            opmode.robot.follower.followPath(Paths.basket_to_right)
+            opmode.robot.follower.followPath(Paths.bucket_to_right)
             while (!opmode.robot.follower.atParametricEnd()) {
                 if (!opmode.opModeIsActive()) {
                     break;

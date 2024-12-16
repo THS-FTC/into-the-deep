@@ -25,31 +25,27 @@ class CompositeOuttake(val robot: HypnoticRobot) : AbstractSubsystem() {
 
         return if (newState == OuttakeState.Transfer) {
             //idle outtake stuff here
-            robot.compositein.setIntake(CompositeIntake.IntakeState.Idle).thenCompose {
-                CompletableFuture.allOf(
-                    robot.ov4b.setPulley(OV4B.PulleyState.Intake),
-                    robot.ov4b.setV4B(OV4B.OV4BState.Transfer),
-                    robot.lift.extendToAndStayAt(SlideConfig.liftClosed),
-                    robot.outtake.setWrist(Outtake.WristState.Front),
-                )
-            }.thenAccept { robot.lift.idle() }.apply { currentOuttakeState = OuttakeState.Transfer }
+            CompletableFuture.allOf(
+                robot.ov4b.setPulley(OV4B.PulleyState.Intake),
+                robot.ov4b.setV4B(OV4B.OV4BState.Transfer),
+                robot.lift.extendToAndStayAt(SlideConfig.liftClosed))
+            .thenAccept { robot.lift.idle() }.apply { currentOuttakeState = OuttakeState.Transfer }
         } else if (newState == OuttakeState.Outtake) {
             //closes the outtake claw and opens the intake claw, then the robot extends forwards
-            robot.intake.setIntakeGrip(Intake.ClawState.Open)
-                .thenAccept { robot.extension.extendToAndStayAt(SlideConfig.extendoGetOut) }
+            robot.intake.setIntakeGrip(Intake.ClawState.Open).thenCompose { robot.extension.extendToAndStayAt(SlideConfig.extendoGetOut) }
+            robot.intake.setRotationPulley(Intake.RotationState.Observe).thenCompose {
+                CompletableFuture.allOf(
+                    robot.ov4b.setPulley(OV4B.PulleyState.Bucket),
+                        robot.lift.extendToAndStayAt(SlideConfig.liftHighBucket),
+                        robot.ov4b.setV4B(OV4B.OV4BState.Outtake))}
             //the outtake rotates outwards
-            //robot.ov4b.setPulley(OV4B.PulleyState.Outtake)
-            robot.outtake.setWrist(Outtake.WristState.Front)
-            robot.lift.extendToAndStayAt(SlideConfig.liftHighBucket)
-            robot.ov4b.setV4B(OV4B.OV4BState.Outtake)
                 .apply { currentOuttakeState = OuttakeState.Outtake }
         } else if (newState == OuttakeState.SpecimenUp) {
             robot.intake.setIntakeGrip(Intake.ClawState.Open)
                 robot.intake.setRotationPulley(Intake.RotationState.Grab)
                 .thenAccept { robot.extension.extendToAndStayAt(SlideConfig.extendoGetOut) }
             //the outtake rotates outwards
-            //robot.ov4b.setPulley(OV4B.PulleyState.Outtake)
-            robot.outtake.setWrist(Outtake.WristState.Front)
+            robot.ov4b.setPulley(OV4B.PulleyState.Specimen)
             robot.lift.extendToAndStayAt(SlideConfig.liftSpecimen)
             robot.ov4b.setV4B(OV4B.OV4BState.Specimen)
                 .apply { currentOuttakeState = OuttakeState.SpecimenUp }
@@ -64,7 +60,6 @@ class CompositeOuttake(val robot: HypnoticRobot) : AbstractSubsystem() {
                     robot.ov4b.setPulley(OV4B.PulleyState.Intake),
                     robot.ov4b.setV4B(OV4B.OV4BState.Transfer),
                     robot.lift.extendToAndStayAt(SlideConfig.liftClosed),
-                    robot.outtake.setWrist(Outtake.WristState.Front),
                 )
             }.thenAccept { robot.lift.idle() }.apply { currentOuttakeState = OuttakeState.Transfer }
         }

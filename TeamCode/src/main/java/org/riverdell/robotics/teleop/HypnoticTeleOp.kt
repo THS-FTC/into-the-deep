@@ -11,10 +11,12 @@ import org.riverdell.robotics.subsystems.CompositeOuttake
 import org.riverdell.robotics.subsystems.IV4B
 import org.riverdell.robotics.subsystems.Intake
 import org.riverdell.robotics.subsystems.OV4B
+import org.riverdell.robotics.subsystems.OutakeConfig
 import org.riverdell.robotics.subsystems.Outtake
 import org.riverdell.robotics.subsystems.Outtake.ClawState
 import org.riverdell.robotics.subsystems.SlideConfig
 import kotlin.math.absoluteValue
+import kotlin.random.Random
 
 @TeleOp(
     name = "Bit-By-Bit Drive",
@@ -48,6 +50,7 @@ class HypnoticTeleOp : HypnoticOpMode() {
             while (opModeIsActive()) {
                 val multiplier = 0.55 + gamepad2.right_trigger * 0.5
                 drivetrain.driveRobotCentric(robotDriver, multiplier)
+                
                 if ((compositein.currentIntakeState == CompositeIntake.IntakeState.Intake))
                 {
                     val wantedPower = -opMode.gamepad1.left_trigger + opMode.gamepad1.right_trigger
