@@ -6,6 +6,8 @@ import com.acmerobotics.dashboard.config.Config;
 public class SlideConfig {
     //lift
     public static int liftHighBucket = 2000; //1700 maybe for quick score
+    public static int INTAKE_MAXIMUM_EXTENSION = -300;
+    public static int OUTTAKE_MAXIMUM_EXTENSION = 1800;
     public static int liftSpecimen  = 400;
     public static int downSpecimen  = 0;
 

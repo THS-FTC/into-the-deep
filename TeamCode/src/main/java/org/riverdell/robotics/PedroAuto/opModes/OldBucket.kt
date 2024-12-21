@@ -4,9 +4,8 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous
 import io.liftgate.robotics.mono.pipeline.single
 import org.riverdell.robotics.PedroAuto.Paths.Paths
 import org.riverdell.robotics.autonomous.HypnoticAuto
-import org.riverdell.robotics.subsystems.composite.CompositeOuttake
 import org.riverdell.robotics.subsystems.outtake.other.Outtake
-
+/*
 @Autonomous(name = "4+0 Bucket", group = "Comp")
 class OldBucket : HypnoticAuto({ opmode ->
     single("subsystems") {
@@ -57,3 +56,5 @@ class OldBucket : HypnoticAuto({ opmode ->
         opmode.robot.intake.setRotationPulley(Intake.RotationState.Observe)
     }*/
 })
+
+ */

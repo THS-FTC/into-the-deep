@@ -4,7 +4,13 @@ import com.qualcomm.robotcore.hardware.DcMotorEx
 import com.qualcomm.robotcore.hardware.DcMotorSimple
 import com.qualcomm.robotcore.hardware.ServoImplEx
 import org.riverdell.robotics.pedroPathing.localization.GoBildaPinpointDriver
-import org.riverdell.robotics.subsystems.outtake.other.OutakeConfig
+import org.riverdell.robotics.subsystems.intake.other.IClawState
+import org.riverdell.robotics.subsystems.intake.other.IPulleyState
+import org.riverdell.robotics.subsystems.intake.other.WristState
+import org.riverdell.robotics.subsystems.intake.v4b.iv4bState
+import org.riverdell.robotics.subsystems.outtake.other.OClawState
+import org.riverdell.robotics.subsystems.outtake.v4b.ov4bState
+import org.riverdell.robotics.subsystems.outtake.v4b.OPulleyState
 
 class HypnoticRobotHardware(private val opMode: HypnoticOpMode)
 {
@@ -67,35 +73,32 @@ class HypnoticRobotHardware(private val opMode: HypnoticOpMode)
         extensionMotorRight.direction = DcMotorSimple.Direction.FORWARD
 
         intakeV4BLeft = opMode.hardwareMap.get(ServoImplEx::class.java, "iv4b_rotation_left")
-        intakeV4BLeft.position = IV4BConfig.idlePosition
+        intakeV4BLeft.position = iv4bState.Idle.position
 
         intakeV4BRight = opMode.hardwareMap.get(ServoImplEx::class.java, "iv4b_rotation_right")
-        intakeV4BRight.position = 1.0 - IV4BConfig.idlePosition
+        intakeV4BRight.position = 1.0 - iv4bState.Idle.position
 
         // Intake
         intakeWrist = opMode.hardwareMap.get(ServoImplEx::class.java, "intake_wrist")
-        intakeWrist.position = IntakeConfig.frontPosition
+        intakeWrist.position = WristState.Horiz.position
 
         intakePulley = opMode.hardwareMap.get(ServoImplEx::class.java, "intake_pulley")
-        intakePulley.position = IntakeConfig.observePosition
+        intakePulley.position = IPulleyState.Observe.position
 
         intakeGrip = opMode.hardwareMap.get(ServoImplEx::class.java, "intake_grip")
-        intakeGrip.position = IntakeConfig.openPositon
+        intakeGrip.position = IClawState.Open.position
 
         // Outtake
         outtakeRotationLeft = opMode.hardwareMap.get(ServoImplEx::class.java, "ov4b_rotation_left")
-        outtakeRotationLeft.position = OV4BConfig.IdlePosition
+        outtakeRotationLeft.position = ov4bState.Transfer.position
 
         outtakeRotationRight = opMode.hardwareMap.get(ServoImplEx::class.java, "ov4b_rotation_right")
-        outtakeRotationRight.position = 1.0 - OV4BConfig.IdlePosition
+        outtakeRotationRight.position = 1.0 - ov4bState.Transfer.position
 
         outtakePulley = opMode.hardwareMap.get(ServoImplEx::class.java, "ov4b_pulley")
-        outtakePulley.position = OV4BConfig.idlePulley
-
-        outtakeWrist = opMode.hardwareMap.get(ServoImplEx::class.java, "outtake_wrist")
-        outtakeWrist.position = OutakeConfig.frontPosition
+        outtakePulley.position = OPulleyState.Transfer.position
 
         outtakeGrip = opMode.hardwareMap.get(ServoImplEx::class.java, "outtake_grip")
-        outtakeGrip.position = OutakeConfig.closePositon
+        outtakeGrip.position = OClawState.Close.position
     }
 }

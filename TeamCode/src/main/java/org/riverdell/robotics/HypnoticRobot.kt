@@ -8,12 +8,11 @@ import io.liftgate.robotics.mono.subsystem.AbstractSubsystem
 import io.liftgate.robotics.mono.subsystem.Subsystem
 import io.liftgate.robotics.mono.subsystem.System
 import org.riverdell.robotics.pedroPathing.follower.Follower
-import org.riverdell.robotics.subsystems.composite.CompositeIntake
-import org.riverdell.robotics.subsystems.composite.CompositeOuttake
 import org.riverdell.robotics.subsystems.Drivetrain
+import org.riverdell.robotics.subsystems.intake.composite.CompositeAll
 import org.riverdell.robotics.subsystems.slides.Extension
 import org.riverdell.robotics.subsystems.intake.v4b.IV4B
-import org.riverdell.robotics.subsystems.intake.other.
+import org.riverdell.robotics.subsystems.intake.other.Intake
 import org.riverdell.robotics.subsystems.slides.Lift
 import org.riverdell.robotics.subsystems.outtake.v4b.OV4B
 import org.riverdell.robotics.subsystems.outtake.other.Outtake
@@ -36,8 +35,7 @@ abstract class HypnoticRobot(val opMode: HypnoticOpMode) : System
     val extension by lazy { Extension(this) }
     val ov4b by lazy { OV4B(this) }
     val outtake by lazy { Outtake(this) }
-    val compositeout by lazy { CompositeOuttake(this) }
-    val compositein by lazy { CompositeIntake(this) }
+    val composite by lazy {CompositeAll(this)}
     val follower by lazy { Follower(opMode.hardwareMap) }
 
     val multipleTelemetry by lazy {
@@ -70,7 +68,7 @@ abstract class HypnoticRobot(val opMode: HypnoticOpMode) : System
         hardware.initializeHardware()
 
         register(
-            drivetrain, intake, iv4b, lift, extension, ov4b, outtake, compositeout, compositein,
+            drivetrain, intake, iv4b, lift, extension, ov4b, outtake, composite,
             *additionalSubSystems().toTypedArray()
         )
 

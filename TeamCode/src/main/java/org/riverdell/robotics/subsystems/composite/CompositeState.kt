@@ -4,7 +4,11 @@ enum class CompositeState
 {
     Rest,
     Intake,
+    IntakeReady,
     OuttakeReady,
     Outtaking,
-    InProgress
+    InProgress,
+    SpecimenReady,
+    Specimen
+
 }

@@ -1,10 +1,8 @@
-package org.riverdell.robotics.subsystems.outtake
+package org.riverdell.robotics.subsystems.outtake.v4b
 
 import io.liftgate.robotics.mono.subsystem.AbstractSubsystem
 import org.riverdell.robotics.HypnoticRobot
-import org.riverdell.robotics.subsystems.outtake.v4b.v4bState
 import org.riverdell.robotics.subsystems.motionProfiledServo
-import org.riverdell.robotics.subsystems.outtake.v4b.PulleyState
 import org.riverdell.robotics.utilities.managed.ServoBehavior
 import org.riverdell.robotics.utilities.motionprofile.Constraint
 import java.util.concurrent.CompletableFuture
@@ -15,14 +13,14 @@ class OV4B(private val robot: HypnoticRobot) : AbstractSubsystem()
     private val rightRotation = motionProfiledServo(robot.hardware.outtakeRotationRight, Constraint.HALF.scale(30.5))
     private val pulley = motionProfiledServo(robot.hardware.outtakePulley, Constraint.HALF.scale(10.5))
 
-    var rotationState = PulleyState.Transfer
-    var V4bState = v4bState.Transfer
+    var rotationState = OPulleyState.Transfer
+    var V4bState = ov4bState.Transfer
 
-    fun transferRotation() = setRotation(PulleyState.Transfer)
-    fun specimenRotation() = setRotation(PulleyState.OuttakeSpecimen)
-    fun bucketRotation() = setRotation(PulleyState.OuttakeBucket)
+    fun transferRotation() = setRotation(OPulleyState.Transfer)
+    fun specimenRotation() = setRotation(OPulleyState.OuttakeSpecimen)
+    fun bucketRotation() = setRotation(OPulleyState.OuttakeBucket)
 
-    fun setRotation(state: PulleyState) = let {
+    fun setRotation(state: OPulleyState) = let {
         if (rotationState == state)
             return@let CompletableFuture.completedFuture(null)
 
@@ -35,13 +33,13 @@ class OV4B(private val robot: HypnoticRobot) : AbstractSubsystem()
         return pulleyRotateTo(rotationState.position)
     }
 
-    fun v4bOuttake() = setV4B(v4bState.Outtake)
-    fun v4bSpeicmen() = setV4B(v4bState.Specimen)
-    fun v4bIdle() = setV4B(v4bState.Idle)
-    fun v4bTransfer() = setV4B(v4bState.Transfer)
+    fun v4bOuttake() = setV4B(ov4bState.Outtake)
+    fun v4bSpeicmen() = setV4B(ov4bState.Specimen)
+    fun v4bIdle() = setV4B(ov4bState.Idle)
+    fun v4bTransfer() = setV4B(ov4bState.Transfer)
 
 
-    fun setV4B(state: v4bState) = let {
+    fun setV4B(state: ov4bState) = let {
         if (state == V4bState)
         {
             println("Same state! $state and $V4bState")

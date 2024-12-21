@@ -1,10 +1,7 @@
-package org.riverdell.robotics.subsystems.intake
+package org.riverdell.robotics.subsystems.intake.other
 
 import io.liftgate.robotics.mono.subsystem.AbstractSubsystem
 import org.riverdell.robotics.HypnoticRobot
-import org.riverdell.robotics.subsystems.intake.other.ClawState
-import org.riverdell.robotics.subsystems.intake.other.PulleyState
-import org.riverdell.robotics.subsystems.intake.other.WristState
 import org.riverdell.robotics.subsystems.motionProfiledServo
 import org.riverdell.robotics.utilities.managed.ServoBehavior
 import org.riverdell.robotics.utilities.motionprofile.Constraint
@@ -17,15 +14,15 @@ class Intake(private val robot: HypnoticRobot) : AbstractSubsystem() {
     private val pulley = motionProfiledServo(robot.hardware.intakePulley, Constraint.HALF.scale(10.5))
 
 
-    var clawState = ClawState.Open
+    var clawState = IClawState.Open
     var wristState = WristState.Lat
-    var pulleyState = PulleyState.Observe
+    var pulleyState = IPulleyState.Observe
 
 
-    fun openIntake() = setIntake(ClawState.Open)
-    fun closeIntake() = setIntake(ClawState.Closed)
+    fun openIntake() = setIntake(IClawState.Open)
+    fun closeIntake() = setIntake(IClawState.Closed)
 
-    fun setIntake(state: ClawState) = let {
+    fun setIntake(state: IClawState) = let {
         if (clawState == state)
             return@let CompletableFuture.completedFuture(null)
 
@@ -33,19 +30,21 @@ class Intake(private val robot: HypnoticRobot) : AbstractSubsystem() {
         return@let updateClawState()
     }
 
-    fun setPulley(state: PulleyState) = let {
+    fun setPulley(state: IPulleyState) = let {
         if (pulleyState == state)
             return@let CompletableFuture.completedFuture(null)
 
         pulleyState = state
         return@let updatePulleyState()
     }
-    fun pulleyObserve() = setPulley(PulleyState.Observe)
-    fun pulleyGrab() = setPulley(PulleyState.Grab)
-    fun pulleyTransfer() = setPulley(PulleyState.Transfer)
+    fun pulleyObserve() = setPulley(IPulleyState.Observe)
+    fun pulleyGrab() = setPulley(IPulleyState.Grab)
+    fun pulleyTransfer() = setPulley(IPulleyState.Transfer)
 
     fun leftWrist() = setWrist(WristState.Left)
     fun rightWrist() = setWrist(WristState.Right)
+    fun latWrist() = setWrist(WristState.Lat)
+    fun horizWrist() = setWrist(WristState.Horiz)
 
     fun setWrist(state: WristState) = let {
         if (wristState == state)
@@ -66,8 +65,8 @@ class Intake(private val robot: HypnoticRobot) : AbstractSubsystem() {
     }
 
     private fun wristRotateTo(state: WristState) = wrist.setTarget(state.position, ServoBehavior.Direct)
-    private fun intakeRotateTo(state: ClawState) = grip.setTarget(state.position, ServoBehavior.Direct)
-    private fun pulleyRotateTo(state: PulleyState) = pulley.setTarget(state.position, ServoBehavior.MotionProfile)
+    private fun intakeRotateTo(state: IClawState) = grip.setTarget(state.position, ServoBehavior.Direct)
+    private fun pulleyRotateTo(state: IPulleyState) = pulley.setTarget(state.position, ServoBehavior.MotionProfile)
 
 
     override fun start() {

@@ -5,16 +5,14 @@ import io.liftgate.robotics.mono.pipeline.single
 import org.riverdell.robotics.PedroAuto.Constants.pathTimes
 import org.riverdell.robotics.PedroAuto.Paths.Paths
 import org.riverdell.robotics.autonomous.HypnoticAuto
-import org.riverdell.robotics.subsystems.composite.CompositeIntake
-import org.riverdell.robotics.subsystems.composite.CompositeOuttake
 import org.riverdell.robotics.subsystems.intake.v4b.IV4B
 import org.riverdell.robotics.subsystems.intake.other.Intake
 import org.riverdell.robotics.subsystems.outtake.v4b.OV4B
 import org.riverdell.robotics.subsystems.outtake.other.Outtake
 
-@Autonomous(name = "4+0 Bucket", group = "Comp")
-class BucketHigh : HypnoticAuto({ opmode ->
-
+//@Autonomous(name = "4+0 Bucket", group = "Comp")
+//class BucketHigh : HypnoticAuto({ opmode ->
+/*
     //initial sample
 
     single("subsystems") {
@@ -253,3 +251,5 @@ class BucketHigh : HypnoticAuto({ opmode ->
         }
     }
 })
+
+*/

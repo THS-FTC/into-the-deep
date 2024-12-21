@@ -12,15 +12,15 @@ class IV4B(robot: HypnoticRobot) : AbstractSubsystem()
     private val leftRotation = motionProfiledServo(robot.hardware.intakeV4BLeft, Constraint.HALF.scale(30.5))
     private val rightRotation = motionProfiledServo(robot.hardware.intakeV4BRight, Constraint.HALF.scale(30.5))
 
-    var V4bState = v4bState.Idle
+    var V4bState = iv4bState.Idle
 
-    fun v4bObserve() = setV4B(v4bState.Observe)
-    fun v4bTransfer() = setV4B(v4bState.Transfer)
-    fun v4bIdle() = setV4B(v4bState.Idle)
-    fun v4bMoveAway() = setV4B(v4bState.MoveAway)
-    fun v4bGrab() = setV4B(v4bState.Grab)
+    fun v4bObserve() = setV4B(iv4bState.Observe)
+    fun v4bTransfer() = setV4B(iv4bState.Transfer)
+    fun v4bIdle() = setV4B(iv4bState.Idle)
+    fun v4bMoveAway() = setV4B(iv4bState.MoveAway)
+    fun v4bGrab() = setV4B(iv4bState.Grab)
 
-    fun setV4B(state: v4bState) = let {
+    fun setV4B(state: iv4bState) = let {
         if (state == V4bState)
         {
             println("Same state! $state and $V4bState")

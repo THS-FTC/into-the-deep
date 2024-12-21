@@ -6,10 +6,11 @@ import io.liftgate.robotics.mono.Mono.commands
 import io.liftgate.robotics.mono.gamepad.ButtonType
 import org.riverdell.robotics.HypnoticOpMode
 import org.riverdell.robotics.HypnoticRobot
-import org.riverdell.robotics.subsystems.composite.CompositeIntake
-import org.riverdell.robotics.subsystems.composite.CompositeOuttake
+import org.riverdell.robotics.subsystems.composite.CompositeState
+import org.riverdell.robotics.subsystems.intake.composite.CompositeAll
 import org.riverdell.robotics.subsystems.intake.v4b.IV4B
 import org.riverdell.robotics.subsystems.intake.other.Intake
+import org.riverdell.robotics.subsystems.outtake.other.OClawState
 import kotlin.math.absoluteValue
 
 @TeleOp(
@@ -44,7 +45,7 @@ class HypnoticTeleOp : HypnoticOpMode() {
             while (opModeIsActive()) {
                 val multiplier = 0.55 + gamepad2.right_trigger * 0.5
                 drivetrain.driveRobotCentric(robotDriver, multiplier)
-                if ((compositein.currentIntakeState == CompositeIntake.IntakeState.Intake))
+                if ((composite.state == CompositeState.IntakeReady || composite.state == CompositeState.IntakeReady))
                 {
                     val wantedPower = -opMode.gamepad1.left_trigger + opMode.gamepad1.right_trigger
                     if (wantedPower.absoluteValue > 0.1 && !extension.slides.isTravelling())
@@ -72,7 +73,7 @@ class HypnoticTeleOp : HypnoticOpMode() {
                     {
                         extension.slides.supplyPowerToAll(0.0)
                     }
-                } else if ((compositein.currentIntakeState == CompositeIntake.IntakeState.Transfer) ){
+                } else if (( composite.state == CompositeState.Rest ) ){
                     val wantedPower = opMode.gamepad1.left_trigger - opMode.gamepad1.right_trigger
                     if (wantedPower.absoluteValue > 0.1 && !extension.slides.isTravelling())
                     {
@@ -101,7 +102,6 @@ class HypnoticTeleOp : HypnoticOpMode() {
                     }
                 }
 
-                telemetry.addLine("Composite State: ${compositein.currentIntakeState}")
                 telemetry.addLine("Extendo Left Position: ${hardware.extensionMotorLeft.currentPosition}")
                 telemetry.addLine("Extendo Right Position: ${hardware.extensionMotorRight.currentPosition}")
                 telemetry.update()
@@ -120,70 +120,110 @@ class HypnoticTeleOp : HypnoticOpMode() {
             //grab positions
             gp1Commands.apply {
                 where(ButtonType.ButtonA)
+                    .onlyWhen { composite.state == CompositeState.IntakeReady }
                     .triggers {
-                        intake.setIntakeGrip(Intake.ClawState.Open)
-                        intake.setRotationPulley(Intake.RotationState.Grab)
-                        iv4b.setV4B(IV4B.V4BState.Grab).thenCompose { intake.setIntakeGrip(Intake.ClawState.Closed) }.thenCompose { iv4b.setV4B(
-                            IV4B.V4BState.Observe) }
-                        intake.setRotationPulley(Intake.RotationState.Observe)
-                        // intake.toggleIntakeGrip()
-                    }
-                    .whenPressedOnce()
-
-                where(ButtonType.BumperLeft)
-                    .triggers {
-                        compositein.toggle()
+                        composite.intakeGrabAndConfirm()
                     }
                     .whenPressedOnce()
 
                 where(ButtonType.BumperRight)
+                    .onlyWhen { composite.state != CompositeState.Rest || composite.state != CompositeState.Outtaking }
                     .triggers {
-                        compositeout.toggleBucket()
+                        composite.exitOuttakeReadyToRest()
+                    }
+                    .whenPressedOnce()
+
+                where(ButtonType.BumperRight)
+                    .onlyWhen { composite.state == CompositeState.Rest }
+                    .triggers {
+                        composite.initialOuttakeFromRest()
+                    }
+                    .whenPressedOnce()
+                where(ButtonType.BumperLeft)
+                    .onlyWhen { composite.state != CompositeState.IntakeReady || composite.state != CompositeState.Intake }
+                    .triggers {
+                        composite.intakeObserve()
+                    }
+                    .whenPressedOnce()
+
+                where(ButtonType.BumperLeft)
+                    .onlyWhen { composite.state == CompositeState.IntakeReady }
+                    .triggers {
+                        composite.confirmTransferAndReady()
                     }
                     .whenPressedOnce()
 
                 where(ButtonType.DPadDown)
+                    .onlyWhen { composite.state == CompositeState.IntakeReady }
                     .triggers {
-                        intake.setWrist(Intake.WristState.Vertical)
+                        intake.horizWrist()
                     }
                     .whenPressedOnce()
 
                 where(ButtonType.DPadLeft)
+                    .onlyWhen { composite.state == CompositeState.IntakeReady }
                     .triggers {
-                        intake.setWrist(Intake.WristState.Left)
+                        intake.leftWrist()
                     }
                     .whenPressedOnce()
 
                 where(ButtonType.DPadRight)
+                    .onlyWhen { composite.state == CompositeState.IntakeReady }
                     .triggers {
-                        intake.setWrist(Intake.WristState.Right)
+                        intake.rightWrist()
                     }
                     .whenPressedOnce()
 
                 where(ButtonType.DPadUp)
+                    .onlyWhen { composite.state == CompositeState.IntakeReady }
                     .triggers {
-                        intake.setWrist(Intake.WristState.Front)
+                        intake.latWrist()
 
                     }
                     .whenPressedOnce()
 
                 where(ButtonType.ButtonX)
                     .triggers {
-                        compositeout.setOuttake(CompositeOuttake.OuttakeState.Transfer)
+                        composite.exitOuttakeReadyToRest()
                     }
                     .whenPressedOnce()
 
                 where(ButtonType.ButtonB)
+                    .onlyWhen { outtake.clawState == OClawState.Close }
                     .triggers {
-                        outtake.toggleOuttakeGrip()
+                        if (composite.state == CompositeState.Outtaking) {
+                            composite.outtakeCompleteAndReturnToOuttakeReady()
+                        }
+                        outtake.openClaw()
                     }
                     .whenPressedOnce()
 
-                where(ButtonType.ButtonY)
+
+                where(ButtonType.ButtonB)
+                    .onlyWhen { outtake.clawState == OClawState.Open }
                     .triggers {
-                        compositeout.toggleSpecimen()
+                        outtake.closeClaw()
                     }
                     .whenPressedOnce()
+
+
+                where(ButtonType.ButtonY)
+                    .onlyWhen {composite.state == CompositeState.Specimen }
+                    .triggers {
+                        composite.specimenScoredAndReturnToRest()
+                    }
+                    .whenPressedOnce()
+
+
+                where(ButtonType.ButtonY)
+                    .onlyWhen { composite.state == CompositeState.Rest }
+                    .triggers {
+                        composite.initialspecimenOuttakeFromRest()
+                    }
+                    .andIsHeldUntilReleasedWhere {
+                        composite.scoreSpecimen()
+                    }
+
 
             }
 

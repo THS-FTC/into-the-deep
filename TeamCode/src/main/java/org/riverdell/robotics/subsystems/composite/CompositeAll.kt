@@ -3,7 +3,13 @@ package org.riverdell.robotics.subsystems.intake.composite
 import io.liftgate.robotics.mono.subsystem.AbstractSubsystem
 import org.riverdell.robotics.HypnoticRobot
 import org.riverdell.robotics.subsystems.composite.CompositeState
+import org.riverdell.robotics.subsystems.intake.other.IPulleyState
+import org.riverdell.robotics.subsystems.intake.other.Intake
+import org.riverdell.robotics.subsystems.intake.other.IntakeLevel
 import org.riverdell.robotics.subsystems.intake.other.WristState
+import org.riverdell.robotics.subsystems.intake.v4b.IV4B
+import org.riverdell.robotics.subsystems.outtake.other.OuttakeLevel
+import org.riverdell.robotics.subsystems.slides.SlideConfig
 import java.util.concurrent.CompletableFuture
 
 class CompositeAll(private val robot: HypnoticRobot) : AbstractSubsystem()
@@ -11,149 +17,195 @@ class CompositeAll(private val robot: HypnoticRobot) : AbstractSubsystem()
     var state = CompositeState.Rest
     var attemptedState: CompositeState? = null
     var attemptTime = System.currentTimeMillis()
+    var outtakeLevel = OuttakeLevel.Rest
+
+
+    fun initialOuttake(level: OuttakeLevel = OuttakeLevel.HighBasket) = stateMachineRestrict(
+        CompositeState.OuttakeReady,
+        CompositeState.Outtaking,
+        ignoreInProgress = true
+    ) {
+        outtakeLevel = level
+
+        robot.extension.extendToAndStayAt(IntakeLevel.OuttakeOut.encoderLevel)
+            .thenRunAsync {
+                CompletableFuture.allOf(
+                iv4b.v4bIdle(),
+                intake.pulleyObserve()
+                    .thenCompose {
+                        CompletableFuture.allOf(
+                            ov4b.v4bOuttake(),
+                            ov4b.bucketRotation()
+                        )
+                    }
+                ).join()
+                CompletableFuture.allOf(
+                    robot.lift.extendToAndStayAt(outtakeLevel.encoderLevel)
+                )
+            }
+    }
+    fun initialOuttakeFromRest(level: OuttakeLevel = OuttakeLevel.HighBasket) = stateMachineRestrict(
+        CompositeState.Rest,
+        CompositeState.Outtaking,
+        ignoreInProgress = true
+    ) {
+        outtakeLevel = level
+
+        robot.extension.extendToAndStayAt(IntakeLevel.OuttakeOut.encoderLevel)
+            .thenRunAsync {
+                CompletableFuture.allOf(
+                    iv4b.v4bIdle(),
+                    intake.pulleyObserve()
+                        .thenCompose {
+                            CompletableFuture.allOf(
+                                ov4b.v4bOuttake(),
+                                ov4b.bucketRotation()
+                            )
+                        }
+                ).join()
+                CompletableFuture.allOf(
+                    robot.lift.extendToAndStayAt(outtakeLevel.encoderLevel)
+                )
+            }
+    }
+    fun initialspecimenOuttakeFromRest(level: OuttakeLevel = OuttakeLevel.Bar2) = stateMachineRestrict(
+        CompositeState.Rest,
+        CompositeState.SpecimenReady,
+        ignoreInProgress = true
+    ) {
+        outtakeLevel = level
+
+        robot.extension.extendToAndStayAt(IntakeLevel.OuttakeOut.encoderLevel)
+            .thenRunAsync {
+                CompletableFuture.allOf(
+                    iv4b.v4bIdle(),
+                    intake.pulleyObserve()
+                        .thenCompose {
+                            CompletableFuture.allOf(
+                                ov4b.v4bSpeicmen(),
+                                ov4b.specimenRotation()
+                            )
+                        }
+                ).join()
+                CompletableFuture.allOf(
+                    robot.lift.extendToAndStayAt(outtakeLevel.encoderLevel)
+                )
+            }
+    }
 
     fun outtakeCompleteAndReturnToOuttakeReady() = stateMachineRestrict(
-        InteractionCompositeState.Outtaking,
-        InteractionCompositeState.OuttakeReady
+        CompositeState.Outtaking,
+        CompositeState.OuttakeReady
     ) {
         CompletableFuture.runAsync {
             outtake.openClaw()
         }
     }
-
-    fun wallOuttakeFromRest() =
-        stateMachineRestrict(
-            InteractionCompositeState.Rest,
-            InteractionCompositeState.WallIntakeViaOuttake
-        ) {
+    fun scoreSpecimen(level: OuttakeLevel = OuttakeLevel.Bar2Down) = stateMachineRestrict(
+        CompositeState.SpecimenReady,
+        CompositeState.Specimen
+    ) {
+        CompletableFuture.runAsync {
+            // add slides go back up to the right pose
             CompletableFuture.allOf(
-                robot.outtake.depositRotation(),
-                robot.outtake.openClaw()
-            )
+                robot.lift.extendToAndStayAt(outtakeLevel.encoderLevel)
+            ).join()
         }
-
-    fun exitOuttakeReadyToRest() = stateMachineRestrict(
-        InteractionCompositeState.OuttakeReady,
-        InteractionCompositeState.Rest,
+    }
+    fun specimenScoredAndReturnToRest() = stateMachineRestrict(
+        CompositeState.Specimen,
+        CompositeState.Rest,
         ignoreInProgress = true
     ) {
-        robot.outtake.openClaw()
-        CompletableFuture.allOf(
-            robot.outtake.transferRotation(),
-            robot.lift.extendToAndStayAt(0)
-        )
+        outtake.openClaw()
+            .thenRunAsync {
+                robot.ov4b.v4bTransfer()
+                robot.ov4b.transferRotation().join()
+                robot.lift.extendToAndStayAt(0).join()
+            }
     }
 
-    fun inToOut() = stateMachineRestrict(
-        InteractionCompositeState.Rest,
-        InteractionCompositeState.OuttakeReady
+    fun exitOuttakeReadyToRest() = stateMachineRestrict(
+        CompositeState.OuttakeReady,
+        CompositeState.Rest,
+        ignoreInProgress = true
     ) {
-        CompletableFuture.allOf(
-            robot.outtake.depositRotation()
-        )
+        outtake.openClaw()
+            .thenRunAsync {
+                robot.ov4b.v4bTransfer()
+                robot.ov4b.transferRotation().join()
+                robot.lift.extendToAndStayAt(0).join()
+            }
     }
 
-    fun wallOuttakeToOuttakeReady() =
-        stateMachineRestrict(
-            InteractionCompositeState.WallIntakeViaOuttake,
-            InteractionCompositeState.OuttakeReady
-        ) {
-            CompletableFuture.allOf(
-                robot.outtake.closeClaw()
-            )
-        }
+    fun intakeObserve() =
+        stateMachineRestrict(CompositeState.Rest, CompositeState.IntakeReady) {
 
-    fun outtakeAndRest() =
-        stateMachineRestrict(
-            InteractionCompositeState.OuttakeReady,
-            InteractionCompositeState.Rest
-        ) {
-
-            outtake.forceRotation()
-                .thenRunAsync {
-                    Thread.sleep(300L)
-                    outtake.openClaw()
-                    outtake.transferRotation().join()
-                }
-        }
-
-    fun prepareForPickup(wristState: WristState = WristState.Lateral, wideOpen: Boolean = false) =
-        stateMachineRestrict(InteractionCompositeState.Rest, InteractionCompositeState.Pickup) {
-            intakeV4B.v4bUnlock()
+            iv4b.v4bObserve()
                 .thenAcceptAsync {
-                    extension.extendToAndStayAt(IntakeConfig.MAX_EXTENSION)
+                    extension.extendToAndStayAt(IntakeLevel.PartialOut.encoderLevel)
                         .thenAccept {
                             extension.slides.idle()
                         }
 
-                    outtake.transferRotation()
                     outtake.openClaw()
 
                     CompletableFuture.allOf(
-                        intakeV4B.v4bSampleGateway(),
-                        intakeV4B.coaxialIntake()
+                        iv4b.v4bObserve(),
+                        intake.pulleyObserve()
                             .thenCompose {
-                                intake.openIntake(wideOpen)
+                                intake.openIntake()
                             },
-                        intake.setWrist(wristState)
+                        intake.horizWrist()
                     ).join()
                 }
         }
 
-    fun intakeAndConfirm() =
-        stateMachineRestrict(InteractionCompositeState.Pickup, InteractionCompositeState.Confirm) {
-            intakeV4B.v4bSamplePickup().thenRunAsync {
-                intake.closeIntake()
-                Thread.sleep(125L)
+    fun intakeGrabAndConfirm() =
+        stateMachineRestrict(CompositeState.IntakeReady, CompositeState.IntakeReady) {
+            intake.openIntake().thenRunAsync {
 
                 CompletableFuture.allOf(
-                    intakeV4B.v4bIntermediate(),
-                    intakeV4B.coaxialIntermediate()
+                    intake.pulleyGrab(),
+                    iv4b.v4bGrab()
                 ).join()
-
-                intake.setWrist(WristState.Lateral)
+                Thread.sleep(10L)
+                intake.closeIntake()
+                CompletableFuture.allOf(
+                    intake.pulleyObserve(),
+                    iv4b.v4bObserve()
+                ).join()
+                intake.horizWrist()
             }
         }
 
-    fun declineAndIntake() =
-        stateMachineRestrict(InteractionCompositeState.Confirm, InteractionCompositeState.Pickup) {
-            CompletableFuture.allOf(
-                intakeV4B.v4bSampleGateway(),
-                intakeV4B.coaxialIntake()
-                    .thenCompose {
-                        intake.openIntake()
-                    },
-                intake.lateralWrist()
-            )
-        }
-
-    fun confirmAndTransferAndReady() =
+    fun confirmTransferAndReady() =
         stateMachineRestrict(
-            InteractionCompositeState.Confirm,
-            InteractionCompositeState.OuttakeReady
+            CompositeState.IntakeReady,
+            CompositeState.Rest
         ) {
-            intakeV4B.v4bTransfer()
+            iv4b.v4bTransfer()
                 .thenRunAsync {
                     CompletableFuture.allOf(
-                        extension.extendToAndStayAt(135),
-                        intakeV4B.coaxialRest()
+                        extension.extendToAndStayAt(IntakeLevel.Transfer.encoderLevel-50),
+                        intake.pulleyTransfer()
                     ).join()
 
-                    intakeV4B.coaxialTransfer().join()
-                    extension.extendToAndStayAt(15).join()
-
+                    intake.horizWrist().join()
+                    extension.extendToAndStayAt(IntakeLevel.Transfer.encoderLevel).join()
+                    Thread.sleep(100)
                     outtake.closeClaw()
-                    Thread.sleep(150)
+                    Thread.sleep(70)
                     intake.openIntake()
                     Thread.sleep(100)
-
-                    intakeV4B.coaxialRest().join()
-                    outtake.depositRotation()
-
+                    CompletableFuture.allOf(
+                        extension.extendToAndStayAt(IntakeLevel.PartialOut.encoderLevel-50),
+                        intake.pulleyObserve(),
+                        iv4b.v4bMoveAway()
+                    ).join()
+                    ov4b.v4bOuttake().join()
                     Thread.sleep(250L)
                     extension.extendToAndStayAt(0).join()
-
-                    intakeV4B.v4bLock().join()
                     intake.closeIntake()
                     extension.slides.idle()
                 }

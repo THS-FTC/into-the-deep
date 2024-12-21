@@ -1,9 +1,8 @@
-package org.riverdell.robotics.subsystems.outtake
+package org.riverdell.robotics.subsystems.outtake.other
 
 import io.liftgate.robotics.mono.subsystem.AbstractSubsystem
 import org.riverdell.robotics.HypnoticRobot
 import org.riverdell.robotics.subsystems.motionProfiledServo
-import org.riverdell.robotics.subsystems.outtake.other.ClawState
 import org.riverdell.robotics.utilities.managed.ServoBehavior
 import org.riverdell.robotics.utilities.motionprofile.Constraint
 import java.util.concurrent.CompletableFuture
@@ -13,12 +12,12 @@ class Outtake(private val robot: HypnoticRobot) : AbstractSubsystem()
     private val claw = motionProfiledServo(robot.hardware.outtakeGrip, Constraint.HALF.scale(10.5))
 
 
-    var clawState = ClawState.Close
+    var clawState = OClawState.Close
 
-    fun openClaw() = setClaw(ClawState.Open)
-    fun closeClaw() = setClaw(ClawState.Close)
+    fun openClaw() = setClaw(OClawState.Open)
+    fun closeClaw() = setClaw(OClawState.Close)
 
-    fun setClaw(state: ClawState) = let {
+    fun setClaw(state: OClawState) = let {
         if (clawState == state)
             return@let CompletableFuture.completedFuture(null)
 
