@@ -4,7 +4,7 @@ import com.acmerobotics.dashboard.config.Config;
 
 @Config
 public class IntakeConfig {
-    public static double closePosition= 0.425;
+    public static double closePosition= 0.46;
     public static double openPositon  = 0.2;
     public static double resetPosition  = 0.0;
 

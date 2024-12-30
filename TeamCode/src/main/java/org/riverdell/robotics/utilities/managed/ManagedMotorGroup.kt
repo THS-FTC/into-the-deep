@@ -202,7 +202,7 @@ class ManagedMotorGroup(
     fun goTo(target: Int): CompletableFuture<StateResult>
     {
         exitIdle()
-        return state.override(target, timeout = timeout)
+        return state.override(target, timeout = timeout) as CompletableFuture<StateResult>
     }
 
     /**

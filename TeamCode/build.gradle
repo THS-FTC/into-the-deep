@@ -14,9 +14,9 @@ buildscript {
             url = 'https://www.matthewo.tech/maven/'
         }
     }
-    dependencies {
+    /*dependencies {
         classpath 'io.liftgate:fast-load-plugin:0.2.0'
-    }
+    }*/
 }
 
 // Custom definitions may go here
@@ -28,7 +28,7 @@ plugins {
 // Include common definitions from above.
 apply from: "../build.common.gradle"
 apply from: "../build.dependencies.gradle"
-apply plugin: "io.liftgate.fast-load-plugin"
+//apply plugin: "io.liftgate.fast-load-plugin"
 
 android {
     namespace = "org.firstinspires.ftc.teamcode"

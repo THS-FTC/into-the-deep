@@ -14,7 +14,7 @@ class Drivetrain(private val robot: HypnoticRobot) : AbstractSubsystem()
     private val voltageSensor = robot.opMode.hardwareMap.voltageSensor.first()
 
     //private val imuState by state(write = { _ -> }, read = { robot.hardware.pinpointDriver.heading })
-    private val voltageState by state(write = { _ -> }, read = voltageSensor::getVoltage)
+    private val voltageState by state(write = { _ -> }, read = { voltageSensor.voltage})
 
     private lateinit var backingDriveBase: MecanumDrive
 
