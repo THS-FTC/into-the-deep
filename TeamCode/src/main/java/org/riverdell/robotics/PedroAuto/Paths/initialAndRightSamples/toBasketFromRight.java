@@ -15,11 +15,11 @@ public class toBasketFromRight {
                     // Line 1
                     new BezierLine(
                             //new Point(30.500, 5.000, Point.CARTESIAN),
-                            new Point(26.000, 5.000, Point.CARTESIAN),
-                            new Point(19.000, 12.000, Point.CARTESIAN)
+                            new Point(12, -10.500, Point.CARTESIAN),
+                            new Point(17.000, -7.800, Point.CARTESIAN)
                     )
             )
-            .setLinearHeadingInterpolation(Math.toRadians(320), Math.toRadians(270));
+            .setLinearHeadingInterpolation(Math.toRadians(270), Math.toRadians(225));
     return builder.build();
   }
 }

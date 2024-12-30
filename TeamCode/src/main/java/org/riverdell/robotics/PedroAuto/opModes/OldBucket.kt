@@ -18,13 +18,16 @@ import org.riverdell.robotics.subsystems.OV4B
 import org.riverdell.robotics.subsystems.Outtake
 import java.util.concurrent.CompletableFuture
 
-@Autonomous(name = "4+0 Bucket", group = "Comp")
+@Autonomous(name = "1+0 Bucket", group = "Comp")
 class OldBucket : HypnoticAuto({ opmode ->
     single("subsystems") {
+        opmode.robot.follower.setStartingPose(Pose(0.000, 0.000, Math.toRadians(225.0)))
         opmode.robot.compositeout.setOuttake(CompositeOuttake.OuttakeState.Outtake)
         Thread.sleep(50L)
-        opmode.robot.follower.followPath(Paths.slant_to_bucket)
+        //line that starts the movement
+        opmode.robot.follower.followPath(Paths.slant_to_bucket,true)
         while (!opmode.robot.follower.atParametricEnd()) {
+            //this checks if the follower is done and the path is finished
             if (!opmode.opModeIsActive()) {
                 break;
             }

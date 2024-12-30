@@ -995,7 +995,4 @@ public class Follower {
     /**
      * This resets the IMU, if applicable.
      */
-    public void resetIMU() {
-        poseUpdater.resetIMU();
-    }
 }

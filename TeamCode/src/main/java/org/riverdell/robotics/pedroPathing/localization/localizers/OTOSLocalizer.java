@@ -46,7 +46,7 @@ public class OTOSLocalizer extends Localizer {
     private SparkFunOTOS.Pose2D otosAcc;
     private double previousHeading;
     private double totalHeading;
-
+//reversed, forward, 37.2499090578, odo.setOffsets(-69.2125, -72.33931)
     /**
      * This creates a new OTOSLocalizer from a HardwareMap, with a starting Pose at (0,0)
      * facing 0 heading.

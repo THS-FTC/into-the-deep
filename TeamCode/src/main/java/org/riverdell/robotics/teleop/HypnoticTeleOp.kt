@@ -80,26 +80,26 @@ class HypnoticTeleOp : HypnoticOpMode() {
                         extension.slides.supplyPowerToAll(0.0)
                     }
                 } else if ((compositein.currentIntakeState == CompositeIntake.IntakeState.Transfer) ){
-                    val wantedPower = opMode.gamepad1.left_trigger - opMode.gamepad1.right_trigger
+                    val wantedPower = -opMode.gamepad1.left_trigger + opMode.gamepad1.right_trigger
                     if (wantedPower.absoluteValue > 0.1 && !extension.slides.isTravelling())
                     {
                         if (wantedPower < 0)
                         {
-                            if (extension.slides.currentPosition() > -80)
+                            if (extension.slides.currentPosition() > -170)
                             {
                                 extension.slides.supplyPowerToAll(0.0)
                             } else
                             {
-                                extension.slides.supplyPowerToAll(-wantedPower.toDouble() / 2.0)
+                                extension.slides.supplyPowerToAll(wantedPower.toDouble() / 2.0)
                             }
                         } else
                         {
-                            if (extension.slides.currentPosition() <= -92)
+                            if (extension.slides.currentPosition() <= -190)
                             {
                                 extension.slides.supplyPowerToAll(0.0)
                             } else
                             {
-                                extension.slides.supplyPowerToAll(-wantedPower.toDouble() / 2.0)
+                                extension.slides.supplyPowerToAll(wantedPower.toDouble() / 2.0)
                             }
                         }
                     } else if (!extension.slides.isTravelling())
@@ -111,6 +111,8 @@ class HypnoticTeleOp : HypnoticOpMode() {
                 telemetry.addLine("Composite State: ${compositein.currentIntakeState}")
                 telemetry.addLine("Extendo Left Position: ${hardware.extensionMotorLeft.currentPosition}")
                 telemetry.addLine("Extendo Right Position: ${hardware.extensionMotorRight.currentPosition}")
+                telemetry.addLine("left trigger amount: ${opMode.gamepad1.left_trigger}")
+                telemetry.addLine("right trigger amount: ${opMode.gamepad1.right_trigger}")
                 telemetry.update()
 
                 gp1Commands.run()
