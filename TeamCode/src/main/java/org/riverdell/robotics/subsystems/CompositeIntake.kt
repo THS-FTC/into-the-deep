@@ -45,10 +45,12 @@ class CompositeIntake(val robot: HypnoticRobot) : AbstractSubsystem() {
                 println("updated to transfer")
                 currentIntakeState = IntakeState.Transfer
             } //works idk i am him*/
-            robot.iv4b.setV4B(IV4B.V4BState.Transfer)
+            CompletableFuture.allOf(
+                robot.iv4b.setV4B(IV4B.V4BState.Transfer),
+                robot.intake.setRotationPulley(Intake.RotationState.Transfer)
+            )
                 .thenComposeAsync{
                     CompletableFuture.allOf(
-                        robot.intake.setRotationPulley(Intake.RotationState.Transfer),
                         robot.intake.setWrist(Intake.WristState.Front)
                     ).join()
                     CompletableFuture.allOf(

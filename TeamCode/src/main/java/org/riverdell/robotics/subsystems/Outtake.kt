@@ -59,27 +59,17 @@ class Outtake(private val robot: HypnoticRobot) : AbstractSubsystem() {
         return if (newState == ClawState.Open) {
             currentClawState = ClawState.Open
             gripRotateTo(OutakeConfig.openPosition)
-                .thenAccept {
-                    println(it)
-                }
         } else {
             currentClawState = ClawState.Closed
             gripRotateTo(OutakeConfig.closePositon)
-                .thenAccept {
-                    println(it)
-                }
         }
     }
 
     fun toggleOuttakeGrip(): CompletableFuture<Void> {
         return if (currentClawState == ClawState.Closed) {
-            gripRotateTo(OutakeConfig.openPosition).apply {
-                currentClawState = ClawState.Open
-            }
+            setOuttakeGrip(ClawState.Open)
         } else {
-            gripRotateTo(OutakeConfig.closePositon).apply {
-                currentClawState = ClawState.Closed
-            }
+            setOuttakeGrip(ClawState.Closed)
         }
     }
 

@@ -28,7 +28,7 @@ class BucketHigh : HypnoticAuto({ opmode ->
 //        Thread.sleep(50L)
         //starts path to the bucket
         opmode.robot.follower.setStartingPose(Pose(0.000, 0.000, Math.toRadians(225.0)))
-        opmode.robot.follower.followPath(Paths.slant_to_bucket,true)
+        opmode.robot.follower.followPath(Paths.slant_to_bucket)
 
         //while loop that keeps the follower on and sets outtake to out at a certain time
 
@@ -93,16 +93,13 @@ class BucketHigh : HypnoticAuto({ opmode ->
         opmode.robot.intake.setRotationPulley(Intake.RotationState.Observe)
         Thread.sleep(500)
         opmode.robot.compositein.setIntake(CompositeIntake.IntakeState.Transfer)
-        Thread.sleep(600)
+        Thread.sleep(1000)
+        opmode.robot.outtake.setOuttakeGrip(Outtake.ClawState.Closed)
     }
     single("pathing_to_bucket") {
         opmode.robot.follower.followPath(Paths.right_to_bucket,true)
         while (!opmode.robot.follower.atParametricEnd()) {
             val t = opmode.robot.follower.currentTValue
-            if (t >= pathTimes.sampleOuttakeGripClose - 0.07 && t <= pathTimes.sampleOuttakeGripClose + 0.07) {
-                opmode.robot.outtake.setOuttakeGrip(Outtake.ClawState.Closed)
-                Thread.sleep(50L)
-            }
             if (t >= pathTimes.SampleOuttakeOut - 0.07 && t <= pathTimes.SampleOuttakeOut + 0.07) {
                 opmode.robot.compositeout.setOuttake(CompositeOuttake.OuttakeState.Outtake)
                 Thread.sleep(50L)
