@@ -21,7 +21,7 @@ public class toBasketFromSlant {
                     // Line 1
                     new BezierLine(
                             new Point(0.000, 0.000, Point.CARTESIAN),
-                            new Point(17.000, -7.800, Point.CARTESIAN)
+                            new Point(16.200, -6.800, Point.CARTESIAN)
                     )
             ).setLinearHeadingInterpolation(Math.toRadians(225), Math.toRadians(225));
 //            .addPath(

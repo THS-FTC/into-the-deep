@@ -35,21 +35,29 @@ class CompositeIntake(val robot: HypnoticRobot) : AbstractSubsystem() {
             }
         } else if (newState == IntakeState.Transfer) {
             //this is for transfer
+            /*robot.iv4b.setV4B(IV4B.V4BState.Transfer)
+
+            robot.intake.setRotationPulley(Intake.RotationState.Transfer) .thenCompose {CompletableFuture.allOf(
+                robot.intake.setWrist(Intake.WristState.Front),
+                robot.extension.extendToAndStayAt(SlideConfig.extendoTransfer)
+                )
+            }.apply {
+                println("updated to transfer")
+                currentIntakeState = IntakeState.Transfer
+            } //works idk i am him*/
             robot.iv4b.setV4B(IV4B.V4BState.Transfer)
-
-            robot.intake.setRotationPulley(Intake.RotationState.Transfer)
-                .thenCompose {
-                    robot.intake.setWrist(Intake.WristState.Front).thenCompose { robot.extension.extendToAndStayAt(SlideConfig.extendoTransfer) }
-                    }
-                        .thenCompose {
-                        robot.outtake.setOuttakeGrip(Outtake.ClawState.Closed)
-                    }
-                        .apply {
-                        println("updated to transfer")
-                        currentIntakeState = IntakeState.Transfer
+                .thenComposeAsync{
+                    CompletableFuture.allOf(
+                        robot.intake.setRotationPulley(Intake.RotationState.Transfer),
+                        robot.intake.setWrist(Intake.WristState.Front)
+                    ).join()
+                    CompletableFuture.allOf(
+                        robot.extension.extendToAndStayAt(SlideConfig.extendoTransfer)
+                    )
+                }.apply {
+                    println("updated to transfer")
+                    currentIntakeState = IntakeState.Transfer
                 } //works idk i am him
-
-
         } else {
             //this is for observing/intaking
             robot.iv4b.setV4B(IV4B.V4BState.Observe) //set it to observe later
