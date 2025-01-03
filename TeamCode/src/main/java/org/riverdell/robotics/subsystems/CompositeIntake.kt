@@ -57,6 +57,7 @@ class CompositeIntake(val robot: HypnoticRobot) : AbstractSubsystem() {
                     CompletableFuture.allOf(
                         robot.extension.extendToAndStayAt(SlideConfig.extendoTransfer)
                     )
+
                 }.apply {
                     println("updated to transfer")
                     currentIntakeState = IntakeState.Transfer

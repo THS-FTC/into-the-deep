@@ -17,13 +17,12 @@ import org.riverdell.robotics.subsystems.SlideConfig
 import kotlin.math.absoluteValue
 
 @TeleOp(
-    name = "Bit-By-Bit Drive",
     group = "Drive"
 )
-class SoloZoom : HypnoticOpMode() {
+class DuoZoom : HypnoticOpMode() {
     override fun buildRobot() = TeleOpRobot()
 
-    inner class TeleOpRobot : HypnoticRobot(this@SoloZoom) {
+    inner class TeleOpRobot : HypnoticRobot(this@DuoZoom) {
         private val gp1Commands by lazy { commands(gamepad1) }
         private val gp2Commands by lazy { commands(gamepad2) }
         //val visionPipeline by lazy { VisionPipeline(this@SoloZoom) }
@@ -46,64 +45,32 @@ class SoloZoom : HypnoticOpMode() {
             val robotDriver = GamepadEx(gamepad1)
             buildCommands()
             while (opModeIsActive()) {
-                val multiplier = 0.55 + gamepad1.right_trigger * 0.5
-                drivetrain.driveRobotCentric(robotDriver, multiplier)
-//                if ((compositein.currentIntakeState == CompositeIntake.IntakeState.Intake))
-//                {
-//                    val wantedPower = -opMode.gamepad1.left_trigger + opMode.gamepad1.right_trigger
-//                    if (wantedPower.absoluteValue > 0.1 && !extension.slides.isTravelling())
-//                    {
-//                        if (wantedPower < 0)
-//                        {
-//                            if (extension.slides.currentPosition() >= -10)
-//                            {
-//                                extension.slides.supplyPowerToAll(0.0)
-//                            } else
-//                            {
-//                                extension.slides.supplyPowerToAll(-wantedPower.toDouble() / 2.0)
-//                            }
-//                        } else
-//                        {
-//                            if (extension.slides.currentPosition() < -435)
-//                            {
-//                                extension.slides.supplyPowerToAll(0.0)
-//                            } else
-//                            {
-//                                extension.slides.supplyPowerToAll(-wantedPower.toDouble() / 2.0)
-//                            }
-//                        }
-//                    } else if (!extension.slides.isTravelling())
-//                    {
-//                        extension.slides.supplyPowerToAll(0.0)
-//                    }
-//                } else if ((compositein.currentIntakeState == CompositeIntake.IntakeState.Transfer) ){
-//                    val wantedPower = opMode.gamepad1.left_trigger - opMode.gamepad1.right_trigger
-//                    if (wantedPower.absoluteValue > 0.1 && !extension.slides.isTravelling())
-//                    {
-//                        if (wantedPower < 0)
-//                        {
-//                            if (extension.slides.currentPosition() > -80)
-//                            {
-//                                extension.slides.supplyPowerToAll(0.0)
-//                            } else
-//                            {
-//                                extension.slides.supplyPowerToAll(-wantedPower.toDouble() / 2.0)
-//                            }
-//                        } else
-//                        {
-//                            if (extension.slides.currentPosition() <= -92)
-//                            {
-//                                extension.slides.supplyPowerToAll(0.0)
-//                            } else
-//                            {
-//                                extension.slides.supplyPowerToAll(-wantedPower.toDouble() / 2.0)
-//                            }
-//                        }
-//                    } else if (!extension.slides.isTravelling())
-//                    {
-//                        extension.slides.supplyPowerToAll(0.0)
-//                    }
-//                }
+                if ((compositein.currentIntakeState == CompositeIntake.IntakeState.Intake)) {
+                    val multiplier = 0.62
+                    drivetrain.driveRobotCentric(robotDriver, multiplier)
+                    val wantedPower = -opMode.gamepad1.left_trigger + opMode.gamepad1.right_trigger
+                    if (wantedPower.absoluteValue > 0.1 && !extension.slides.isTravelling()) {
+                        if (wantedPower < 0) {
+                            if (extension.slides.currentPosition() >= -10) {
+                                extension.slides.supplyPowerToAll(0.0)
+                            } else {
+                                extension.slides.supplyPowerToAll(-wantedPower.toDouble() / 2.0)
+                            }
+                        } else {
+                            if (extension.slides.currentPosition() < -435) {
+                                extension.slides.supplyPowerToAll(0.0)
+                            } else {
+                                extension.slides.supplyPowerToAll(-wantedPower.toDouble() / 2.0)
+                            }
+                        }
+                    } else if (!extension.slides.isTravelling()) {
+                        extension.slides.supplyPowerToAll(0.0)
+                    }
+                }
+                else{
+                    val multiplier = 0.6 + gamepad1.right_trigger * 0.4
+                    drivetrain.driveRobotCentric(robotDriver, multiplier)
+                }
 
                 telemetry.addLine("Composite State: ${compositein.currentIntakeState}")
                 telemetry.addLine("Extendo Left Position: ${hardware.extensionMotorLeft.currentPosition}")
@@ -117,9 +84,6 @@ class SoloZoom : HypnoticOpMode() {
         }
 
         private fun buildCommands() {
-            //game pad 1 commands
-
-
 
             //grab positions
             gp1Commands.apply {
@@ -136,12 +100,6 @@ class SoloZoom : HypnoticOpMode() {
                 where(ButtonType.BumperLeft)
                     .triggers {
                         compositein.toggle()
-                    }
-                    .whenPressedOnce()
-
-                where(ButtonType.BumperRight)
-                    .triggers {
-                        compositeout.toggleBucket()
                     }
                     .whenPressedOnce()
 
@@ -170,9 +128,12 @@ class SoloZoom : HypnoticOpMode() {
                     }
                     .whenPressedOnce()
 
-                where(ButtonType.ButtonX)
+            }
+
+            gp2Commands.apply {
+                where(ButtonType.BumperRight)
                     .triggers {
-                        compositeout.setOuttake(CompositeOuttake.OuttakeState.Transfer)
+                        compositeout.toggleBucket()
                     }
                     .whenPressedOnce()
 
@@ -181,16 +142,17 @@ class SoloZoom : HypnoticOpMode() {
                         outtake.toggleOuttakeGrip()
                     }
                     .whenPressedOnce()
-
                 where(ButtonType.ButtonY)
                     .triggers {
                         compositeout.toggleSpecimen()
                     }
                     .whenPressedOnce()
-
+                where(ButtonType.ButtonX)
+                    .triggers {
+                        compositeout.setOuttake(CompositeOuttake.OuttakeState.Transfer)
+                    }
+                    .whenPressedOnce()
             }
-
-
 
             gp1Commands.doButtonUpdatesManually()
             gp2Commands.doButtonUpdatesManually()

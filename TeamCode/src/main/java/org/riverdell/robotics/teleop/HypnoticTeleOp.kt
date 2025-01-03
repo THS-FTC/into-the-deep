@@ -48,10 +48,10 @@ class HypnoticTeleOp : HypnoticOpMode() {
             val robotDriver = GamepadEx(gamepad2)
             buildCommands()
             while (opModeIsActive()) {
-                val multiplier = 0.55 + gamepad2.right_trigger * 0.5
+                val multiplier = 0.57 + gamepad2.right_trigger * 0.43
                 drivetrain.driveRobotCentric(robotDriver, multiplier)
-                
-                if ((compositein.currentIntakeState == CompositeIntake.IntakeState.Intake))
+
+                if ((compositein.currentIntakeState == CompositeIntake.IntakeState.Intake ))
                 {
                     val wantedPower = -opMode.gamepad1.left_trigger + opMode.gamepad1.right_trigger
                     if (wantedPower.absoluteValue > 0.1 && !extension.slides.isTravelling())
@@ -75,34 +75,8 @@ class HypnoticTeleOp : HypnoticOpMode() {
                                 extension.slides.supplyPowerToAll(-wantedPower.toDouble() / 2.0)
                             }
                         }
-                    } else if (!extension.slides.isTravelling())
-                    {
-                        extension.slides.supplyPowerToAll(0.0)
                     }
-                } else if ((compositein.currentIntakeState == CompositeIntake.IntakeState.Transfer) ){
-                    val wantedPower = -opMode.gamepad1.left_trigger + opMode.gamepad1.right_trigger
-                    if (wantedPower.absoluteValue > 0.1 && !extension.slides.isTravelling())
-                    {
-                        if (wantedPower < 0)
-                        {
-                            if (extension.slides.currentPosition() > -170)
-                            {
-                                extension.slides.supplyPowerToAll(0.0)
-                            } else
-                            {
-                                extension.slides.supplyPowerToAll(wantedPower.toDouble() / 2.0)
-                            }
-                        } else
-                        {
-                            if (extension.slides.currentPosition() <= -190)
-                            {
-                                extension.slides.supplyPowerToAll(0.0)
-                            } else
-                            {
-                                extension.slides.supplyPowerToAll(wantedPower.toDouble() / 2.0)
-                            }
-                        }
-                    } else if (!extension.slides.isTravelling())
+                    else if (!extension.slides.isTravelling())
                     {
                         extension.slides.supplyPowerToAll(0.0)
                     }

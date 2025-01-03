@@ -5,6 +5,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode
 import io.liftgate.robotics.mono.states.StateResult
 import io.liftgate.robotics.mono.subsystem.AbstractSubsystem
 import org.riverdell.robotics.HypnoticRobot
+import org.riverdell.robotics.subsystems.CompositeIntake.IntakeState
 import org.riverdell.robotics.subsystems.Outtake.ClawState
 import java.util.Currency
 import java.util.concurrent.CompletableFuture
@@ -32,32 +33,33 @@ class CompositeOuttake(val robot: HypnoticRobot) : AbstractSubsystem() {
             .thenAccept { robot.lift.idle() }.apply { currentOuttakeState = OuttakeState.Transfer }
         } else if (newState == OuttakeState.Outtake) {
             //closes the outtake claw and opens the intake claw, then the robot extends forwards
-            robot.intake.setIntakeGrip(Intake.ClawState.Open).thenCompose { robot.extension.extendToAndStayAt(SlideConfig.extendoGetOut) }
+            robot.intake.setIntakeGrip(Intake.ClawState.Open)
+            .thenCompose { CompletableFuture.allOf(
+                robot.lift.extendToAndStayAt(SlideConfig.liftHighBucket),
+                robot.extension.extendToAndStayAt(SlideConfig.extendoGetOut)
+            ) }
             robot.intake.setRotationPulley(Intake.RotationState.Observe).thenCompose {
                 CompletableFuture.allOf(
                     robot.ov4b.setPulley(OV4B.PulleyState.Bucket),
-                        robot.lift.extendToAndStayAt(SlideConfig.liftHighBucket),
                         robot.ov4b.setV4B(OV4B.OV4BState.Outtake))}
-            //the outtake rotates outwards
+//            //the outtake rotates outwards
                 .apply { currentOuttakeState = OuttakeState.Outtake }
         } else if (newState == OuttakeState.SpecimenUp) {
-            CompletableFuture.allOf(
-                robot.intake.setIntakeGrip(Intake.ClawState.Open),
-                robot.intake.setRotationPulley(Intake.RotationState.Grab)
-            )
-                .thenComposeAsync{
-                    CompletableFuture.allOf(
-                        robot.extension.extendToAndStayAt(SlideConfig.extendoGetOut)
-                    ).join()
-                    CompletableFuture.allOf(
-                        robot.ov4b.setPulley(OV4B.PulleyState.Specimen),
-                        robot.lift.extendToAndStayAt(SlideConfig.liftSpecimen),
-                        robot.ov4b.setV4B(OV4B.OV4BState.Specimen)
-                    )
-                }.apply { currentOuttakeState = OuttakeState.SpecimenUp }
+            robot.intake.setIntakeGrip(Intake.ClawState.Open)
+                .thenCompose { CompletableFuture.allOf(
+                    robot.extension.extendToAndStayAt(SlideConfig.extendoGetOut)
+                ) }
+            robot.intake.setRotationPulley(Intake.RotationState.Observe).thenCompose {
+                CompletableFuture.allOf(
+                    robot.lift.extendToAndStayAt(SlideConfig.liftSpecimen),
+                    robot.ov4b.setPulley(OV4B.PulleyState.Specimen),
+                    robot.ov4b.setV4B(OV4B.OV4BState.Specimen))}
+//            //the outtake rotates outwards
+                .apply { currentOuttakeState = OuttakeState.SpecimenUp }
         }else if (newState == OuttakeState.SpecimenDown) {
-            robot.lift.extendToAndStayAt(SlideConfig.downSpecimen).thenCompose { robot.ov4b.setV4B(OV4B.OV4BState.Specimen) }
-//            robot.outtake.toggleOuttakeGrip().thenCompose{robot.ov4b.setV4B(OV4B.OV4BState.Transfer)}
+            CompletableFuture.allOf(
+                robot.lift.extendToAndStayAt(SlideConfig.downSpecimen)
+            )
                 .apply { currentOuttakeState = OuttakeState.SpecimenDown }
         }
         else{
@@ -81,7 +83,7 @@ class CompositeOuttake(val robot: HypnoticRobot) : AbstractSubsystem() {
     }
 
     fun toggleSpecimen() : CompletableFuture<Void>{
-        return if (currentOuttakeState == OuttakeState.Transfer || currentOuttakeState == OuttakeState.SpecimenDown){
+        return if (currentOuttakeState == OuttakeState.SpecimenDown){
             setOuttake(OuttakeState.SpecimenUp)
         }
         else{

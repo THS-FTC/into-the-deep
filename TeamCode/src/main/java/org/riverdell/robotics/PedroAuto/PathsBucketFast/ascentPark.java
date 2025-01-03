@@ -1,7 +1,6 @@
-package org.riverdell.robotics.PedroAuto.Paths;
+package org.riverdell.robotics.PedroAuto.PathsBucketFast;
 
 import org.riverdell.robotics.pedroPathing.pathGeneration.BezierCurve;
-import org.riverdell.robotics.pedroPathing.pathGeneration.BezierLine;
 import org.riverdell.robotics.pedroPathing.pathGeneration.PathBuilder;
 import org.riverdell.robotics.pedroPathing.pathGeneration.PathChain;
 import org.riverdell.robotics.pedroPathing.pathGeneration.Point;

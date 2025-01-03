@@ -1,4 +1,4 @@
-package org.riverdell.robotics.PedroAuto.Paths.initialAndRightSamples;
+package org.riverdell.robotics.PedroAuto.PathsBucketFast.initialAndRightSamples;
 
 import org.riverdell.robotics.pedroPathing.pathGeneration.BezierLine;
 import org.riverdell.robotics.pedroPathing.pathGeneration.PathBuilder;

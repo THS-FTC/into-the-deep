@@ -1,4 +1,4 @@
-package org.riverdell.robotics.PedroAuto.Paths;
+package org.riverdell.robotics.PedroAuto.SlowBucket;
 
 import org.riverdell.robotics.pedroPathing.pathGeneration.BezierLine;
 import org.riverdell.robotics.pedroPathing.pathGeneration.PathBuilder;

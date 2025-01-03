@@ -1,15 +1,15 @@
-package org.riverdell.robotics.PedroAuto.Paths;
+package org.riverdell.robotics.PedroAuto.PathsBucketFast;
 
-import org.riverdell.robotics.PedroAuto.Paths.initialAndRightSamples.*;
-import org.riverdell.robotics.PedroAuto.Paths.leftSample.toBasketFromLeft;
-import org.riverdell.robotics.PedroAuto.Paths.leftSample.toLeftSample;
-import org.riverdell.robotics.PedroAuto.Paths.middleSample.toBasketFromMiddle;
-import org.riverdell.robotics.PedroAuto.Paths.middleSample.toMiddleSample;
+import org.riverdell.robotics.PedroAuto.PathsBucketFast.initialAndRightSamples.*;
+import org.riverdell.robotics.PedroAuto.PathsBucketFast.leftSample.toBasketFromLeft;
+import org.riverdell.robotics.PedroAuto.PathsBucketFast.leftSample.toLeftSample;
+import org.riverdell.robotics.PedroAuto.PathsBucketFast.middleSample.toBasketFromMiddle;
+import org.riverdell.robotics.PedroAuto.PathsBucketFast.middleSample.toMiddleSample;
 import org.riverdell.robotics.pedroPathing.pathGeneration.PathChain;
 
 public class Paths {
     //test path
-    public static PathChain goForward = org.riverdell.robotics.PedroAuto.Paths.goForward.path();
+    public static PathChain goForward = org.riverdell.robotics.PedroAuto.PathsBucketFast.goForward.path();
 
     public static PathChain right_to_bucket = toBasketFromRight.path();
     public static PathChain middle_to_bucket = toBasketFromMiddle.path();

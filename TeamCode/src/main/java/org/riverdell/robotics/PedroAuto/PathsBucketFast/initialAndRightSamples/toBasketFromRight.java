@@ -1,11 +1,11 @@
-package org.riverdell.robotics.PedroAuto.Paths.middleSample;
+package org.riverdell.robotics.PedroAuto.PathsBucketFast.initialAndRightSamples;
 
 import org.riverdell.robotics.pedroPathing.pathGeneration.BezierLine;
 import org.riverdell.robotics.pedroPathing.pathGeneration.PathBuilder;
 import org.riverdell.robotics.pedroPathing.pathGeneration.PathChain;
 import org.riverdell.robotics.pedroPathing.pathGeneration.Point;
 
-public class toBasketFromMiddle {
+public class toBasketFromRight {
 
   public static PathChain path() {
     PathBuilder builder = new PathBuilder();
@@ -14,8 +14,9 @@ public class toBasketFromMiddle {
             .addPath(
                     // Line 1
                     new BezierLine(
-                            new Point(16.100, -13.000, Point.CARTESIAN),
-                            new Point(15.900, -10.700, Point.CARTESIAN)
+                            //new Point(30.500, 5.000, Point.CARTESIAN),
+                            new Point(10.900, -13.100, Point.CARTESIAN),
+                            new Point(14.000, -10.700, Point.CARTESIAN)
                     )
             )
             .setLinearHeadingInterpolation(Math.toRadians(260), Math.toRadians(225));

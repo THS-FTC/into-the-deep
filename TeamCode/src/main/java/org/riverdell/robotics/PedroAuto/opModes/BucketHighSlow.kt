@@ -1,42 +1,45 @@
 package org.riverdell.robotics.autonomous.impl.tests
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous
-import org.riverdell.robotics.pedroPathing.localization.Pose
 import io.liftgate.robotics.mono.pipeline.single
 import org.riverdell.robotics.PedroAuto.Constants.pathTimes
-import org.riverdell.robotics.PedroAuto.PathsBucketFast.Paths
+import org.riverdell.robotics.PedroAuto.SlowBucket.SlowPaths
 import org.riverdell.robotics.autonomous.HypnoticAuto
+import org.riverdell.robotics.pedroPathing.localization.Pose
 import org.riverdell.robotics.subsystems.CompositeIntake
 import org.riverdell.robotics.subsystems.CompositeOuttake
 import org.riverdell.robotics.subsystems.IV4B
 import org.riverdell.robotics.subsystems.Intake
+import org.riverdell.robotics.subsystems.OV4B
 import org.riverdell.robotics.subsystems.Outtake
 
-@Autonomous(name = "2+0 Bucket", group = "Comp")
-class BucketHigh : HypnoticAuto({ opmode ->
+@Autonomous(name = "4+0 Bucket", group = "Comp")
+class BucketHighSlow : HypnoticAuto({ opmode ->
 
     //initial sample
 
-    single("subsystems") {
-//        opmode.robot.compositeout.setOuttake(CompositeOuttake.OuttakeState.Outtake)
-//        Thread.sleep(50L)
-        //starts path to the bucket
+    single("pathing_to_pre") {
         opmode.robot.follower.setStartingPose(Pose(0.000, 0.000, Math.toRadians(225.0)))
-        opmode.robot.follower.followPath(Paths.slant_to_bucket, true)
+        opmode.robot.compositeout.setOuttake(CompositeOuttake.OuttakeState.Outtake)
+        Thread.sleep(50L)
+        opmode.robot.follower.followPath(SlowPaths.slant_to_pre,true)
 
         //while loop that keeps the follower on and sets outtake to out at a certain time
 
         while (!opmode.robot.follower.atParametricEnd()) {
             //checks if opmode is stopped
-            val t = opmode.robot.follower.currentTValue
-            if (t >= pathTimes.initialSampleOuttakeOut - 0.09 && t <= pathTimes.initialSampleOuttakeOut + 0.09) {
-                opmode.robot.compositeout.setOuttake(CompositeOuttake.OuttakeState.Outtake)
-                Thread.sleep(50L)
+            if (!opmode.opModeIsActive()) {
+                break;
             }
-            if (t >= pathTimes.sampleExtendoOut - 0.09 && t <= pathTimes.sampleExtendoOut + 0.09) {
-                opmode.robot.compositein.setIntake(CompositeIntake.IntakeState.Intake)
-                Thread.sleep(50L)
-            }
+            Thread.sleep(50L)
+        }
+    }
+    single("pathing_to_bucket") {
+        Thread.sleep(400L)
+        opmode.robot.follower.followPath(SlowPaths.initialPre_to_bucket)
+
+        //while loop that keeps the follower on and sets outtake to out at a certain time
+        while (!opmode.robot.follower.atParametricEnd()) {
             if (!opmode.opModeIsActive()) {
                 break;
             }
@@ -45,28 +48,26 @@ class BucketHigh : HypnoticAuto({ opmode ->
     }
     //drops sample
     single("First Drop Sample") {
-        Thread.sleep(700)
+        Thread.sleep(1000L)
         opmode.robot.outtake.setOuttakeGrip(Outtake.ClawState.Open)
-        Thread.sleep(300)
+        Thread.sleep(400L)
 
     }
+
 
 
     //start of first cycle to samples (right sample)
 
 
+
+
     single("pathing/outtake in") {
-        opmode.robot.follower.followPath(Paths.bucket_to_right)
+        Thread.sleep(400L)
+        opmode.robot.follower.followPath(SlowPaths.bucket_to_right,true)
+        opmode.robot.compositein.setIntake(CompositeIntake.IntakeState.Intake)
+        Thread.sleep(50L)
         while (!opmode.robot.follower.atParametricEnd()) {
             val t = opmode.robot.follower.currentTValue
-            if (t >= pathTimes.sampleOuttakeIn - 1.00 && t <= pathTimes.sampleOuttakeIn + 1.00) {
-                opmode.robot.compositeout.setOuttake(CompositeOuttake.OuttakeState.Transfer)
-                Thread.sleep(50L)
-            }
-            if (t >= pathTimes.sampleExtendoOut - 0.09 && t <= pathTimes.sampleExtendoOut + 0.09) {
-                opmode.robot.compositein.setIntake(CompositeIntake.IntakeState.Intake)
-                Thread.sleep(50L)
-            }
             if (!opmode.opModeIsActive()) {
                 break;
             }
@@ -74,7 +75,8 @@ class BucketHigh : HypnoticAuto({ opmode ->
         }
     }
     single("Grab Right") {
-        Thread.sleep(600)
+        Thread.sleep(800L)
+        opmode.robot.compositeout.setOuttake(CompositeOuttake.OuttakeState.Transfer)
         opmode.robot.intake.setIntakeGrip(Intake.ClawState.Open)
         opmode.robot.intake.setRotationPulley(Intake.RotationState.Grab)
         opmode.robot.iv4b.setV4B(IV4B.V4BState.Grab)
@@ -85,51 +87,59 @@ class BucketHigh : HypnoticAuto({ opmode ->
                 )
             }
         opmode.robot.intake.setRotationPulley(Intake.RotationState.Observe)
-        Thread.sleep(500)
+        Thread.sleep(500L)
         opmode.robot.compositein.setIntake(CompositeIntake.IntakeState.Transfer)
-        Thread.sleep(1000)
+        Thread.sleep(1000L)
         opmode.robot.outtake.setOuttakeGrip(Outtake.ClawState.Closed)
+        Thread.sleep(600L)
     }
-    single("pathing_to_bucket") {
-        opmode.robot.follower.followPath(Paths.right_to_bucket)
+    single("pathing_to_Prebucket"){
+        opmode.robot.compositeout.setOuttake(CompositeOuttake.OuttakeState.Outtake)
+        Thread.sleep(400L)
+        opmode.robot.follower.followPath(SlowPaths.right_to_pre,true)
         while (!opmode.robot.follower.atParametricEnd()) {
             val t = opmode.robot.follower.currentTValue
-            if (t >= pathTimes.SampleOuttakeOut - 0.09 && t <= pathTimes.SampleOuttakeOut + 0.09) {
-                opmode.robot.compositeout.setOuttake(CompositeOuttake.OuttakeState.Outtake)
-                Thread.sleep(50L)
-            }
             if (!opmode.opModeIsActive()) {
                 break;
             }
             Thread.sleep(50L)
         }
-        Thread.sleep(500)
+    }
+    single("pathing_to_bucket") {
+        Thread.sleep(400L)
+        opmode.robot.follower.followPath(SlowPaths.rightPre_to_bucket)
+        //while loop that keeps the follower on and sets outtake to out at a certain time
+
+        while (!opmode.robot.follower.atParametricEnd()) {
+            //checks if opmode is stopped
+            if (!opmode.opModeIsActive()) {
+                break;
+            }
+            Thread.sleep(50L)
+        }
     }
     single("Second Drop Sample") {
-        Thread.sleep(700)
+        Thread.sleep(1000L)
         opmode.robot.outtake.setOuttakeGrip(Outtake.ClawState.Open)
-        Thread.sleep(300)
+        Thread.sleep(400L)
 
     }
+
+
+
 
 
     //start of second cycle to samples (middle sample)
 
-    //TODO: Replace all parts of the right side sample for middle paths
 
 
     single("pathing/outtake in") {
-        opmode.robot.follower.followPath(Paths.bucket_to_middle)
+        Thread.sleep(400L)
+        opmode.robot.compositein.setIntake(CompositeIntake.IntakeState.Intake)
+        Thread.sleep(50L)
+        opmode.robot.follower.followPath(SlowPaths.bucket_to_middle)
         while (!opmode.robot.follower.atParametricEnd()) {
             val t = opmode.robot.follower.currentTValue
-            if (t >= pathTimes.sampleOuttakeIn - 1.00 && t <= pathTimes.sampleOuttakeIn + 1.00) {
-                opmode.robot.compositeout.setOuttake(CompositeOuttake.OuttakeState.Transfer)
-                Thread.sleep(50L)
-            }
-            if (t >= pathTimes.sampleExtendoOut - 0.09 && t <= pathTimes.sampleExtendoOut + 0.09) {
-                opmode.robot.compositein.setIntake(CompositeIntake.IntakeState.Intake)
-                Thread.sleep(50L)
-            }
             if (!opmode.opModeIsActive()) {
                 break;
             }
@@ -137,7 +147,8 @@ class BucketHigh : HypnoticAuto({ opmode ->
         }
     }
     single("Grab Middle") {
-        Thread.sleep(600)
+        Thread.sleep(400L)
+        opmode.robot.compositeout.setOuttake(CompositeOuttake.OuttakeState.Transfer)
         opmode.robot.intake.setIntakeGrip(Intake.ClawState.Open)
         opmode.robot.intake.setRotationPulley(Intake.RotationState.Grab)
         opmode.robot.iv4b.setV4B(IV4B.V4BState.Grab)
@@ -148,57 +159,67 @@ class BucketHigh : HypnoticAuto({ opmode ->
                 )
             }
         opmode.robot.intake.setRotationPulley(Intake.RotationState.Observe)
-        Thread.sleep(500)
+        Thread.sleep(500L)
         opmode.robot.compositein.setIntake(CompositeIntake.IntakeState.Transfer)
-        Thread.sleep(1000)
+        Thread.sleep(1000L)
         opmode.robot.outtake.setOuttakeGrip(Outtake.ClawState.Closed)
+        Thread.sleep(600L)
     }
-    single("pathing_to_bucket") {
-        opmode.robot.follower.followPath(Paths.middle_to_bucket)
+    single("pathing_to_Prebucket"){
+        opmode.robot.compositeout.setOuttake(CompositeOuttake.OuttakeState.Outtake)
+        Thread.sleep(50L)
+        opmode.robot.follower.followPath(SlowPaths.middle_to_pre)
         while (!opmode.robot.follower.atParametricEnd()) {
             val t = opmode.robot.follower.currentTValue
-            if (t >= pathTimes.SampleOuttakeOut - 0.09 && t <= pathTimes.SampleOuttakeOut + 0.09) {
-                opmode.robot.compositeout.setOuttake(CompositeOuttake.OuttakeState.Outtake)
-                Thread.sleep(50L)
-            }
             if (!opmode.opModeIsActive()) {
                 break;
             }
             Thread.sleep(50L)
         }
-        Thread.sleep(500)
     }
-    single("Third Drop Sample") {
-        Thread.sleep(700)
+    single("pathing_to_bucket") {
+        Thread.sleep(400L)
+        opmode.robot.follower.followPath(SlowPaths.middlePre_to_bucket)
+
+        //while loop that keeps the follower on and sets outtake to out at a certain time
+
+        while (!opmode.robot.follower.atParametricEnd()) {
+            //checks if opmode is stopped
+            if (!opmode.opModeIsActive()) {
+                break;
+            }
+            Thread.sleep(50L)
+        }
+    }
+    single("Second Drop Sample") {
+        Thread.sleep(1000L)
         opmode.robot.outtake.setOuttakeGrip(Outtake.ClawState.Open)
-        Thread.sleep(300)
+        Thread.sleep(400L)
 
     }
 
-})
-/*
+
+
     //start of third cycle to samples (left sample)
 
 
     single("pathing/outtake in") {
-        opmode.robot.follower.followPath(Paths.bucket_to_left)
+        Thread.sleep(200L)
+        opmode.robot.compositein.setIntake(CompositeIntake.IntakeState.Intake)
+        opmode.robot.intake.setWrist(Intake.WristState.Right)
+        Thread.sleep(500L)
+        opmode.robot.follower.followPath(SlowPaths.bucket_to_left)
         while (!opmode.robot.follower.atParametricEnd()) {
             val t = opmode.robot.follower.currentTValue
             if (!opmode.opModeIsActive()) {
                 break;
-            }
-            if (t >= pathTimes.sampleOuttakeIn-0.09 && t <= pathTimes.sampleOuttakeIn+0.09){
-                opmode.robot.compositeout.setOuttake(CompositeOuttake.OuttakeState.Transfer)
-            }
-            else if (t >= pathTimes.sampleExtendoOut-0.09 && t <= pathTimes.sampleExtendoOut+0.09){
-                opmode.robot.compositein.setIntake(CompositeIntake.IntakeState.Intake)
-                opmode.robot.intake.setWrist(Intake.WristState.Right)
             }
             Thread.sleep(50L)
         }
     }
     single("Grab Left") {
-        Thread.sleep(600)
+        Thread.sleep(600L)
+        opmode.robot.compositeout.setOuttake(CompositeOuttake.OuttakeState.Transfer)
         opmode.robot.intake.setIntakeGrip(Intake.ClawState.Open)
         opmode.robot.intake.setRotationPulley(Intake.RotationState.Grab)
         opmode.robot.iv4b.setV4B(IV4B.V4BState.Grab)
@@ -208,31 +229,41 @@ class BucketHigh : HypnoticAuto({ opmode ->
                     IV4B.V4BState.Observe
                 )
             }
-        Thread.sleep(500)
+        opmode.robot.intake.setRotationPulley(Intake.RotationState.Observe)
+        Thread.sleep(500L)
+        opmode.robot.compositein.setIntake(CompositeIntake.IntakeState.Transfer)
+        Thread.sleep(1500L)
+        opmode.robot.outtake.setOuttakeGrip(Outtake.ClawState.Closed)
+        Thread.sleep(600L)
     }
-    single("pathing_to_bucket"){
-        opmode.robot.follower.followPath(Paths.left_to_bucket)
+    single("pathing_to_Prebucket"){
+        opmode.robot.compositeout.setOuttake(CompositeOuttake.OuttakeState.Outtake)
+        Thread.sleep(50L)
+        opmode.robot.follower.followPath(SlowPaths.left_to_pre)
         while (!opmode.robot.follower.atParametricEnd()) {
             val t = opmode.robot.follower.currentTValue
             if (!opmode.opModeIsActive()) {
                 break;
             }
-            if (t >= pathTimes.sampleExtendoIn-0.09 && t <= pathTimes.sampleExtendoIn+0.09){
-                opmode.robot.compositein.setIntake(CompositeIntake.IntakeState.Transfer)
-            }
-            else if (t >= pathTimes.sampleOuttakeGripClose-0.09 && t <= pathTimes.sampleOuttakeGripClose+0.09){
-                opmode.robot.outtake.setOuttakeGrip(Outtake.ClawState.Closed)
-            }
-            else if (t >= pathTimes.SampleOuttakeOut-0.09 && t <= pathTimes.SampleOuttakeOut+0.09){
-                opmode.robot.compositeout.setOuttake(CompositeOuttake.OuttakeState.Outtake)
+            Thread.sleep(50L)
+        }
+    }
+    single("pathing_to_bucket") {
+        Thread.sleep(400L)
+        opmode.robot.follower.followPath(SlowPaths.leftPre_to_bucket)
+        //while loop that keeps the follower on and sets outtake to out at a certain time
+        while (!opmode.robot.follower.atParametricEnd()) {
+            //checks if opmode is stopped
+            if (!opmode.opModeIsActive()) {
+                break;
             }
             Thread.sleep(50L)
         }
     }
     single("Fourth Drop Sample") {
-        Thread.sleep(700)
+        Thread.sleep(1000L)
         opmode.robot.outtake.setOuttakeGrip(Outtake.ClawState.Open)
-        Thread.sleep(300)
+        Thread.sleep(400L)
 
     }
 
@@ -241,18 +272,31 @@ class BucketHigh : HypnoticAuto({ opmode ->
 
 
     single("parking"){
-        opmode.robot.follower.followPath(Paths.bucket_to_ascent)
+        Thread.sleep(50L)
+        opmode.robot.compositeout.setOuttake(CompositeOuttake.OuttakeState.Transfer)
+        Thread.sleep(50L)
+        opmode.robot.follower.followPath(SlowPaths.bucket_to_preascent)
         while (!opmode.robot.follower.atParametricEnd()) {
             val t = opmode.robot.follower.currentTValue
             if (!opmode.opModeIsActive()) {
                 break;
             }
-            else if (t >= pathTimes.ascentOut-0.09 && t <= pathTimes.ascentOut+0.09){
-                opmode.robot.ov4b.setV4B(OV4B.OV4BState.Outtake)
+            Thread.sleep(50L)
+        }
+    }
+    single("parking"){
+        Thread.sleep(50L)
+        opmode.robot.ov4b.setV4B(OV4B.OV4BState.Specimen)
+        Thread.sleep(50L)
+        opmode.robot.compositein.setIntake(CompositeIntake.IntakeState.Idle)
+        Thread.sleep(50L)
+        opmode.robot.follower.followPath(SlowPaths.pre_to_park)
+        while (!opmode.robot.follower.atParametricEnd()) {
+            val t = opmode.robot.follower.currentTValue
+            if (!opmode.opModeIsActive()) {
+                break;
             }
             Thread.sleep(50L)
         }
     }
 })
-
-*/
