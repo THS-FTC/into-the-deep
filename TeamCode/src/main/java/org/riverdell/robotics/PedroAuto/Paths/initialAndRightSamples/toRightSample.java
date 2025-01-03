@@ -14,11 +14,11 @@ public class toRightSample {
             .addPath(
                     // Line 1
                     new BezierLine(
-                            new Point(17.000, -7.800, Point.CARTESIAN),
+                            new Point(13.800, -8.000, Point.CARTESIAN),
                             //new Point(30.500, 5.000, Point.CARTESIAN)
-                            new Point(10.900, -12.700, Point.CARTESIAN)
+                            new Point(10.900, -12.950, Point.CARTESIAN)
                     )
-            ).setLinearHeadingInterpolation(Math.toRadians(225),Math.toRadians(270));
+            ).setLinearHeadingInterpolation(Math.toRadians(225),Math.toRadians(260));
     return builder.build();
   }
 }

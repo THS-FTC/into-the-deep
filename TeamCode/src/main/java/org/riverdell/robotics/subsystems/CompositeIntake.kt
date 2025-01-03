@@ -47,7 +47,8 @@ class CompositeIntake(val robot: HypnoticRobot) : AbstractSubsystem() {
             } //works idk i am him*/
             CompletableFuture.allOf(
                 robot.iv4b.setV4B(IV4B.V4BState.Transfer),
-                robot.intake.setRotationPulley(Intake.RotationState.Transfer)
+                robot.intake.setRotationPulley(Intake.RotationState.Transfer),
+                robot.outtake.setOuttakeGrip(Outtake.ClawState.Open)
             )
                 .thenComposeAsync{
                     CompletableFuture.allOf(

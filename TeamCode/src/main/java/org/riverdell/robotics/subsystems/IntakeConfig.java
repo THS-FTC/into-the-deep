@@ -4,12 +4,12 @@ import com.acmerobotics.dashboard.config.Config;
 
 @Config
 public class IntakeConfig {
-    public static double closePosition= 0.46;
+    public static double closePosition= 0.47;
     public static double openPositon  = 0.2;
     public static double resetPosition  = 0.0;
 
     //rotation
-    public static double transferPosition = 0.65;
+    public static double transferPosition = 0.63;
     public static double observePosition= 0.94;
     public static double grabPosition= 0.91;
 

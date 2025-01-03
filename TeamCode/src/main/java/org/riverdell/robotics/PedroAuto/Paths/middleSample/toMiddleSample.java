@@ -14,10 +14,10 @@ public class toMiddleSample {
             .addPath(
                     // Line 1
                     new BezierLine(
-                            new Point(19.000, 12.000, Point.CARTESIAN),
-                            new Point(26.000, 15.500, Point.CARTESIAN)
+                            new Point(14.000, -10.700, Point.CARTESIAN),
+                            new Point(16.150, -13.100, Point.CARTESIAN)
                     )
-            ).setLinearHeadingInterpolation(Math.toRadians(270),Math.toRadians(320));
+            ).setLinearHeadingInterpolation(Math.toRadians(225),Math.toRadians(260));
     return builder.build();
   }
 }
