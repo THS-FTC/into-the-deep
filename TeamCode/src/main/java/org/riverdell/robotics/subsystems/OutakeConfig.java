@@ -8,8 +8,8 @@ public class OutakeConfig {
     public static double closePositon  = 0.74;
 
     //rotation
-    public static double transferPosition = 1.0;
-    public static double outtakePosition = 0.0;
+    public static double frontPosition = 1.0;
+    public static double specimenPosition = 0.0;
 
     // pulley
     public static double pulleyTransferPosition= 0.0;

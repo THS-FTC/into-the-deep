@@ -97,5 +97,8 @@ class HypnoticRobotHardware(private val opMode: HypnoticOpMode)
 
         outtakeGrip = opMode.hardwareMap.get(ServoImplEx::class.java, "outtake_grip")
         outtakeGrip.position = OutakeConfig.closePositon
+
+        outtakeWrist = opMode.hardwareMap.get(ServoImplEx::class.java, "outtake_wrist")
+        outtakeWrist.position = OutakeConfig.outtakePosition
     }
 }
