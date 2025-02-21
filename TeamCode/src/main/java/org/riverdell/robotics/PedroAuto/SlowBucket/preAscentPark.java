@@ -14,7 +14,8 @@ public class preAscentPark {
             .addPath(
                     // Line 1
                     new BezierCurve(
-                            new Point(15.900, 10.700, Point.CARTESIAN),
+                           // new Point(15.900, 10.700, Point.CARTESIAN),
+                            new Point(13.900, -9.200, Point.CARTESIAN),
                             new Point(25.000, -20.000, Point.CARTESIAN),
                             new Point(0.000, -60.000, Point.CARTESIAN)
                     )

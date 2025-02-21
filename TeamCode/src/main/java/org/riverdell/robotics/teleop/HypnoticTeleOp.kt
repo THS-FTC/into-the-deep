@@ -108,7 +108,6 @@ class HypnoticTeleOp : HypnoticOpMode() {
                         intake.setRotationPulley(Intake.RotationState.Grab)
                         iv4b.setV4B(IV4B.V4BState.Grab).thenCompose { intake.setIntakeGrip(Intake.ClawState.Closed) }.thenCompose { iv4b.setV4B(IV4B.V4BState.Observe) }
                         intake.setRotationPulley(Intake.RotationState.Observe)
-                        // intake.toggleIntakeGrip()
                     }
                     .whenPressedOnce()
 

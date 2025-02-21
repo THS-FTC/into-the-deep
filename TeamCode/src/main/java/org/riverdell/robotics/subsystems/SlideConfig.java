@@ -14,7 +14,7 @@ public class SlideConfig {
 
    //extendo
     public static int extendoIntake = -300;
-    public static int extendoTransfer = -148;
+    public static int extendoTransfer = -130;
     public static int extendoClosed = 0;
     public static int extendoGetOut = -200;
     

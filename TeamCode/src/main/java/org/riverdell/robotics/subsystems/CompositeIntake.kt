@@ -28,23 +28,12 @@ class CompositeIntake(val robot: HypnoticRobot) : AbstractSubsystem() {
             robot.iv4b.setV4B(IV4B.V4BState.Idle)
             robot.intake.setRotationPulley(Intake.RotationState.Idle)
             robot.extension.extendToAndStayAt(SlideConfig.extendoClosed)
-            robot.intake.setWrist(Intake.WristState.Front).apply {
+            robot.intake.wristRotateTo(IntakeConfig.frontPosition).apply {
 
                 println("updated to idle")
                 currentIntakeState = IntakeState.Idle
             }
         } else if (newState == IntakeState.Transfer) {
-            //this is for transfer
-            /*robot.iv4b.setV4B(IV4B.V4BState.Transfer)
-
-            robot.intake.setRotationPulley(Intake.RotationState.Transfer) .thenCompose {CompletableFuture.allOf(
-                robot.intake.setWrist(Intake.WristState.Front),
-                robot.extension.extendToAndStayAt(SlideConfig.extendoTransfer)
-                )
-            }.apply {
-                println("updated to transfer")
-                currentIntakeState = IntakeState.Transfer
-            } //works idk i am him*/
             CompletableFuture.allOf(
                 robot.iv4b.setV4B(IV4B.V4BState.Transfer),
                 robot.intake.setRotationPulley(Intake.RotationState.Transfer),
@@ -68,8 +57,7 @@ class CompositeIntake(val robot: HypnoticRobot) : AbstractSubsystem() {
             robot.intake.setRotationPulley(Intake.RotationState.Observe) //set it to observe later
             robot.extension.extendToAndStayAt(SlideConfig.extendoIntake).thenRun {
                 robot.extension.idle()
-            }
-            robot.intake.setWrist(Intake.WristState.Front).apply {
+            }.apply {
                 println("updated to intake")
                 currentIntakeState = IntakeState.Intake
             }

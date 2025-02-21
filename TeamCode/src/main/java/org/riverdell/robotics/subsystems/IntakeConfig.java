@@ -4,7 +4,7 @@ import com.acmerobotics.dashboard.config.Config;
 
 @Config
 public class IntakeConfig {
-    public static double closePosition= 0.45;
+    public static double closePosition= 0.48;
     public static double openPositon  = 0.2;
     public static double resetPosition  = 0.0;
 
@@ -14,9 +14,9 @@ public class IntakeConfig {
     public static double grabPosition= 0.91;
 
     // wrist
-    public static double frontPosition= 0.62;
-    public static double  backPosition = 0.62;
+    public static double frontPosition= 0.6;
     public static double  veritcalPosition = 0.32;
+    public static double  otherPosition = 0.6;
     public static double  leftPosition = 0.47;
     public static double  rightPosition = 0.2;
 

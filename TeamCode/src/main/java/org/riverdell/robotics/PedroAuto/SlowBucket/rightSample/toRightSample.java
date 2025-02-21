@@ -15,7 +15,7 @@ public class toRightSample {
                     // Line 1
                     new BezierLine(
                             new Point(13.900, -9.200, Point.CARTESIAN),
-                            new Point(11.800, -12.350, Point.CARTESIAN)
+                            new Point(11.950, -12.450, Point.CARTESIAN)
                     )
             ).setLinearHeadingInterpolation(Math.toRadians(225),Math.toRadians(264));
     return builder.build();
