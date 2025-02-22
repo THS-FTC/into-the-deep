@@ -4,9 +4,12 @@ import com.acmerobotics.dashboard.config.Config;
 
 @Config
 public class ServoConfig {
-    public static double position = 0.0;
-    public static String name = "intake_pulley";/*
+    public static double position1 = 0.0;
+    public static String name1 = "intake_pulley";
 
+    public static double position2 = 0.0;
+    public static String name2 = "intake_wrist";
+/*
     public static double IL_changer = 0.0;
     public static String IV4BL = "iv4b_rotation_left";
 

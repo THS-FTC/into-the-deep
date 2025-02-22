@@ -20,10 +20,10 @@ class TestServo : LinearOpMode()
 
         while (opModeIsActive())
         {
-            val hardware = hardwareMap[ServoConfig.name] as Servo
-            hardware.position = ServoConfig.position
-
-
+            val servo1 = hardwareMap[ServoConfig.name1] as Servo
+            servo1.position = ServoConfig.position1
+            val servo2 = hardwareMap[ServoConfig.name2] as Servo
+            servo2.position = ServoConfig.position2
             Thread.sleep(50L)
         }
     }
