@@ -11,5 +11,9 @@ public class IV4BConfig {
     public static double observePosition= 0.60;
     public static double grabPosition= 0.77;
 
+    //TODO:Change this value for Intake V4B
+    public static double hiddenPosition= 0.77;
+
+
     public static boolean leftIsReversed = false;
 }

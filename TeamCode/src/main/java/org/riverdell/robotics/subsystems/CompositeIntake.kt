@@ -11,7 +11,7 @@ import java.util.concurrent.CompletableFuture
 
 class CompositeIntake(val robot: HypnoticRobot) : AbstractSubsystem() {
     enum class IntakeState {
-        Intake, Idle, Transfer, Init
+        Intake, Idle, Transfer, Init, SlideIn, SlideOut
     }
 
     var currentIntakeState = IntakeState.Init
@@ -33,13 +33,22 @@ class CompositeIntake(val robot: HypnoticRobot) : AbstractSubsystem() {
                 println("updated to idle")
                 currentIntakeState = IntakeState.Idle
             }
-        } else if (newState == IntakeState.Transfer) {
+        } else if (newState == IntakeState.SlideIn) {
+            CompletableFuture.allOf(
+                robot.extension.extendToAndStayAt(SlideConfig.extendoIntake)
+            ).apply { currentIntakeState = IntakeState.SlideIn }
+        } else if (newState == IntakeState.SlideOut) {
+            CompletableFuture.allOf(
+                robot.extension.extendToAndStayAt(SlideConfig.extendoIdle)
+            ).apply { currentIntakeState = IntakeState.SlideIn }
+        }
+        else if (newState == IntakeState.Transfer) {
             CompletableFuture.allOf(
                 robot.iv4b.setV4B(IV4B.V4BState.Transfer),
                 robot.intake.setRotationPulley(Intake.RotationState.Transfer),
                 robot.outtake.setOuttakeGrip(Outtake.ClawState.Open)
             )
-                .thenComposeAsync{
+                .thenComposeAsync {
                     CompletableFuture.allOf(
                         robot.intake.setWrist(Intake.WristState.Front)
                     ).join()
@@ -51,6 +60,7 @@ class CompositeIntake(val robot: HypnoticRobot) : AbstractSubsystem() {
                     println("updated to transfer")
                     currentIntakeState = IntakeState.Transfer
                 } //works idk i am him
+
         } else {
             //this is for observing/intaking
             robot.iv4b.setV4B(IV4B.V4BState.Observe) //set it to observe later
@@ -64,11 +74,20 @@ class CompositeIntake(val robot: HypnoticRobot) : AbstractSubsystem() {
         }
     }
 
-    fun toggle(): CompletableFuture<Void> {
-        return if (currentIntakeState == IntakeState.Intake) {
+    fun toggleIntake(): CompletableFuture<Void> {
+        return if (currentIntakeState != IntakeState.Transfer && currentIntakeState != IntakeState.SlideIn) {
             setIntake(IntakeState.Transfer)
         } else {
             setIntake(IntakeState.Intake)
+        }
+    }
+
+    //logic may be fucked, try it
+    fun toggleSlides(): CompletableFuture<Void> {
+        return if (currentIntakeState != IntakeState.SlideOut) {
+            setIntake(IntakeState.SlideOut)
+        } else {
+            setIntake(IntakeState.SlideIn)
         }
     }
 

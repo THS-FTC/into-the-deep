@@ -3,7 +3,6 @@ package org.riverdell.robotics
 import com.qualcomm.robotcore.hardware.DcMotorEx
 import com.qualcomm.robotcore.hardware.DcMotorSimple
 import com.qualcomm.robotcore.hardware.ServoImplEx
-import org.riverdell.robotics.pedroPathing.localization.GoBildaPinpointDriver
 import org.riverdell.robotics.subsystems.IV4BConfig
 import org.riverdell.robotics.subsystems.IntakeConfig
 import org.riverdell.robotics.subsystems.OV4BConfig
@@ -22,7 +21,6 @@ class HypnoticRobotHardware(private val opMode: HypnoticOpMode)
     lateinit var backRight: DcMotorEx
     lateinit var backLeft: DcMotorEx
 
-    lateinit var pinpointDriver: GoBildaPinpointDriver
 
     lateinit var intakeV4BLeft: ServoImplEx
     lateinit var intakeV4BRight: ServoImplEx
@@ -69,36 +67,39 @@ class HypnoticRobotHardware(private val opMode: HypnoticOpMode)
         extensionMotorRight = opMode.hardwareMap["extension_motor_right"] as DcMotorEx
         extensionMotorRight.direction = DcMotorSimple.Direction.FORWARD
 
+
+
+        //THIS IS IN SPECIMEN POSITION BTW
         intakeV4BLeft = opMode.hardwareMap.get(ServoImplEx::class.java, "iv4b_rotation_left")
-        intakeV4BLeft.position = IV4BConfig.idlePosition
+        intakeV4BLeft.position = IV4BConfig.hiddenPosition
 
         intakeV4BRight = opMode.hardwareMap.get(ServoImplEx::class.java, "iv4b_rotation_right")
-        intakeV4BRight.position = 1.0 - IV4BConfig.idlePosition
+        intakeV4BRight.position = 1.0 - IV4BConfig.observePosition
 
         // Intake
         intakeWrist = opMode.hardwareMap.get(ServoImplEx::class.java, "intake_wrist")
-        intakeWrist.position = IntakeConfig.frontPosition
+        intakeWrist.position = IntakeConfig.veritcalPosition // test this remeber to
 
         intakePulley = opMode.hardwareMap.get(ServoImplEx::class.java, "intake_pulley")
         intakePulley.position = IntakeConfig.observePosition
 
         intakeGrip = opMode.hardwareMap.get(ServoImplEx::class.java, "intake_grip")
-        intakeGrip.position = IntakeConfig.openPositon
+        intakeGrip.position = IntakeConfig.closePosition
 
         // Outtake
         outtakeRotationLeft = opMode.hardwareMap.get(ServoImplEx::class.java, "ov4b_rotation_left")
-        outtakeRotationLeft.position = OV4BConfig.IdlePosition
+        outtakeRotationLeft.position = OV4BConfig.SpecimenIntakePosition
 
         outtakeRotationRight = opMode.hardwareMap.get(ServoImplEx::class.java, "ov4b_rotation_right")
-        outtakeRotationRight.position = 1.0 - OV4BConfig.IdlePosition
+        outtakeRotationRight.position = 1.0 - OV4BConfig.SpecimenIntakePosition
 
         outtakePulley = opMode.hardwareMap.get(ServoImplEx::class.java, "ov4b_pulley")
-        outtakePulley.position = OV4BConfig.idlePulley
+        outtakePulley.position = OV4BConfig.SpecimenIntakePosition
 
         outtakeGrip = opMode.hardwareMap.get(ServoImplEx::class.java, "outtake_grip")
         outtakeGrip.position = OutakeConfig.closePositon
 
         outtakeWrist = opMode.hardwareMap.get(ServoImplEx::class.java, "outtake_wrist")
-        outtakeWrist.position = OutakeConfig.outtakePosition
+        outtakeWrist.position = OutakeConfig.frontPosition
     }
 }

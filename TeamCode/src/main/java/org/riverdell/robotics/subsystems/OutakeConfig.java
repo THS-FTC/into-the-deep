@@ -9,6 +9,8 @@ public class OutakeConfig {
 
     //rotation
     public static double frontPosition = 1.0;
+
+    //TODO: Change both values for the wrist, above and below
     public static double specimenPosition = 0.0;
 
     // pulley

@@ -18,7 +18,7 @@ class IV4B(private val robot: HypnoticRobot) : AbstractSubsystem()
 //    )
     enum class V4BState
     {
-        Observe, Transfer, Grab, Idle, MoveAway, Init
+        Observe, Transfer, Grab, Idle, MoveAway, Init,Hidden
     }
 //    private val v4bConfig = konfig<V4BConfig>()
     private val currentV4BState = V4BState.Init
@@ -57,6 +57,12 @@ class IV4B(private val robot: HypnoticRobot) : AbstractSubsystem()
                 }
         } else if (newState == V4BState.Grab){
             v4bRotateTo(IV4BConfig.grabPosition)
+                .thenAccept {
+                    println(it)
+                }
+        }
+        else if (newState == V4BState.Hidden){
+            v4bRotateTo(IV4BConfig.hiddenPosition)
                 .thenAccept {
                     println(it)
                 }

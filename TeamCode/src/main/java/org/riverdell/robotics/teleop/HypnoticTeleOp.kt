@@ -82,7 +82,8 @@ class HypnoticTeleOp : HypnoticOpMode() {
                     }
                 }
 
-                telemetry.addLine("Composite State: ${compositein.currentIntakeState}")
+                telemetry.addLine("Composite In State: ${compositein.currentIntakeState}")
+                telemetry.addLine("Composite Out State: ${compositeout.currentOuttakeState}")
                 telemetry.addLine("Extendo Left Position: ${hardware.extensionMotorLeft.currentPosition}")
                 telemetry.addLine("Extendo Right Position: ${hardware.extensionMotorRight.currentPosition}")
                 telemetry.addLine("left trigger amount: ${opMode.gamepad1.left_trigger}")
@@ -113,7 +114,7 @@ class HypnoticTeleOp : HypnoticOpMode() {
 
                 where(ButtonType.BumperLeft)
                     .triggers {
-                        compositein.toggle()
+                        compositein.toggleIntake()
                     }
                     .whenPressedOnce()
 
@@ -150,7 +151,7 @@ class HypnoticTeleOp : HypnoticOpMode() {
 
                 where(ButtonType.ButtonX)
                     .triggers {
-                        compositeout.setOuttake(CompositeOuttake.OuttakeState.Transfer)
+                        compositein.toggleSlides()
                     }
                     .whenPressedOnce()
 
@@ -163,6 +164,14 @@ class HypnoticTeleOp : HypnoticOpMode() {
                 where(ButtonType.ButtonY)
                     .triggers {
                         compositeout.toggleSpecimen()
+                    }
+                    .whenPressedOnce()
+
+            }
+            gp2Commands.apply {
+                where(ButtonType.ButtonX)
+                    .triggers {
+                        compositeout.toggleMode()
                     }
                     .whenPressedOnce()
 

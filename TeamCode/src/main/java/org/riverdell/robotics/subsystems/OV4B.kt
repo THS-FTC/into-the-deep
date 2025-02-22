@@ -9,9 +9,8 @@ import org.riverdell.robotics.utilities.motionprofile.Constraint
 import org.riverdell.robotics.utilities.motionprofile.ProfileConstraints
 import java.util.concurrent.CompletableFuture
 
-class OV4B(private val robot: HypnoticRobot) : AbstractSubsystem()
-{
-//    @Serializable
+class OV4B(private val robot: HypnoticRobot) : AbstractSubsystem() {
+    //    @Serializable
 //    data class V4BConfig(
 //        val leftIsReversed: Boolean = false,
 //        val idlePosition: Double = 0.0,
@@ -21,22 +20,25 @@ class OV4B(private val robot: HypnoticRobot) : AbstractSubsystem()
 //
 //        val pulleyIntake: Double = 0.2,
 //    )
-    enum class OV4BState
-    {
-        Transfer,Outtake,Idle,Init,Specimen
+    enum class OV4BState {
+        Transfer, Outtake, Idle, Init, Specimen, SpecimenScore, Away, SpecimenIntake
     }
-    enum class PulleyState
-    {
-        Bucket,Intake,Idle,Init,Specimen
+
+    enum class PulleyState {
+        Bucket, Intake, Idle, Init, Specimen, SpecimenScore, SpecimenIntake
     }
-//    private val ov4bConfig = konfig<V4BConfig>()
+
+    //    private val ov4bConfig = konfig<V4BConfig>()
     private var currentV4BState = OV4BState.Init
     private var currentRotateState = PulleyState.Init
 
 
-    private val leftRotation = motionProfiledServo(robot.hardware.outtakeRotationLeft, Constraint.HALF.scale(15.0))
-    private val rightRotation = motionProfiledServo(robot.hardware.outtakeRotationRight, Constraint.HALF.scale(15.0))
-    private val clawPulley = motionProfiledServo(robot.hardware.outtakePulley, Constraint.HALF.scale(5.0))
+    private val leftRotation =
+        motionProfiledServo(robot.hardware.outtakeRotationLeft, Constraint.HALF.scale(15.0))
+    private val rightRotation =
+        motionProfiledServo(robot.hardware.outtakeRotationRight, Constraint.HALF.scale(15.0))
+    private val clawPulley =
+        motionProfiledServo(robot.hardware.outtakePulley, Constraint.HALF.scale(5.0))
 
 
     fun pulleyRotateTo(position: Double) = clawPulley.setMotionProfileTarget(position)
@@ -52,15 +54,12 @@ class OV4B(private val robot: HypnoticRobot) : AbstractSubsystem()
         )
     )
 
-    fun setPulley(newState: PulleyState): CompletableFuture<Void>
-    {
-        if (currentRotateState == newState)
-        {
+    fun setPulley(newState: PulleyState): CompletableFuture<Void> {
+        if (currentRotateState == newState) {
             return CompletableFuture.completedFuture(null)
         }
 
-        return if (newState == PulleyState.Intake)
-        {
+        return if (newState == PulleyState.Intake) {
             pulleyRotateTo(OV4BConfig.idlePulley)
                 .thenAccept {
                     println(it)
@@ -70,8 +69,20 @@ class OV4B(private val robot: HypnoticRobot) : AbstractSubsystem()
                 .thenAccept {
                     println(it)
                 }
-        }
-        else{
+
+        } else if (newState == PulleyState.SpecimenIntake) {
+            pulleyRotateTo(OV4BConfig.specimenIntakePulley)
+                .thenAccept {
+                    println(it)
+                }
+
+        } else if (newState == PulleyState.SpecimenScore) {
+            pulleyRotateTo(OV4BConfig.specimenscorePulley)
+                .thenAccept {
+                    println(it)
+                }
+
+        } else {
             pulleyRotateTo(OV4BConfig.bucketPulley)
                 .thenAccept {
                     println(it)
@@ -79,26 +90,37 @@ class OV4B(private val robot: HypnoticRobot) : AbstractSubsystem()
         }
 
     }
-    fun setV4B(newState: OV4BState): CompletableFuture<Void>
-    {
-        if (currentV4BState == newState)
-        {
+
+    fun setV4B(newState: OV4BState): CompletableFuture<Void> {
+        if (currentV4BState == newState) {
             return CompletableFuture.completedFuture(null)
         }
 
-        return if (newState == OV4BState.Transfer)
-        {
+        return if (newState == OV4BState.Transfer) {
             v4bRotateTo(OV4BConfig.transferPosition).apply {
                 currentV4BState = OV4BState.Transfer
             }
-        } else if (newState == OV4BState.Outtake){
+        } else if (newState == OV4BState.Outtake) {
             v4bRotateTo(OV4BConfig.OuttakePosition)
                 .apply {
                     currentV4BState = OV4BState.Outtake
                 }
-        }
-        else
-        {
+        } else if (newState == OV4BState.SpecimenScore) {
+            v4bRotateTo(OV4BConfig.SpecimenScorePosition)
+                .apply {
+                    currentV4BState = OV4BState.SpecimenScore
+                }
+        } else if (newState == OV4BState.SpecimenIntake) {
+            v4bRotateTo(OV4BConfig.SpecimenIntakePosition)
+                .apply {
+                    currentV4BState = OV4BState.SpecimenScore
+                }
+        } else if (newState == OV4BState.Away) {
+            v4bRotateTo(OV4BConfig.awayPosition)
+                .apply {
+                    currentV4BState = OV4BState.Away
+                }
+        } else {
             v4bRotateTo(OV4BConfig.SpecimenPosition)
                 .apply {
                     currentV4BState = OV4BState.Specimen
@@ -114,7 +136,6 @@ class OV4B(private val robot: HypnoticRobot) : AbstractSubsystem()
      *    claw.setMotionProfileTarget(0.5)
      * }
      */
-
 
 
     /**
@@ -136,13 +157,11 @@ class OV4B(private val robot: HypnoticRobot) : AbstractSubsystem()
      *
      */
 
-    override fun start()
-    {
+    override fun start() {
 
     }
 
-    override fun doInitialize()
-    {
+    override fun doInitialize() {
 //        pulleyRotateTo(OV4BConfig.idlePulley)
 //        v4bRotateTo(OV4BConfig.IdlePosition)
 

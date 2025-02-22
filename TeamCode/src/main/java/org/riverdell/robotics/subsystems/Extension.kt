@@ -3,11 +3,17 @@ package org.riverdell.robotics.subsystems
 import com.acmerobotics.roadrunner.control.PIDCoefficients
 import io.liftgate.robotics.mono.subsystem.AbstractSubsystem
 import org.riverdell.robotics.HypnoticRobot
+import org.riverdell.robotics.subsystems.CompositeOuttake.OuttakeState
 import org.riverdell.robotics.utilities.managed.ManagedMotorGroup
 import org.riverdell.robotics.utilities.managed.pidf.PIDFConfig
+import java.util.concurrent.CompletableFuture
 
 class Extension(val robot: HypnoticRobot) : AbstractSubsystem()
 {
+    enum class SlideState {
+    In,Out
+    }
+
     val slides = with(PIDFConfig(0.01, 0.0, 0.0)) {
         ManagedMotorGroup(
             this@Extension,
@@ -24,12 +30,13 @@ class Extension(val robot: HypnoticRobot) : AbstractSubsystem()
         ).withTimeout(1500L)
     }
 
+    var currentSlideExtension = SlideState.In
+
     fun position() = robot.hardware.extensionMotorRight.currentPosition
     fun extendToAndStayAt(position: Int) = slides.goTo(position)
     fun idle() = slides.idle();
 
     fun isExtending() = slides.isTravelling()
-
 
     override fun start()
     {

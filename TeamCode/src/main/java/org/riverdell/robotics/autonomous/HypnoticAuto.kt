@@ -5,7 +5,7 @@ import io.liftgate.robotics.mono.pipeline.RootExecutionGroup
 import io.liftgate.robotics.mono.subsystem.AbstractSubsystem
 import org.riverdell.robotics.HypnoticOpMode
 import org.riverdell.robotics.HypnoticRobot
-import org.riverdell.robotics.pedroPathing.localization.Pose
+import com.pedropathing.localization.Pose;
 import org.riverdell.robotics.utilities.managed.ManagedMotorGroup
 import kotlin.concurrent.thread
 
@@ -22,7 +22,7 @@ abstract class HypnoticAuto(
     inner class HypnoticAutoRobot : HypnoticRobot(this@HypnoticAuto)
     {
         //val navigationConfig = NavigationConfig()
-//       val visionPipeline by lazy { VisionPipeline(this@HypnoticAuto) } // TODO: new season
+//       val visionPipeline by lazy { VisionPipeline(this@HypnoticAuto) } //
 
         override fun additionalSubSystems() = listOf<AbstractSubsystem>(/*visionPipeline*/)
         override fun initialize()
