@@ -1,15 +1,13 @@
 package org.riverdell.robotics.autonomous
 
+
+import com.pedropathing.localization.Pose
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous
-import com.pedropathing.localization.Pose;
 import io.liftgate.robotics.mono.pipeline.single
-
-
-import org.riverdell.robotics.subsystems.CompositeIntake
+import org.riverdell.robotics.autonomous.PathFolder.PathChains.fiveSpecPaths.*
 import org.riverdell.robotics.subsystems.CompositeOuttake
-import org.riverdell.robotics.subsystems.IV4B
-import org.riverdell.robotics.subsystems.Intake
 import org.riverdell.robotics.subsystems.Outtake
+
 
 @Autonomous(name = "5 Specimen")
 class `5Spec` : HypnoticAuto({ opmode ->
@@ -19,7 +17,7 @@ class `5Spec` : HypnoticAuto({ opmode ->
     val toBar = 0.9
     val toPush = 0.95
 
-    opmode.robot.follower.setStartingPose(Pose(0.000, 0.000, Math.toRadians(225.0))) //TODO: Insert Start Pose
+    opmode.robot.follower.setStartingPose(Pose(8.0, 71.5, Math.toRadians(0.0))) //TODO: Insert Start Pose
 
     fun SpecOut() {
         opmode.robot.compositeout.setOuttake(CompositeOuttake.OuttakeState.SpecimenScoring).join()
@@ -42,9 +40,11 @@ class `5Spec` : HypnoticAuto({ opmode ->
 
 
     single("firstSpec") {
-        opmode.robot.follower.setMaxPower(toBar)
-        //opmode.robot.follower.followPath(Paths.park_to_bar)
+        Thread.sleep(300)
         SpecOut()
+        Thread.sleep(200)
+        opmode.robot.follower.setMaxPower(toBar)
+        opmode.robot.follower.followPath(TB_FP)
         while (!opmode.robot.follower.atParametricEnd()) {
             if (!opmode.opModeIsActive()) {
                 break;
@@ -53,10 +53,11 @@ class `5Spec` : HypnoticAuto({ opmode ->
         }
     }
     single("firstPush") {
+        Thread.sleep(300)
         SpecScored()
         Thread.sleep(300)
         opmode.robot.follower.setMaxPower(toPush)
-        //opmode.robot.follower.followPath(Paths.bar_to_first)
+        opmode.robot.follower.followPath(TF_FB)
         SpecGetReady()
         while (!opmode.robot.follower.atParametricEnd()) {
             if (!opmode.opModeIsActive()) {
@@ -68,7 +69,7 @@ class `5Spec` : HypnoticAuto({ opmode ->
     single("secondPush") {
         Thread.sleep(300)
         opmode.robot.follower.setMaxPower(toPush)
-        //opmode.robot.follower.followPath(Paths.first_to_second)
+        opmode.robot.follower.followPath(FF_TS)
         while (!opmode.robot.follower.atParametricEnd()) {
             if (!opmode.opModeIsActive()) {
                 break;
@@ -79,7 +80,7 @@ class `5Spec` : HypnoticAuto({ opmode ->
     single("thirdPush") {
         Thread.sleep(300)
         opmode.robot.follower.setMaxPower(toPush)
-        //opmode.robot.follower.followPath(Paths.second_to_third)
+        opmode.robot.follower.followPath(FS_TT)
         while (!opmode.robot.follower.atParametricEnd()) {
             if (!opmode.opModeIsActive()) {
                 break;
@@ -104,7 +105,8 @@ class `5Spec` : HypnoticAuto({ opmode ->
         Thread.sleep(300)
         opmode.robot.follower.setMaxPower(toIntake)
         OpenClaw()
-        //opmode.robot.follower.followPath(Paths.third_to_FS)
+        Thread.sleep(300)
+        opmode.robot.follower.followPath(FT_TSPEC2)
         while (!opmode.robot.follower.atParametricEnd()) {
             if (!opmode.opModeIsActive()) {
                 break;
@@ -116,10 +118,10 @@ class `5Spec` : HypnoticAuto({ opmode ->
         Thread.sleep(300)
         opmode.robot.follower.setMaxPower(toBar)
         CloseClaw()
-        Thread.sleep(200)
+        Thread.sleep(700)
         SpecOut()
         Thread.sleep(300)
-        //opmode.robot.follower.followPath(Paths.FS_to_Bar)
+        opmode.robot.follower.followPath(FSPEC_TB)
         while (!opmode.robot.follower.atParametricEnd()) {
             if (!opmode.opModeIsActive()) {
                 break;
@@ -131,10 +133,11 @@ class `5Spec` : HypnoticAuto({ opmode ->
     // ----------------------------------------------------- Second Spec --------------------------------------------------
 
     single("pathSecondSpec") {
+        Thread.sleep(300)
         SpecScored()
         Thread.sleep(300)
         opmode.robot.follower.setMaxPower(toIntake)
-        //opmode.robot.follower.followPath(Paths.Bar_SS)
+        opmode.robot.follower.followPath(FB_TSPEC)
         while (!opmode.robot.follower.atParametricEnd()) {
             if (!opmode.opModeIsActive()) {
                 break;
@@ -146,10 +149,10 @@ class `5Spec` : HypnoticAuto({ opmode ->
         Thread.sleep(300)
         opmode.robot.follower.setMaxPower(toBar)
         CloseClaw()
-        Thread.sleep(200)
+        Thread.sleep(700)
         SpecOut()
         Thread.sleep(300)
-        //opmode.robot.follower.followPath(Paths.SS_to_Bar)
+        opmode.robot.follower.followPath(FSPEC_TB)
         while (!opmode.robot.follower.atParametricEnd()) {
             if (!opmode.opModeIsActive()) {
                 break;
@@ -161,10 +164,11 @@ class `5Spec` : HypnoticAuto({ opmode ->
     // ----------------------------------------------------- Third Spec --------------------------------------------------
 
     single("pathThirdSpec") {
+        Thread.sleep(300)
         SpecScored()
         Thread.sleep(300)
         opmode.robot.follower.setMaxPower(toIntake)
-        //opmode.robot.follower.followPath(Paths.Bar_TS)
+        opmode.robot.follower.followPath(FB_TSPEC)
         while (!opmode.robot.follower.atParametricEnd()) {
             if (!opmode.opModeIsActive()) {
                 break;
@@ -176,10 +180,10 @@ class `5Spec` : HypnoticAuto({ opmode ->
         Thread.sleep(300)
         opmode.robot.follower.setMaxPower(toBar)
         CloseClaw()
-        Thread.sleep(200)
+        Thread.sleep(700)
         SpecOut()
         Thread.sleep(300)
-        //opmode.robot.follower.followPath(Paths.TS_to_Bar)
+        opmode.robot.follower.followPath(FSPEC_TB)
         while (!opmode.robot.follower.atParametricEnd()) {
             if (!opmode.opModeIsActive()) {
                 break;
@@ -191,10 +195,11 @@ class `5Spec` : HypnoticAuto({ opmode ->
     // ----------------------------------------------------- Fourth Spec --------------------------------------------------
 
     single("pathFourthSpec") {
+        Thread.sleep(300)
         SpecScored()
         Thread.sleep(300)
         opmode.robot.follower.setMaxPower(toIntake)
-        //opmode.robot.follower.followPath(Paths.Bar_FS)
+        opmode.robot.follower.followPath(FB_TSPEC)
         while (!opmode.robot.follower.atParametricEnd()) {
             if (!opmode.opModeIsActive()) {
                 break;
@@ -206,10 +211,10 @@ class `5Spec` : HypnoticAuto({ opmode ->
         Thread.sleep(300)
         opmode.robot.follower.setMaxPower(toBar)
         CloseClaw()
-        Thread.sleep(200)
+        Thread.sleep(700)
         SpecOut()
         Thread.sleep(300)
-        //opmode.robot.follower.followPath(Paths.FS_to_Bar)
+        opmode.robot.follower.followPath(FSPEC_TB)
         while (!opmode.robot.follower.atParametricEnd()) {
             if (!opmode.opModeIsActive()) {
                 break;

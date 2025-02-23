@@ -35,12 +35,13 @@ class CompositeIntake(val robot: HypnoticRobot) : AbstractSubsystem() {
             }
         } else if (newState == IntakeState.SlideIn) {
             CompletableFuture.allOf(
-                robot.extension.extendToAndStayAt(SlideConfig.extendoIntake)
+                robot.extension.extendToAndStayAt(SlideConfig.extendoIdle)
             ).apply { currentIntakeState = IntakeState.SlideIn }
         } else if (newState == IntakeState.SlideOut) {
             CompletableFuture.allOf(
-                robot.extension.extendToAndStayAt(SlideConfig.extendoIdle)
-            ).apply { currentIntakeState = IntakeState.SlideIn }
+                robot.extension.extendToAndStayAt(SlideConfig.extendoIntake).thenRun {
+                    robot.extension.idle()}
+            ).apply { currentIntakeState = IntakeState.SlideOut }
         }
         else if (newState == IntakeState.Transfer) {
             CompletableFuture.allOf(
@@ -84,7 +85,7 @@ class CompositeIntake(val robot: HypnoticRobot) : AbstractSubsystem() {
 
     //logic may be fucked, try it
     fun toggleSlides(): CompletableFuture<Void> {
-        return if (currentIntakeState != IntakeState.SlideOut) {
+        return if (currentIntakeState == IntakeState.SlideIn) {
             setIntake(IntakeState.SlideOut)
         } else {
             setIntake(IntakeState.SlideIn)

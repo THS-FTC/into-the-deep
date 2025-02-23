@@ -45,13 +45,14 @@ class HypnoticTeleOp : HypnoticOpMode() {
         }
 
         override fun opModeStart() {
+            outtake.setOuttakeGrip(ClawState.Open)
             val robotDriver = GamepadEx(gamepad2)
             buildCommands()
             while (opModeIsActive()) {
                 val multiplier = 0.57 + gamepad2.right_trigger * 0.43
                 drivetrain.driveRobotCentric(robotDriver, multiplier)
 
-                if ((compositein.currentIntakeState == CompositeIntake.IntakeState.Intake ))
+                if ((compositein.currentIntakeState == CompositeIntake.IntakeState.Intake || compositein.currentIntakeState == CompositeIntake.IntakeState.SlideOut ))
                 {
                     val wantedPower = -opMode.gamepad1.left_trigger + opMode.gamepad1.right_trigger
                     if (wantedPower.absoluteValue > 0.1 && !extension.slides.isTravelling())
@@ -174,8 +175,27 @@ class HypnoticTeleOp : HypnoticOpMode() {
                         compositeout.toggleMode()
                     }
                     .whenPressedOnce()
+                where(ButtonType.BumperLeft)
+                    .triggers {
+                        robot.hardware.hangServoLeft.power = -1.0
+                        robot.hardware.hangServoRight.power = -1.0
+                    }
+                    .repeatedlyWhilePressedUntilReleasedWhere{
+                        robot.hardware.hangServoLeft.power = 0.0
+                        robot.hardware.hangServoRight.power = 0.0
+                    }
+                where(ButtonType.ButtonA)
+                    .triggers {
+                        robot.hardware.hangServoLeft.power = 1.0
+                        robot.hardware.hangServoRight.power = 1.0
+                    }
+                    .repeatedlyWhilePressedUntilReleasedWhere{
+                        robot.hardware.hangServoLeft.power = 0.0
+                        robot.hardware.hangServoRight.power = 0.0
+                    }
 
             }
+
 
 
 

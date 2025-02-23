@@ -4,14 +4,14 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp
 import com.qualcomm.robotcore.hardware.CRServoImplEx
 import com.qualcomm.robotcore.hardware.Servo
-import org.riverdell.robotics.teleop.tests_new.config.ServoConfig
+import org.riverdell.robotics.teleop.tests_new.config.TESTINGConfig
 
 
 @TeleOp(
     name = "Servo Power Test",
     group = "Tests"
 )
-class TestServo : LinearOpMode()
+class TestServoPos : LinearOpMode()
 {
     override fun runOpMode()
     {
@@ -23,8 +23,8 @@ class TestServo : LinearOpMode()
 
         while (opModeIsActive())
         {
-            val hardware = hardwareMap[ServoConfig.name] as CRServoImplEx
-            hardware.power = ServoConfig.power
+            val hardware = hardwareMap[TESTINGConfig.name] as Servo
+            hardware.position = TESTINGConfig.position
             Thread.sleep(50L)
         }
     }

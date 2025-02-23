@@ -7,7 +7,7 @@ import org.riverdell.robotics.teleop.tests_new.config.IntakePrepareConfig
 
 
 @TeleOp(
-    name = "Prepare Outtake",
+    name = "Prepare Intake",
     group = "Tests"
 )
 class PrepareIntakeTune : LinearOpMode()

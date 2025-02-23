@@ -1,7 +1,10 @@
 package org.riverdell.robotics
 
+import com.qualcomm.robotcore.hardware.CRServo
+import com.qualcomm.robotcore.hardware.CRServoImplEx
 import com.qualcomm.robotcore.hardware.DcMotorEx
 import com.qualcomm.robotcore.hardware.DcMotorSimple
+import com.qualcomm.robotcore.hardware.Servo
 import com.qualcomm.robotcore.hardware.ServoImplEx
 import org.riverdell.robotics.subsystems.IV4BConfig
 import org.riverdell.robotics.subsystems.IntakeConfig
@@ -24,6 +27,9 @@ class HypnoticRobotHardware(private val opMode: HypnoticOpMode)
 
     lateinit var intakeV4BLeft: ServoImplEx
     lateinit var intakeV4BRight: ServoImplEx
+
+    lateinit var hangServoLeft: CRServoImplEx
+    lateinit var hangServoRight: CRServoImplEx
 
     lateinit var intakeWrist: ServoImplEx
     lateinit var intakePulley: ServoImplEx
@@ -54,12 +60,12 @@ class HypnoticRobotHardware(private val opMode: HypnoticOpMode)
         backLeft.direction = DcMotorSimple.Direction.FORWARD
 
         liftMotorLeft = opMode.hardwareMap["lift_motor_left"] as DcMotorEx
-        liftMotorLeft.direction = DcMotorSimple.Direction.FORWARD
-        liftMotorLeft.direction = DcMotorSimple.Direction.FORWARD// idk why this works
+        liftMotorLeft.direction = DcMotorSimple.Direction.REVERSE
+        liftMotorLeft.direction = DcMotorSimple.Direction.REVERSE// idk why this works
 
         liftMotorRight = opMode.hardwareMap["lift_motor_right"] as DcMotorEx
-        liftMotorRight.direction = DcMotorSimple.Direction.REVERSE
-        liftMotorRight.direction = DcMotorSimple.Direction.REVERSE// idk why this works
+        liftMotorRight.direction = DcMotorSimple.Direction.FORWARD
+        liftMotorRight.direction = DcMotorSimple.Direction.FORWARD// idk why this works
 
         extensionMotorLeft = opMode.hardwareMap["extension_motor_left"] as DcMotorEx
         extensionMotorLeft.direction = DcMotorSimple.Direction.REVERSE
@@ -74,7 +80,7 @@ class HypnoticRobotHardware(private val opMode: HypnoticOpMode)
         intakeV4BLeft.position = IV4BConfig.hiddenPosition
 
         intakeV4BRight = opMode.hardwareMap.get(ServoImplEx::class.java, "iv4b_rotation_right")
-        intakeV4BRight.position = 1.0 - IV4BConfig.observePosition
+        intakeV4BRight.position = 1.0 - IV4BConfig.hiddenPosition
 
         // Intake
         intakeWrist = opMode.hardwareMap.get(ServoImplEx::class.java, "intake_wrist")
@@ -86,6 +92,11 @@ class HypnoticRobotHardware(private val opMode: HypnoticOpMode)
         intakeGrip = opMode.hardwareMap.get(ServoImplEx::class.java, "intake_grip")
         intakeGrip.position = IntakeConfig.closePosition
 
+        hangServoLeft = opMode.hardwareMap.get(CRServoImplEx::class.java, "hang_left")
+        hangServoLeft.power = 0.0
+
+        hangServoRight = opMode.hardwareMap.get(CRServoImplEx::class.java, "hang_right")
+        hangServoRight.power = 0.0
         // Outtake
         outtakeRotationLeft = opMode.hardwareMap.get(ServoImplEx::class.java, "ov4b_rotation_left")
         outtakeRotationLeft.position = OV4BConfig.SpecimenIntakePosition
@@ -94,7 +105,7 @@ class HypnoticRobotHardware(private val opMode: HypnoticOpMode)
         outtakeRotationRight.position = 1.0 - OV4BConfig.SpecimenIntakePosition
 
         outtakePulley = opMode.hardwareMap.get(ServoImplEx::class.java, "ov4b_pulley")
-        outtakePulley.position = OV4BConfig.SpecimenIntakePosition
+        outtakePulley.position = OV4BConfig.specimenIntakePulley
 
         outtakeGrip = opMode.hardwareMap.get(ServoImplEx::class.java, "outtake_grip")
         outtakeGrip.position = OutakeConfig.closePositon

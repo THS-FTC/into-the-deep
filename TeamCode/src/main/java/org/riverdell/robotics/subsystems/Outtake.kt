@@ -14,7 +14,7 @@ class Outtake(private val robot: HypnoticRobot) : AbstractSubsystem() {
     }
 
     enum class WristState {
-        Front, Specimen
+        Front, Specimen, Idle
     }
 
     fun gripRotateTo(position: Double): CompletableFuture<Void> {
@@ -35,7 +35,7 @@ class Outtake(private val robot: HypnoticRobot) : AbstractSubsystem() {
     }
 
     private var currentClawState = ClawState.Idle
-    private var currentWristState = WristState.Front
+    private var currentWristState = WristState.Idle
 
     fun setOuttakeGrip(newState: ClawState): CompletableFuture<Void> {
         if (currentClawState == newState) {

@@ -21,11 +21,11 @@ class OV4B(private val robot: HypnoticRobot) : AbstractSubsystem() {
 //        val pulleyIntake: Double = 0.2,
 //    )
     enum class OV4BState {
-        Transfer, Outtake, Idle, Init, Specimen, SpecimenScore, Away, SpecimenIntake
+        Transfer, Outtake, Idle, Init, SpecimenScored, SpecimenScore, Away, SpecimenIntake
     }
 
     enum class PulleyState {
-        Bucket, Intake, Idle, Init, Specimen, SpecimenScore, SpecimenIntake
+        Bucket, Transfer, Idle, Init, Specimen, SpecimenScore, SpecimenIntake
     }
 
     //    private val ov4bConfig = konfig<V4BConfig>()
@@ -59,7 +59,7 @@ class OV4B(private val robot: HypnoticRobot) : AbstractSubsystem() {
             return CompletableFuture.completedFuture(null)
         }
 
-        return if (newState == PulleyState.Intake) {
+        return if (newState == PulleyState.Transfer) {
             pulleyRotateTo(OV4BConfig.idlePulley)
                 .thenAccept {
                     println(it)
@@ -113,17 +113,19 @@ class OV4B(private val robot: HypnoticRobot) : AbstractSubsystem() {
         } else if (newState == OV4BState.SpecimenIntake) {
             v4bRotateTo(OV4BConfig.SpecimenIntakePosition)
                 .apply {
-                    currentV4BState = OV4BState.SpecimenScore
+                    currentV4BState = OV4BState.SpecimenIntake
                 }
-        } else if (newState == OV4BState.Away) {
+
+        } else if (newState == OV4BState.SpecimenScored) {
+            v4bRotateTo(OV4BConfig.SpecimenScoredPosition)
+                .apply {
+                    currentV4BState = OV4BState.SpecimenScored
+                }
+
+        }else {
             v4bRotateTo(OV4BConfig.awayPosition)
                 .apply {
                     currentV4BState = OV4BState.Away
-                }
-        } else {
-            v4bRotateTo(OV4BConfig.SpecimenPosition)
-                .apply {
-                    currentV4BState = OV4BState.Specimen
                 }
         }
 

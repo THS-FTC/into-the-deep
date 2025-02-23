@@ -21,13 +21,13 @@ class PrepareOuttake : LinearOpMode()
         }
 
         val left = hardwareMap["ov4b_rotation_left"] as Servo
-        val right = hardwareMap["ov4b_rotation_left"] as Servo
+        val right = hardwareMap["ov4b_rotation_right"] as Servo
         val pulley = hardwareMap["ov4b_pulley"] as Servo
 
         while (opModeIsActive())
         {
-            left.position = OuttakePrepareConfig.v4b_position
-            right.position = 1.0 - OuttakePrepareConfig.v4b_position
+            right.position = OuttakePrepareConfig.v4b_position
+            left.position = 1.0 - OuttakePrepareConfig.v4b_position
             pulley.position = OuttakePrepareConfig.pulley_position
             Thread.sleep(50L)
         }

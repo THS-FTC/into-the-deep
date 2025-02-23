@@ -13,8 +13,8 @@ buildscript {
         maven {
             url = 'https://www.matthewo.tech/maven/'
         }
-    }
-    /*dependencies {
+    }/*
+    dependencies {
         classpath 'io.liftgate:fast-load-plugin:0.2.0'
     }*/
 }
@@ -28,13 +28,29 @@ plugins {
 // Include common definitions from above.
 apply from: "../build.common.gradle"
 apply from: "../build.dependencies.gradle"
-//apply plugin: "io.liftgate.fast-load-plugin"
+apply plugin: 'kotlin-android'
+apply plugin: 'com.android.application'
+
 
 android {
     namespace = "org.firstinspires.ftc.teamcode"
+    androidResources {
+        noCompress 'tflite'
+    }
 
     packagingOptions {
+        jniLibs {
+            pickFirsts += ['**/*.so']
+        }
         jniLibs.useLegacyPackaging true
+    }
+    kotlinOptions {
+        jvmTarget = "1.8"
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
     }
 }
 
@@ -63,3 +79,4 @@ dependencies {
     api project(":FtcRobotController")
     annotationProcessor files("lib/OpModeAnnotationProcessor.jar")
 }
+

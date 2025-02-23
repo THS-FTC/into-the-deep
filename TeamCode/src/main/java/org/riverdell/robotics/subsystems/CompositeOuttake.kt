@@ -16,7 +16,7 @@ class CompositeOuttake(val robot: HypnoticRobot) : AbstractSubsystem() {
         Transfer, Outtake, Init, SpecimenStart, SpecimenIntake, SpecimenScoring, SpecimenScored, SampleStart
     }
 
-    var currentOuttakeState = OuttakeState.Init
+    var currentOuttakeState = OuttakeState.SpecimenStart
 
 
     fun setOuttake(newState: OuttakeState): CompletableFuture<Void> {
@@ -27,7 +27,7 @@ class CompositeOuttake(val robot: HypnoticRobot) : AbstractSubsystem() {
         return if (newState == OuttakeState.Transfer) {
             //idle outtake stuff here
             CompletableFuture.allOf(
-                robot.ov4b.setPulley(OV4B.PulleyState.Intake),
+                robot.ov4b.setPulley(OV4B.PulleyState.Transfer),
                 robot.ov4b.setV4B(OV4B.OV4BState.Transfer),
                 robot.lift.extendToAndStayAt(SlideConfig.liftClosed)
             ).thenAccept { robot.lift.idle() }.apply { currentOuttakeState = OuttakeState.Transfer }
@@ -48,6 +48,7 @@ class CompositeOuttake(val robot: HypnoticRobot) : AbstractSubsystem() {
         } else if (newState == OuttakeState.SpecimenStart) {
             CompletableFuture.allOf(
                 robot.ov4b.setV4B(OV4B.OV4BState.Away),
+                robot.ov4b.setPulley(OV4B.PulleyState.SpecimenIntake),
                 robot.intake.setWrist(Intake.WristState.Vertical)
             )
                 .thenComposeAsync {
@@ -64,7 +65,8 @@ class CompositeOuttake(val robot: HypnoticRobot) : AbstractSubsystem() {
         } else if (newState == OuttakeState.SampleStart) {
             CompletableFuture.allOf(
                 robot.ov4b.setV4B(OV4B.OV4BState.Away),
-                robot.intake.setWrist(Intake.WristState.Vertical)
+                robot.intake.setWrist(Intake.WristState.Vertical),
+                robot.outtake.setWrist(Outtake.WristState.Specimen)
             )
                 .thenComposeAsync {
                     CompletableFuture.allOf(
@@ -73,22 +75,22 @@ class CompositeOuttake(val robot: HypnoticRobot) : AbstractSubsystem() {
                     ).join()
                     CompletableFuture.allOf(
                         robot.ov4b.setV4B(OV4B.OV4BState.Transfer),
-                        robot.outtake.setWrist(Outtake.WristState.Front)
+                        robot.ov4b.setPulley(OV4B.PulleyState.Transfer),
                     )
                 }
-                .apply { currentOuttakeState = OuttakeState.SpecimenStart }
+                .apply { currentOuttakeState = OuttakeState.SampleStart }
         }
 
         else if (newState == OuttakeState.SpecimenScoring) {
             CompletableFuture.allOf(
                 robot.ov4b.setPulley(OV4B.PulleyState.Specimen),
-                robot.ov4b.setV4B(OV4B.OV4BState.Specimen)
+                robot.ov4b.setV4B(OV4B.OV4BState.SpecimenScore)
             ).thenCompose {
                 robot.outtake.setWrist(Outtake.WristState.Specimen)
             }.apply { currentOuttakeState = OuttakeState.SpecimenScoring }
         } else if (newState == OuttakeState.SpecimenScored) {
             CompletableFuture.allOf(
-                robot.ov4b.setV4B(OV4B.OV4BState.SpecimenScore),
+                robot.ov4b.setV4B(OV4B.OV4BState.SpecimenScored),
                 robot.ov4b.setPulley(OV4B.PulleyState.SpecimenScore)
             ).apply { currentOuttakeState = OuttakeState.SpecimenScored }
         } else if (newState == OuttakeState.SpecimenIntake) {
@@ -101,7 +103,7 @@ class CompositeOuttake(val robot: HypnoticRobot) : AbstractSubsystem() {
         } else {
             robot.compositein.setIntake(IntakeState.Idle).thenCompose {
                 CompletableFuture.allOf(
-                    robot.ov4b.setPulley(OV4B.PulleyState.Intake),
+                    robot.ov4b.setPulley(OV4B.PulleyState.Transfer),
                     robot.ov4b.setV4B(OV4B.OV4BState.Transfer),
                     robot.lift.extendToAndStayAt(SlideConfig.liftClosed),
                 )
@@ -128,7 +130,7 @@ class CompositeOuttake(val robot: HypnoticRobot) : AbstractSubsystem() {
         }
     }
     fun toggleMode(): CompletableFuture<Void> {
-        return if(currentOuttakeState != OuttakeState.SpecimenScored || currentOuttakeState != OuttakeState.SpecimenIntake || currentOuttakeState != OuttakeState.SpecimenScoring){
+        return if(currentOuttakeState != OuttakeState.SpecimenScored && currentOuttakeState != OuttakeState.SpecimenIntake && currentOuttakeState != OuttakeState.SpecimenScoring && currentOuttakeState != OuttakeState.SpecimenStart){
             setOuttake(OuttakeState.SpecimenStart)
         } else {
             setOuttake(OuttakeState.SampleStart)

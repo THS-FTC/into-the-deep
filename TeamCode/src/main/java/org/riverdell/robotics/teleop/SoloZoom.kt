@@ -99,7 +99,7 @@ class DuoZoom : HypnoticOpMode() {
 
                 where(ButtonType.BumperLeft)
                     .triggers {
-                        compositein.toggle()
+                        compositeout.toggleMode()
                     }
                     .whenPressedOnce()
 

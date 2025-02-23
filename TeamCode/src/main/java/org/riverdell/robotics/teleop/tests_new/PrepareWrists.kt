@@ -8,7 +8,7 @@ import org.riverdell.robotics.teleop.tests_new.config.WristPrepareConfig
 
 
 @TeleOp(
-    name = "Prepare Outtake",
+    name = "Prepare Wrists",
     group = "Tests"
 )
 class PrepareWrists : LinearOpMode()

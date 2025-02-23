@@ -4,14 +4,14 @@ import com.acmerobotics.dashboard.config.Config;
 
 @Config
 public class OutakeConfig {
-    public static double openPosition= 0.5;
-    public static double closePositon  = 0.74;
+    public static double openPosition= 0.0;
+    public static double closePositon  = 0.45;
 
     //rotation
     public static double frontPosition = 1.0;
 
     //TODO: Change both values for the wrist, above and below
-    public static double specimenPosition = 0.0;
+    public static double specimenPosition = 0.45;
 
     // pulley
     public static double pulleyTransferPosition= 0.0;
