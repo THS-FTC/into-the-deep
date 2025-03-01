@@ -25,7 +25,7 @@ class IV4B(private val robot: HypnoticRobot) : AbstractSubsystem()
     private val leftRotation = motionProfiledServo(robot.hardware.intakeV4BLeft, Constraint.HALF.scale(5.0))
     private val rightRotation = motionProfiledServo(robot.hardware.intakeV4BRight, Constraint.HALF.scale(5.0))
 
-    fun v4bRotateTo(position: Double) = CompletableFuture.allOf(
+    /* fun v4bRotateTo(position: Double) = CompletableFuture.allOf(
         leftRotation.setMotionProfileTarget(
             if (IV4BConfig.leftIsReversed)
                 (1.0 - position) else position
@@ -35,6 +35,13 @@ class IV4B(private val robot: HypnoticRobot) : AbstractSubsystem()
                 (1.0 - position) else position
         )
     )
+    */
+    fun v4bRotateTo(position: Double) = CompletableFuture.allOf(
+        leftRotation.setMotionProfileTarget(position),
+        rightRotation.setMotionProfileTarget(position)
+    )
+    fun leftDiffyRotate(position: Double) = leftRotation.setMotionProfileTarget(position)
+    fun rightDiffyRotate(position: Double) = rightRotation.setMotionProfileTarget(position)
 
 
 

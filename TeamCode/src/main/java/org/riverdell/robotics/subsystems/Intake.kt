@@ -35,7 +35,7 @@ class Intake(private val robot: HypnoticRobot) : AbstractSubsystem()
     }
     enum class RotationState
     {
-        Transfer, Observe, Grab,Idle,Init
+        Transfer, Observe, Grab,Idle,Init,Hidden
     }
 
 
@@ -148,6 +148,12 @@ class Intake(private val robot: HypnoticRobot) : AbstractSubsystem()
                 }
         } else if (newState == RotationState.Grab){
             pulleyRotateTo(IntakeConfig.grabPosition)
+                .thenAccept {
+                    println(it)
+                }
+        }
+        else if (newState == RotationState.Hidden){
+            pulleyRotateTo(IntakeConfig.awayPulley)
                 .thenAccept {
                     println(it)
                 }

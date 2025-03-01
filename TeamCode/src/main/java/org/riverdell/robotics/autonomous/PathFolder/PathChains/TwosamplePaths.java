@@ -6,7 +6,7 @@ import com.pedropathing.pathgen.PathBuilder;
 import com.pedropathing.pathgen.PathChain;
 import com.pedropathing.pathgen.Point;
 
-public class fiveSpecPaths {
+public class TwosamplePaths {
 
     public static double wallX = 8.000;
     public static PathBuilder builder = new PathBuilder();

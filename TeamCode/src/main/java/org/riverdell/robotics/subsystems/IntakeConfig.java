@@ -10,8 +10,9 @@ public class IntakeConfig {
 
     //rotation
     public static double transferPosition = 0.48;
-    public static double observePosition= 0.94;
-    public static double grabPosition= 0.88;
+    public static double observePosition= 0.85;
+    public static double grabPosition= 0.85;
+    public static double  awayPulley = 0.80;
 
     // wrist
     public static double frontPosition= 0.6;

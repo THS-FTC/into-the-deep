@@ -1,13 +1,16 @@
 package org.riverdell.robotics.autonomous
 
+import com.pedropathing.util.Constants
 import io.liftgate.robotics.mono.Mono
 import io.liftgate.robotics.mono.pipeline.RootExecutionGroup
 import io.liftgate.robotics.mono.subsystem.AbstractSubsystem
 import org.riverdell.robotics.HypnoticOpMode
 import org.riverdell.robotics.HypnoticRobot
-import com.pedropathing.localization.Pose;
+import org.riverdell.robotics.pedroPathing.constants.FConstants
+import org.riverdell.robotics.pedroPathing.constants.LConstants
 import org.riverdell.robotics.utilities.managed.ManagedMotorGroup
 import kotlin.concurrent.thread
+
 
 abstract class HypnoticAuto(
     internal val blockExecutionGroup: RootExecutionGroup.(HypnoticAuto) -> Unit
@@ -24,9 +27,11 @@ abstract class HypnoticAuto(
         //val navigationConfig = NavigationConfig()
 //       val visionPipeline by lazy { VisionPipeline(this@HypnoticAuto) } //
 
+
         override fun additionalSubSystems() = listOf<AbstractSubsystem>(/*visionPipeline*/)
         override fun initialize()
         {
+            Constants.setConstants(FConstants::class.java, LConstants::class.java)
             HypnoticAuto.instance = this@HypnoticAuto
 
             while (opModeInInit())
@@ -34,6 +39,7 @@ abstract class HypnoticAuto(
                 runPeriodics()
                 //drivetrain.localizer.update()
                 robot.follower.update()
+
 
                 multipleTelemetry.addLine("--- Initialization ---")
                 multipleTelemetry.addData(

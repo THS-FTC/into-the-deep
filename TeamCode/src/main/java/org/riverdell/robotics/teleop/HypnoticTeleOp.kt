@@ -45,7 +45,7 @@ class HypnoticTeleOp : HypnoticOpMode() {
         }
 
         override fun opModeStart() {
-            outtake.setOuttakeGrip(ClawState.Open)
+            //outtake.setOuttakeGrip(ClawState.Open) WHEN WE DO AUTO
             val robotDriver = GamepadEx(gamepad2)
             buildCommands()
             while (opModeIsActive()) {
@@ -68,7 +68,7 @@ class HypnoticTeleOp : HypnoticOpMode() {
                             }
                         } else
                         {
-                            if (extension.slides.currentPosition() < -435)
+                            if (extension.slides.currentPosition() < -370)
                             {
                                 extension.slides.supplyPowerToAll(0.0)
                             } else
@@ -82,11 +82,22 @@ class HypnoticTeleOp : HypnoticOpMode() {
                         extension.slides.supplyPowerToAll(0.0)
                     }
                 }
-
+                telemetry.addLine("Composites")
+                telemetry.addLine("_______________________________________-")
                 telemetry.addLine("Composite In State: ${compositein.currentIntakeState}")
                 telemetry.addLine("Composite Out State: ${compositeout.currentOuttakeState}")
+                telemetry.addLine("_______________________________________-")
+                telemetry.addLine("Extendo")
+                telemetry.addLine("_______________________________________-")
                 telemetry.addLine("Extendo Left Position: ${hardware.extensionMotorLeft.currentPosition}")
                 telemetry.addLine("Extendo Right Position: ${hardware.extensionMotorRight.currentPosition}")
+                telemetry.addLine("_______________________________________-")
+                telemetry.addLine("Lift")
+                telemetry.addLine("_______________________________________-")
+                telemetry.addLine("Lift Left Position: ${hardware.liftMotorLeft.currentPosition}")
+                telemetry.addLine("Lift Right Position: ${hardware.liftMotorRight.currentPosition}")
+                telemetry.addLine("Triggers")
+                telemetry.addLine("_______________________________________-")
                 telemetry.addLine("left trigger amount: ${opMode.gamepad1.left_trigger}")
                 telemetry.addLine("right trigger amount: ${opMode.gamepad1.right_trigger}")
                 telemetry.update()
@@ -121,9 +132,11 @@ class HypnoticTeleOp : HypnoticOpMode() {
 
                 where(ButtonType.BumperRight)
                     .triggers {
-                        compositeout.toggleBucket()
+                        intake.setIntakeGrip(Intake.ClawState.Open)
                     }
-                    .whenPressedOnce()
+                    .andIsHeldUntilReleasedWhere {
+                        intake.setIntakeGrip(Intake.ClawState.Closed)
+                    }
 
                 where(ButtonType.DPadDown)
                     .triggers {
@@ -178,7 +191,7 @@ class HypnoticTeleOp : HypnoticOpMode() {
                 where(ButtonType.BumperLeft)
                     .triggers {
                         robot.hardware.hangServoLeft.power = -1.0
-                        robot.hardware.hangServoRight.power = -1.0
+                        robot.hardware.hangServoRight.power = 1.0
                     }
                     .repeatedlyWhilePressedUntilReleasedWhere{
                         robot.hardware.hangServoLeft.power = 0.0
@@ -187,13 +200,18 @@ class HypnoticTeleOp : HypnoticOpMode() {
                 where(ButtonType.ButtonA)
                     .triggers {
                         robot.hardware.hangServoLeft.power = 1.0
-                        robot.hardware.hangServoRight.power = 1.0
+                        robot.hardware.hangServoRight.power = -1.0
                     }
                     .repeatedlyWhilePressedUntilReleasedWhere{
                         robot.hardware.hangServoLeft.power = 0.0
                         robot.hardware.hangServoRight.power = 0.0
                     }
 
+                where(ButtonType.BumperRight)
+                    .triggers {
+                        compositeout.toggleBucket()
+                    }
+                    .whenPressedOnce()
             }
 
 

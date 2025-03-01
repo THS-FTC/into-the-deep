@@ -8,7 +8,7 @@ import org.riverdell.robotics.teleop.tests_new.config.TESTINGConfig
 
 
 @TeleOp(
-    name = "Servo Power Test",
+    name = "Servo Pos Test",
     group = "Tests"
 )
 class TestServoPos : LinearOpMode()

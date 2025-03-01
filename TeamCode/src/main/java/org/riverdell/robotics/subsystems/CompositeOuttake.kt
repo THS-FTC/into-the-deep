@@ -71,11 +71,12 @@ class CompositeOuttake(val robot: HypnoticRobot) : AbstractSubsystem() {
                 .thenComposeAsync {
                     CompletableFuture.allOf(
                         robot.iv4b.setV4B(IV4B.V4BState.Observe),
-                        robot.intake.setRotationPulley(Intake.RotationState.Observe)
+                        robot.intake.setRotationPulley(Intake.RotationState.Hidden)
                     ).join()
                     CompletableFuture.allOf(
                         robot.ov4b.setV4B(OV4B.OV4BState.Transfer),
                         robot.ov4b.setPulley(OV4B.PulleyState.Transfer),
+                        robot.extension.extendToAndStayAt(SlideConfig.extendoIdle)
                     )
                 }
                 .apply { currentOuttakeState = OuttakeState.SampleStart }
@@ -121,10 +122,14 @@ class CompositeOuttake(val robot: HypnoticRobot) : AbstractSubsystem() {
     }
 
     fun toggleSpecimen(): CompletableFuture<Void> {
-        return if (currentOuttakeState == OuttakeState.SpecimenIntake || currentOuttakeState == OuttakeState.SpecimenStart) {
+        return if (currentOuttakeState == OuttakeState.Transfer) {
+            return CompletableFuture.completedFuture(null)
+        }
+        else if (currentOuttakeState == OuttakeState.SpecimenIntake || currentOuttakeState == OuttakeState.SpecimenStart) {
             setOuttake(OuttakeState.SpecimenScoring)
-        } else if (currentOuttakeState == OuttakeState.SpecimenScoring) {
-            setOuttake(OuttakeState.SpecimenScored)
+        }
+        else if (currentOuttakeState == OuttakeState.SpecimenScoring) {
+            setOuttake(OuttakeState.SpecimenIntake)
         } else {
             setOuttake(OuttakeState.SpecimenIntake)
         }

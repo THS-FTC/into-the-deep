@@ -6,21 +6,21 @@ import com.acmerobotics.dashboard.config.Config;
 public class OV4BConfig {
 
     //v4b
-    public static double transferPosition = 0.07; //ok
-    public static double OuttakePosition= 0.65;
+    public static double transferPosition = 0.95; //ok
+    public static double OuttakePosition= 0.9;
 
 
     //TODO: Specimen Positions To change
-    public static double SpecimenScorePosition= 0.87;
-    public static double SpecimenScoredPosition= 0.89;
-    public static double SpecimenIntakePosition= 0.0;
+    public static double SpecimenScorePosition= 0.05;
+    public static double SpecimenScoredPosition= 0.05;
+    public static double SpecimenIntakePosition= 1.0;
 
 
 
-    public static double awayPosition = 0.3;
+    public static double awayPosition = 0.7;
 
     public static double IdlePosition= 0.0;
-    public static boolean leftIsReverse = false;
+    public static boolean leftIsReverse = true;
 
     // pulley
     public static double  idlePulley = 0.7;

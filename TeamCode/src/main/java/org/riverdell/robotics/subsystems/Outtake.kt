@@ -57,15 +57,11 @@ class Outtake(private val robot: HypnoticRobot) : AbstractSubsystem() {
         }
 
         return if (newState == WristState.Front) {
+            currentWristState = WristState.Front
             wristRotateTo(OutakeConfig.frontPosition)
-                .thenAccept {
-                    println(it)
-                }
         } else {
+            currentWristState = WristState.Specimen
             wristRotateTo(OutakeConfig.specimenPosition)
-                .thenAccept {
-                    println(it)
-                }
         }
     }
 

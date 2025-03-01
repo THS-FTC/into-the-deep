@@ -19,7 +19,7 @@ import org.riverdell.robotics.subsystems.Outtake
 
 
 @Autonomous(name = "5 Specimen")
-class `5Spec` : HypnoticAuto({ opmode ->
+class `2Sample` : HypnoticAuto({ opmode ->
     //reference
     //opmode.robot.follower.setMaxPower(0.0)
     val toIntake = 0.7
