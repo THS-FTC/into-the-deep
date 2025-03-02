@@ -1,33 +1,46 @@
 package org.riverdell.robotics.subsystems
 
 import com.qualcomm.hardware.limelightvision.LLResult
-import com.qualcomm.hardware.limelightvision.LLResultTypes
+import com.qualcomm.hardware.limelightvision.Limelight3A
 import io.liftgate.robotics.mono.subsystem.AbstractSubsystem
-import org.riverdell.robotics.HypnoticRobot
+import org.riverdell.robotics.CompositeIntakeInterface
+import org.riverdell.robotics.ExtensionInterface
+import org.riverdell.robotics.IV4BInterface
+import kotlin.math.abs
+import kotlin.math.asin
+import kotlin.math.cos
+import kotlin.math.sin
 import kotlin.math.tan
 
-
-class LimelightManager(private val robot: HypnoticRobot) : AbstractSubsystem() {
+class LimelightManager(
+    private val limelight: Limelight3A,
+    private val extension: ExtensionInterface,
+    private val iv4b: IV4BInterface,
+    private val compositein: CompositeIntakeInterface
+) : AbstractSubsystem() {
 
     lateinit var currentResult: LLResult
     private var currentPipeline = LimelightState.Yellow
-    var lastTx: Double = 0.0
-    var lastTy: Double = 0.0
-    var stopLimeIntake = true
+    var stopLimeIntake = false
 
-    //In reference to the turret center
-    var lime_x_offset: Double = 0.0 //unit mm
-    var lime_y_offset: Double = 0.0 //unit mm
-    var lime_z_offset: Double = 0.0 //unit mm
+    // Offsets for the camera relative to the turret center (in mm)
+    var lime_x_offset: Double = 0.0
+    var lime_y_offset: Double = 0.0
+    var lime_z_offset: Double = 100.0  // Example: 100 mm above turret center
 
-    var lime_pitch: Double = 0.0 //unit degrees
-    var lime_yaw: Double = 0.0 //unit degrees
+    var lime_pitch: Double = 10.0      // e.g., camera tilted down 10°
+    var lime_yaw: Double = 0.0
 
-    var arm_length: Double = 0.0 //unit degrees
-    var extendo_unit_to_in: Double = 0.2 //unit (inches/unit)
+    // The maximum allowed rail travel (in mm)
+    var arm_length: Double = 500.0
 
+    // Telemetry variables
+    var estimatedTargetX: Double = 0.0
+    var estimatedTargetY: Double = 0.0
+    var estimatedTurretAngle: Double = 0.0
 
-    private val limelight = robot.hardware.limelight
+    // List of acceptable class names for detection
+    var wantedClassIDs: List<String> = listOf("Yellow")
 
     enum class LimelightState {
         Yellow, Blue, Red
@@ -39,108 +52,95 @@ class LimelightManager(private val robot: HypnoticRobot) : AbstractSubsystem() {
         limelight.setPollRateHz(100)
     }
 
-    fun Extend(position: Int) = robot.extension.extendToAndStayAt(position)
-    fun SetLeftDiffy(position: Double) = robot.iv4b.leftDiffyRotate(position)
-    fun SetRightDiffy(position: Double) = robot.iv4b.rightDiffyRotate(position)
+    override fun start() {}
+    override fun doInitialize() {}
 
-    fun setCurrentPipeline(newPipeline: LimelightState) {
-        currentPipeline = newPipeline
-        limelight.pipelineSwitch(currentPipeline.ordinal + 1)
+    fun turnOff() {
+        stopLimeIntake = true
     }
 
+    /**
+     * Main processing loop.
+     * This is a blocking method that continuously polls the Limelight and
+     * computes turret heading and rail travel based on the target's global tx and ty.
+     */
     fun limeIntaking() {
-        // Start the intake mechanism.
-        robot.compositein.setIntake(CompositeIntake.IntakeState.Intake)
-        var stopLimeIntake = false
-        // === Calibration & Geometry Constants ===
-        // The camera’s vertical offset (height) above the turret’s center (in mm)
-        val cameraHeight = lime_z_offset
-        // Base diffy servo value when the turret arm is in its neutral (upward) position.
-        val baseServoValue = 0.5
-        // Conversion factor for degrees to servo position increment.
-        val conversionFactor = 0.00111111
-        // Fixed length of the turret's arm (in mm)
-        val turretArmLength = 300.0
-        // Horizontal offsets of the camera relative to the turret’s stationary center.
-        val cameraOffsetX = lime_x_offset // lateral offset (mm)
-        val cameraOffsetY = lime_y_offset // forward offset (mm)
+        compositein.setIntake(CompositeIntakeInterface.IntakeState.Intake)
+        stopLimeIntake = false
+
+        val cameraHeight = lime_z_offset             // mm
+        val baseServoValue = 0.5                      // Neutral servo value
+        val turretArmLength = 300.0                   // mm (fixed turret arm length)
+        val maxTurretAngle = 45.0                     // Maximum turret heading in degrees
 
         while (!stopLimeIntake) {
-            // Get the latest vision result.
             currentResult = limelight.getLatestResult()
 
-            // If no target is detected (tx and ty are zero), skip this cycle.
-            if (currentResult.tx == 0.0 && currentResult.ty == 0.0) {
+            if ((currentResult.tx == 0.0 && currentResult.ty == 0.0) ||
+                currentResult.detectorResults.isEmpty()) {
                 Thread.sleep(50)
                 continue
             }
 
-            // --- Step 1. Compute horizontal distance from the camera to the floor ---
-            // effectiveVerticalAngle = |camera pitch + measured ty|
-            // (Make sure angles are set so that the downward angle is positive for this calculation)
-            val effectiveVerticalAngle = kotlin.math.abs(lime_pitch + currentResult.ty)
+            // Select the first detection whose className is in wantedClassIDs.
+            val chosenDetection = currentResult.detectorResults.firstOrNull { detection ->
+                wantedClassIDs.any { it == detection.className }
+            }
+            if (chosenDetection == null) {
+                Thread.sleep(50)
+                continue
+            }
+
+            // Use the global tx and ty as the detection's center.
+            val detectionCenterTx = currentResult.tx
+            val detectionCenterTy = currentResult.ty
+
+            // Compute horizontal distance using the effective vertical angle.
+            val effectiveVerticalAngle = abs(lime_pitch + detectionCenterTy)
             val effectiveVerticalAngleRadians = Math.toRadians(effectiveVerticalAngle)
-            // Using the camera height above the turret center to compute horizontal distance.
-            val horizontalDistance = cameraHeight / kotlin.math.tan(effectiveVerticalAngleRadians)
+            val horizontalDistance = cameraHeight / tan(effectiveVerticalAngleRadians)
 
-            // --- Step 2. Compute target coordinates in the camera frame (horizontal plane) ---
-            val txRadians = Math.toRadians(currentResult.tx)
-            val targetXCamera = horizontalDistance * kotlin.math.sin(txRadians)
-            val targetYCamera = horizontalDistance * kotlin.math.cos(txRadians)
+            // Compute target coordinates in the camera frame.
+            val centerTxRadians = Math.toRadians(detectionCenterTx)
+            val targetXCamera = horizontalDistance * sin(centerTxRadians)
+            val targetYCamera = horizontalDistance * cos(centerTxRadians)
 
-            // --- Step 3. Transform target coordinates from camera to turret coordinates ---
-            // Rotate the camera coordinates by the camera's yaw and add the camera's horizontal offsets.
+            // Transform to turret coordinates.
             val cameraYawRadians = Math.toRadians(lime_yaw)
-            val targetXTurret =
-                targetXCamera * kotlin.math.cos(cameraYawRadians) - targetYCamera * kotlin.math.sin(
-                    cameraYawRadians
-                ) + cameraOffsetX
-            val targetYTurret =
-                targetXCamera * kotlin.math.sin(cameraYawRadians) + targetYCamera * kotlin.math.cos(
-                    cameraYawRadians
-                ) + cameraOffsetY
+            val targetXTurret = targetXCamera * cos(cameraYawRadians) -
+                    targetYCamera * sin(cameraYawRadians) + lime_x_offset
+            val targetYTurret = targetXCamera * sin(cameraYawRadians) +
+                    targetYCamera * cos(cameraYawRadians) + lime_y_offset
 
-            // --- Step 4. Solve for turret arm angle (A) and extension (E) ---
-            // Ensure that targetXTurret is within the reachable range of the turret arm.
-            val clampedRatio =
-                targetXTurret.coerceIn(-turretArmLength, turretArmLength) / turretArmLength
-            val turretAngleRadians = kotlin.math.asin(clampedRatio)
-            val turretAngleDegrees = Math.toDegrees(turretAngleRadians)
+            // Compute turret heading using arcsin(targetXTurret / turretArmLength)
+            val rawTurretAngleRadians = asin(targetXTurret.coerceIn(-turretArmLength, turretArmLength) / turretArmLength)
+            var turretAngleDegrees = Math.toDegrees(rawTurretAngleRadians)
+            turretAngleDegrees = turretAngleDegrees.coerceIn(-maxTurretAngle, maxTurretAngle)
 
-            // Compute the required extension so that:
-            // extension + turretArmLength*cos(A) = targetYTurret
-            val desiredExtension =
-                targetYTurret - turretArmLength * kotlin.math.cos(turretAngleRadians)
-            // Clamp the extension value to the allowed range of your mechanism.
-            val clampedExtension = desiredExtension.coerceIn(0.0, arm_length)
+            // Compute desired rail travel (forward movement)
+            val desiredRailTravel = targetYTurret - turretArmLength * cos(Math.toRadians(turretAngleDegrees))
+            val clampedRailTravel = desiredRailTravel.coerceIn(0.0, arm_length)
 
-            // --- Step 5. Command turret rotation using diffy servos ---
-            // 0.5 is the neutral value corresponding to 90° (arm pointing up).
-            val servoAngleOffset = turretAngleDegrees - 90.0
-            SetLeftDiffy(baseServoValue + servoAngleOffset * conversionFactor)
-            SetRightDiffy(baseServoValue - servoAngleOffset * conversionFactor)
+            // Map turret heading to diffy servo commands.
+            val leftServoPosition: Double
+            val rightServoPosition: Double
+            if (turretAngleDegrees >= 0) { // turning right: lower left servo
+                leftServoPosition = baseServoValue - (turretAngleDegrees / maxTurretAngle) * 0.25
+                rightServoPosition = baseServoValue
+            } else { // turning left: lower right servo
+                leftServoPosition = baseServoValue
+                rightServoPosition = baseServoValue - (abs(turretAngleDegrees) / maxTurretAngle) * 0.25
+            }
 
-            // Command the extension.
-            Extend(clampedExtension.toInt())
+            iv4b.leftDiffyRotate(leftServoPosition)
+            iv4b.rightDiffyRotate(rightServoPosition)
+            extension.extendToAndStayAt(clampedRailTravel.toInt())
 
-            // Wait 50 milliseconds before the next update.
+            estimatedTargetX = targetXTurret
+            estimatedTargetY = targetYTurret
+            estimatedTurretAngle = turretAngleDegrees
+
             Thread.sleep(50)
         }
-    }
-
-    /**
-     * Placeholder exit condition. Replace with your actual logic.
-     */
-    fun turnOff() {
-        var stopLimeIntake = false
-    }
-
-
-    override fun start() {
-
-    }
-
-    override fun doInitialize() {
-
     }
 }

@@ -71,6 +71,7 @@ tasks.withType(Test).configureEach {
 
 dependencies {
     implementation 'com.fasterxml.jackson.core:jackson-databind:2.12.7'
+    implementation 'androidx.xr.runtime:runtime:1.0.0-alpha03'
     testImplementation "junit:junit:$jUnitVersion"// https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-api
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.11.0'
     testImplementation "org.mockito:mockito-core:$mockitoVersion"

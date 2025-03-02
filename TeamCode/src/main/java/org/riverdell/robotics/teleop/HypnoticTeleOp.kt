@@ -6,6 +6,7 @@ import io.liftgate.robotics.mono.Mono.commands
 import io.liftgate.robotics.mono.gamepad.ButtonType
 import org.riverdell.robotics.HypnoticOpMode
 import org.riverdell.robotics.HypnoticRobot
+import org.riverdell.robotics.autonomous.detection.OrientationPipeline
 import org.riverdell.robotics.subsystems.CompositeIntake
 import org.riverdell.robotics.subsystems.CompositeOuttake
 import org.riverdell.robotics.subsystems.IV4B
@@ -28,14 +29,10 @@ class HypnoticTeleOp : HypnoticOpMode() {
     inner class TeleOpRobot : HypnoticRobot(this@HypnoticTeleOp) {
         private val gp1Commands by lazy { commands(gamepad1) }
         private val gp2Commands by lazy { commands(gamepad2) }
-        //val visionPipeline by lazy { VisionPipeline(this@HypnoticTeleOp) }
-//    val wrist by lazy { hardware<Servo>("intake_wrist") }
+        val visionPipeline by lazy { OrientationPipeline(this@HypnoticTeleOp) }
 
-        override fun additionalSubSystems() = listOf(gp1Commands, gp2Commands)
+        override fun additionalSubSystems() = listOf(gp1Commands, gp2Commands,visionPipeline)
         override fun initialize() {
-//        wrist.position = 0.5
-//        visionPipeline.sampleDetection.supplyCurrentWristPosition { wrist.position }
-//        visionPipeline.sampleDetection.setDetectionType(SampleType.Blue)
 
             while (!isStarted) {
                 multipleTelemetry.addLine("Configured all subsystems. Waiting for start...")

@@ -9,6 +9,7 @@ import io.liftgate.robotics.mono.subsystem.Subsystem
 import io.liftgate.robotics.mono.subsystem.System
 import org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.hardwareMap
 import com.pedropathing.follower.Follower;
+import org.riverdell.robotics.autonomous.detection.OrientationPipeline
 import org.riverdell.robotics.subsystems.CompositeIntake
 import org.riverdell.robotics.subsystems.CompositeOuttake
 import org.riverdell.robotics.subsystems.Drivetrain
