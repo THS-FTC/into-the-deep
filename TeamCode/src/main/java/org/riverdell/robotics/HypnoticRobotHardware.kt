@@ -14,6 +14,7 @@ import org.riverdell.robotics.subsystems.OutakeConfig
 
 class HypnoticRobotHardware(private val opMode: HypnoticOpMode)
 {
+
     lateinit var liftMotorLeft: DcMotorEx
     lateinit var liftMotorRight: DcMotorEx
 

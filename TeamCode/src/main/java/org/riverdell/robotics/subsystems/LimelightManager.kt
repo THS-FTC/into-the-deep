@@ -3,44 +3,39 @@ package org.riverdell.robotics.subsystems
 import com.qualcomm.hardware.limelightvision.LLResult
 import com.qualcomm.hardware.limelightvision.Limelight3A
 import io.liftgate.robotics.mono.subsystem.AbstractSubsystem
-import org.riverdell.robotics.CompositeIntakeInterface
-import org.riverdell.robotics.ExtensionInterface
-import org.riverdell.robotics.IV4BInterface
-import kotlin.math.abs
-import kotlin.math.asin
-import kotlin.math.cos
-import kotlin.math.sin
-import kotlin.math.tan
+import org.riverdell.robotics.HypnoticRobot
+import kotlin.math.*
 
-class LimelightManager(
-    private val limelight: Limelight3A,
-    private val extension: ExtensionInterface,
-    private val iv4b: IV4BInterface,
-    private val compositein: CompositeIntakeInterface
-) : AbstractSubsystem() {
+class LimelightManager(robot: HypnoticRobot) : AbstractSubsystem() {
 
     lateinit var currentResult: LLResult
     private var currentPipeline = LimelightState.Yellow
-    var stopLimeIntake = false
+    var stopLimeIntaking = false
 
     // Offsets for the camera relative to the turret center (in mm)
     var lime_x_offset: Double = 0.0
     var lime_y_offset: Double = 0.0
-    var lime_z_offset: Double = 100.0  // Example: 100 mm above turret center
+    var lime_z_offset: Double = 100.0  // e.g., 100 mm above turret center
 
-    var lime_pitch: Double = 10.0      // e.g., camera tilted down 10°
+    var lime_pitch: Double = 10.0      // e.g., camera tilted downward 10°
     var lime_yaw: Double = 0.0
 
-    // The maximum allowed rail travel (in mm)
+    // arm_length represents the maximum rail travel (in mm) for moving the full turret system forward.
     var arm_length: Double = 500.0
 
-    // Telemetry variables
+    // Telemetry variables.
     var estimatedTargetX: Double = 0.0
     var estimatedTargetY: Double = 0.0
     var estimatedTurretAngle: Double = 0.0
 
-    // List of acceptable class names for detection
+    // Acceptable class names for detection (e.g., "Yellow", "Red", etc.)
     var wantedClassIDs: List<String> = listOf("Yellow")
+
+    // Access hardware from the robot.
+    private val limelight = robot.hardware.limelight
+    private val extension = robot.extension
+    private val iv4b = robot.iv4b
+    private val compositein = robot.compositein
 
     enum class LimelightState {
         Yellow, Blue, Red
@@ -52,28 +47,33 @@ class LimelightManager(
         limelight.setPollRateHz(100)
     }
 
-    override fun start() {}
-    override fun doInitialize() {}
+    override fun start() {
+        // Optional start code.
+    }
+
+    override fun doInitialize() {
+        // Optional initialization code.
+    }
 
     fun turnOff() {
-        stopLimeIntake = true
+        stopLimeIntaking = true
     }
 
     /**
-     * Main processing loop.
-     * This is a blocking method that continuously polls the Limelight and
-     * computes turret heading and rail travel based on the target's global tx and ty.
+     * Main intaking function.
+     * This method is blocking; it runs its own loop until turnOff() is called.
      */
     fun limeIntaking() {
-        compositein.setIntake(CompositeIntakeInterface.IntakeState.Intake)
-        stopLimeIntake = false
+        // Start the intake.
+        compositein.setIntake(CompositeIntake.IntakeState.Intake)
+        stopLimeIntaking = false
 
         val cameraHeight = lime_z_offset             // mm
-        val baseServoValue = 0.5                      // Neutral servo value
+        val baseServoValue = 0.5                      // Neutral servo value (turret arm "up")
         val turretArmLength = 300.0                   // mm (fixed turret arm length)
-        val maxTurretAngle = 45.0                     // Maximum turret heading in degrees
+        val maxTurretAngle = 45.0                     // Maximum turret heading (degrees)
 
-        while (!stopLimeIntake) {
+        while (!stopLimeIntaking) {
             currentResult = limelight.getLatestResult()
 
             if ((currentResult.tx == 0.0 && currentResult.ty == 0.0) ||
@@ -91,7 +91,7 @@ class LimelightManager(
                 continue
             }
 
-            // Use the global tx and ty as the detection's center.
+            // Use global tx and ty as the detection's center.
             val detectionCenterTx = currentResult.tx
             val detectionCenterTy = currentResult.ty
 
@@ -105,29 +105,30 @@ class LimelightManager(
             val targetXCamera = horizontalDistance * sin(centerTxRadians)
             val targetYCamera = horizontalDistance * cos(centerTxRadians)
 
-            // Transform to turret coordinates.
+            // Transform target coordinates from camera to turret coordinates.
             val cameraYawRadians = Math.toRadians(lime_yaw)
             val targetXTurret = targetXCamera * cos(cameraYawRadians) -
                     targetYCamera * sin(cameraYawRadians) + lime_x_offset
             val targetYTurret = targetXCamera * sin(cameraYawRadians) +
                     targetYCamera * cos(cameraYawRadians) + lime_y_offset
 
-            // Compute turret heading using arcsin(targetXTurret / turretArmLength)
+            // Compute turret heading from the lateral offset.
             val rawTurretAngleRadians = asin(targetXTurret.coerceIn(-turretArmLength, turretArmLength) / turretArmLength)
             var turretAngleDegrees = Math.toDegrees(rawTurretAngleRadians)
             turretAngleDegrees = turretAngleDegrees.coerceIn(-maxTurretAngle, maxTurretAngle)
 
-            // Compute desired rail travel (forward movement)
+            // Compute desired rail travel such that:
+            // turretArmLength * cos(θ) + railTravel = targetYTurret.
             val desiredRailTravel = targetYTurret - turretArmLength * cos(Math.toRadians(turretAngleDegrees))
             val clampedRailTravel = desiredRailTravel.coerceIn(0.0, arm_length)
 
             // Map turret heading to diffy servo commands.
             val leftServoPosition: Double
             val rightServoPosition: Double
-            if (turretAngleDegrees >= 0) { // turning right: lower left servo
+            if (turretAngleDegrees >= 0) {
                 leftServoPosition = baseServoValue - (turretAngleDegrees / maxTurretAngle) * 0.25
                 rightServoPosition = baseServoValue
-            } else { // turning left: lower right servo
+            } else {
                 leftServoPosition = baseServoValue
                 rightServoPosition = baseServoValue - (abs(turretAngleDegrees) / maxTurretAngle) * 0.25
             }
